@@ -18,10 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -52,37 +48,39 @@ fun App() {
                 bottomBar = {
                     NavigationBar {
 
-                        var selectedItem by remember { mutableIntStateOf(1) }
                         val navigator = LocalNavigator.currentOrThrow
 
+                        val isCalendarSelected = navigator.lastItem is CalendarScreen
+                        val isHomeSelected = navigator.lastItem is HomeScreen
+                        val isMapSelected = navigator.lastItem is MapScreen
+
                         NavigationBarItem(
-                            selected = navigator.lastItem is CalendarScreen,
+                            selected = isCalendarSelected,
                             onClick = { navigator.push(CalendarScreen()) },
                             icon = {
                                 Icon(
-                                    imageVector = if (selectedItem == 0) Icons.Filled.CalendarMonth else Icons.Outlined.CalendarMonth,
+                                    imageVector = if (isCalendarSelected) Icons.Filled.CalendarMonth else Icons.Outlined.CalendarMonth,
                                     contentDescription = "Calendar"
                                 )
                             },
-
                             )
                         NavigationBarItem(
-                            selected = navigator.lastItem is HomeScreen,
+                            selected =isHomeSelected,
                             onClick = { navigator.push(HomeScreen()) },
                             icon = {
                                 Icon(
-                                    imageVector = if (selectedItem == 1) Icons.Filled.Home else Icons.Outlined.Home,
+                                    imageVector = if (isHomeSelected) Icons.Filled.Home else Icons.Outlined.Home,
                                     contentDescription = "Home"
                                 )
                             },
 
                             )
                         NavigationBarItem(
-                            selected = navigator.lastItem is MapScreen,
+                            selected = isMapSelected,
                             onClick = { navigator.push(MapScreen()) },
                             icon = {
                                 Icon(
-                                    imageVector = if (selectedItem == 2) Icons.Filled.Map else Icons.Outlined.Map,
+                                    imageVector = if (isMapSelected) Icons.Filled.Map else Icons.Outlined.Map,
                                     contentDescription = "Map"
                                 )
                             },
