@@ -6,25 +6,34 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import hsrm.mi.campusapp.repository.CampusRepository
+import hsrm.mi.campusapp.repository.StopRepository
 
-class HomeScreen: CampusScreen {
+class DepartureScreen(
+    val onStopSelected: () -> Unit
+): CampusScreen {
 
-    override val title = "Campus App"
+    override val title = "Stops"
+    val campus = CampusRepository.selectedCampus
+
     @Composable
     override fun Content() {
-        /*Box(modifier = Modifier.fillMaxSize()) {
-            Text("Test")
-        }*/
+
+        val stops = remember(campus) { StopRepository.getStopsForCampusName(campus.name) }
+
         LazyColumn {
-            items(CampusRepository.campuses) { campus ->
+            items(stops) { stop ->
                 Button(
-                    onClick = { CampusRepository.selectCampus(campus) },
+                    onClick = {
+                        StopRepository.selectStop((stop))
+                        onStopSelected()
+                              },
                     modifier = Modifier.padding(4.dp)
                 ) {
-                    Text(campus.name)
+                    Text(stop.name)
                 }
             }
         }

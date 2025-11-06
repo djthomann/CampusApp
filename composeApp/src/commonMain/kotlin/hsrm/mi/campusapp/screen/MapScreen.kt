@@ -5,18 +5,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import hsrm.mi.campusapp.state.MapState
+import hsrm.mi.campusapp.state.MapViewModel
 
-class MapScreen: Screen {
+class MapScreen(
+    private val viewModel: MapViewModel
+): Screen {
 
     @Composable
     override fun Content() {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            MapView()
+            MapView(viewModel.uiState)
         }
     }
 }
 
 @Composable
-expect fun MapView()
+expect fun MapView(state: MapState)

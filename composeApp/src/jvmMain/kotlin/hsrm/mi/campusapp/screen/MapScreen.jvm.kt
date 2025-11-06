@@ -12,14 +12,15 @@ import androidx.compose.ui.Modifier
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import dev.datlag.kcef.KCEF
+import hsrm.mi.campusapp.state.MapState
 import java.io.File
 
 @Composable
-actual fun MapView() {
+actual fun MapView(state: MapState) {
     var initialized by remember { mutableStateOf(true) }
 
     if (initialized) {
-        MainView() // WebView erst nach Init
+        MainView(state) // WebView erst nach Init
     } else {
         Text("Initializing WebView...", modifier = Modifier.fillMaxSize())
     }
@@ -30,7 +31,7 @@ actual fun MapView() {
 }
 
 @Composable
-fun MainView() {
+fun MainView(state: MapState) {
     val htmlContent = """
         <!DOCTYPE html>
         <html>
