@@ -36,6 +36,8 @@ kotlin {
 
             api("io.github.kevinnzou:compose-webview-multiplatform:1.8.4")
 
+            implementation("com.kizitonwose.calendar:compose-multiplatform:2.9.0")
+
             implementation(libs.maplibre.compose)
 
             implementation(libs.voyager.navigator)
