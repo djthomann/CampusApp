@@ -28,13 +28,13 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import hsrm.mi.campusapp.screen.CalendarScreen
-import hsrm.mi.campusapp.screen.CampusScreen
-import hsrm.mi.campusapp.screen.DepartureScreen
-import hsrm.mi.campusapp.screen.FoodScreen
-import hsrm.mi.campusapp.screen.HomeScreen
-import hsrm.mi.campusapp.screen.MapScreen
-import hsrm.mi.campusapp.state.MapViewModel
+import hsrm.mi.campusapp.presentation.screens.CalendarScreen
+import hsrm.mi.campusapp.presentation.screens.CampusScreen
+import hsrm.mi.campusapp.presentation.screens.DepartureScreen
+import hsrm.mi.campusapp.presentation.screens.FoodScreen
+import hsrm.mi.campusapp.presentation.screens.HomeScreen
+import hsrm.mi.campusapp.presentation.screens.MapScreen
+import hsrm.mi.campusapp.presentation.state.MapViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
