@@ -4,17 +4,22 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DepartureBoard
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
@@ -26,11 +31,15 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import hsrm.mi.campusapp.domain.model.Campus
+import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.CampusRepository
+import hsrm.mi.campusapp.domain.repository.StopRepository
+import hsrm.mi.campusapp.presentation.state.AppState
 
 
 class HomeScreenModel: ScreenModel {
-    var selectedCampus = mutableStateOf<Campus?>(null)
+
+
 }
 
 class HomeScreen: CampusScreen {
@@ -43,12 +52,15 @@ class HomeScreen: CampusScreen {
 
         val screenModel = rememberScreenModel { HomeScreenModel() }
 
+        val currentCampus = AppState.selectedCampus.value
+        val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
+
         Column(
             modifier = Modifier.fillMaxSize().padding(12.dp)
         ) {
 
             AnimatedVisibility(
-                visible = screenModel.selectedCampus.value == null,
+                visible = AppState.selectedCampus.value == null,
             ) {
                 Column {
                     ChooseText()
@@ -66,7 +78,7 @@ class HomeScreen: CampusScreen {
                                     )
                             ) {
                                 Button(
-                                    onClick = { screenModel.selectedCampus.value = campus },
+                                    onClick = { AppState.selectCampus(campus) },
                                 ) {
                                     Text(campus.name)
                                 }
@@ -75,9 +87,33 @@ class HomeScreen: CampusScreen {
                     }
                 }
             }
-            screenModel.selectedCampus.value?.let {
+            currentCampus?.let {
                 WelcomeText(it)
             }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector =  Icons.Filled.DepartureBoard,
+                    contentDescription = "Departures"
+                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(stops) { stop ->
+                        Button(
+                            onClick = {
+
+                            },
+                            modifier = Modifier.padding(4.dp)
+                        ) {
+                            val text = remember { stop.name }
+                            Text(text)
+                        }
+                    }
+                }
+            }
+
             Box(modifier = Modifier.padding(12.dp)) {
                 /* Should display MapScreen */
             }
@@ -125,7 +161,8 @@ fun WelcomeText(campus: Campus) {
     Text(
         modifier = Modifier.padding(4.dp),
         text =  "Willkommen am Campus:",
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.titleLarge
     )
     CampusName(campus)
 }

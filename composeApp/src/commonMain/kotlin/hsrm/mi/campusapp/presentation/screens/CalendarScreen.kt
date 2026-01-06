@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
@@ -33,6 +34,14 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlin.time.ExperimentalTime
 
+class CalendarScreenModel: ScreenModel {
+
+    @OptIn(ExperimentalTime::class)
+    val currentDate: LocalDate = LocalDate.now()
+    var selection by mutableStateOf(currentDate)
+
+}
+
 class CalendarScreen: CampusScreen {
 
     override val title = "Calendar"
@@ -41,13 +50,13 @@ class CalendarScreen: CampusScreen {
     @Composable
     override fun Content() {
 
-        val currentDate = remember { LocalDate.now() }
-        var selection by remember { mutableStateOf(currentDate) }
+        val screenModel = rememberScreenModel { CalendarScreenModel() }
+
 
         val state = rememberWeekCalendarState(
-            startDate = currentDate.minusDays(100),
-            endDate = currentDate.plusDays(100),
-            firstVisibleWeekDate = currentDate,
+            startDate = screenModel.currentDate.minusDays(100),
+            endDate = screenModel.currentDate.plusDays(100),
+            firstVisibleWeekDate = screenModel.currentDate,
             firstDayOfWeek = DayOfWeek.MONDAY
         )
 
@@ -60,14 +69,14 @@ class CalendarScreen: CampusScreen {
                 modifier = Modifier,
                 state = state,
                 dayContent = { day ->
-                    Day(day.date, isSelected = selection == day.date) { clicked ->
-                        if (selection != clicked) {
-                            selection = clicked
+                    Day(day.date, isSelected = screenModel.selection == day.date) { clicked ->
+                        if (screenModel.selection != clicked) {
+                            screenModel.selection = clicked
                         }
                     }
                 }
             )
-            Schedule(selection)
+            Schedule(screenModel.selection)
         }
     }
 }

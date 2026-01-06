@@ -26,6 +26,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
+            implementation("androidx.core:core-splashscreen:1.0.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -77,10 +78,6 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-
-
-        val rmvApiKey = System.getenv("RMV_API_KEY") ?: ""
-        // buildConfigField("String", "RMV_API_KEY", "\"$rmvApiKey\"")
 
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())

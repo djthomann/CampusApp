@@ -11,8 +11,14 @@ val AppTypography = Typography(
 
     headlineLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.ExtraBold,
         fontSize = 36.sp
+    ),
+
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 24.sp
     ),
 
     titleLarge = TextStyle(
