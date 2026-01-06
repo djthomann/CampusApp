@@ -3,7 +3,6 @@ package hsrm.mi.campusapp.domain.repository
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.domain.model.Campus
 import io.github.dellisd.spatialk.geojson.Position
 
@@ -15,11 +14,10 @@ object CampusRepository {
         Campus("Campus Rüsselsheim", Position( 8.424, 49.985), 0.0),
     )
 
-    var selectedCampus by mutableStateOf(campuses.first())
+    var selectedCampus: Campus? by mutableStateOf(null)
         private set
 
     fun selectCampus(campus: Campus) {
-        println(RmvAPI.rmvApiKey + "KEY")
         println(  "Campus changed in repo: $campus")
         selectedCampus = campus
     }

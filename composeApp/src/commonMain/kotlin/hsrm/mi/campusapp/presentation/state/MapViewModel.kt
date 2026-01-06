@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
+import io.github.dellisd.spatialk.geojson.Position
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -15,10 +16,11 @@ import org.maplibre.compose.camera.CameraPosition
 
 class MapViewModel: ViewModel() {
 
+    val defaultCenter = Position(0.0, 0.0)
     var uiState by mutableStateOf(
         MapState(
             cameraPosition = CameraPosition(
-                target = CampusRepository.selectedCampus.center,
+                target = CampusRepository.selectedCampus?.center ?: defaultCenter,
                 zoom = 16.0,
                 tilt = 45.0,
                 bearing = 0.0
@@ -32,9 +34,8 @@ class MapViewModel: ViewModel() {
         val campusFlow = snapshotFlow { CampusRepository.selectedCampus }
             .distinctUntilChanged()
             .onEach { campus ->
-                println("Campus flow: $campus")
                 val cameraPosition = CameraPosition(
-                    target = campus.center,
+                    target = campus?.center ?: defaultCenter,
                     zoom = 16.0,
                     tilt = 45.0,
                     bearing = 0.0

@@ -35,6 +35,8 @@ import hsrm.mi.campusapp.presentation.screens.FoodScreen
 import hsrm.mi.campusapp.presentation.screens.HomeScreen
 import hsrm.mi.campusapp.presentation.screens.MapScreen
 import hsrm.mi.campusapp.presentation.state.MapViewModel
+import hsrm.mi.campusapp.presentation.theme.AppTypography
+import hsrm.mi.campusapp.presentation.theme.DarkColorScheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +45,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
 
-    MaterialTheme {
+    MaterialTheme(
+        colorScheme = DarkColorScheme,
+        typography = AppTypography,
+    ) {
         Navigator(HomeScreen()) {
             navigator ->
             Scaffold(

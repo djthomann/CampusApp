@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.domain.model.Departure
+import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ class DepartureScreen(
     @Composable
     override fun Content() {
 
-        val stops = remember(campus) { StopRepository.getStopsForCampusName(campus.name) }
+        val stops: List<Stop> = remember(campus) { campus?.let { StopRepository.getStopsForCampusName(campus.name) } ?: emptyList() }
         val coroutineScope = rememberCoroutineScope()
         val departures = remember { mutableStateOf<List<Departure>>(
             listOf(Departure("Bus 6", LocalTime(17, 4, 0), direction = "Wiesbaden Hauptbahnhof"),
@@ -78,7 +80,7 @@ class DepartureScreen(
 @Composable
 fun DepartureEntry(departure: Departure) {
     Row(
-        modifier = Modifier.fillMaxWidth().background(color = Color.Cyan).padding(10.dp),
+        modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary).padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
         Text(modifier = Modifier.padding(end = 10.dp), fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.name)
