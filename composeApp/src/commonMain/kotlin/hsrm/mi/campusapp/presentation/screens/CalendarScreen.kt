@@ -5,10 +5,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Start
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +39,7 @@ import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
 import com.kizitonwose.calendar.core.now
 import com.kizitonwose.calendar.core.plusDays
+import hsrm.mi.campusapp.domain.model.CourseType
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
@@ -62,12 +73,34 @@ class CalendarScreen: CampusScreen {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
+                .fillMaxSize(),
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 10.dp, 10.dp, 0.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                horizontalArrangement = Arrangement.SpaceBetween,
+
+            ) {
+                DayOfWeek.entries.forEach { dayOfWeek ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(0.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(0.dp),
+                            text = dayOfWeek.toSingleLetter(),
+                            style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
             WeekCalendar(
                 modifier = Modifier,
                 state = state,
+                contentPadding = PaddingValues(10.dp),
                 dayContent = { day ->
                     Day(day.date, isSelected = screenModel.selection == day.date) { clicked ->
                         if (screenModel.selection != clicked) {
@@ -97,12 +130,24 @@ fun DayOfWeek.toShortString(): String = when (this) {
     DayOfWeek.SUNDAY -> "So"
 }
 
+fun DayOfWeek.toSingleLetter(): String = when (this) {
+    DayOfWeek.MONDAY -> "M"
+    DayOfWeek.TUESDAY -> "D"
+    DayOfWeek.WEDNESDAY -> "M"
+    DayOfWeek.THURSDAY -> "D"
+    DayOfWeek.FRIDAY -> "F"
+    DayOfWeek.SATURDAY -> "S"
+    DayOfWeek.SUNDAY -> "S"
+}
+
 @Composable
 private fun Schedule(selection: LocalDate) {
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Gray)
+        modifier = Modifier.fillMaxSize().padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(selection.dayOfWeek.name)
+        Course("Human Computer Interaction", "Prof. Dr. Marion Koelle", CourseType.LECTURE, "D11")
+        Course("Algorithmen und Datenstrukturen", "Prof. Dr. Dirk Krechel", CourseType.PRACTICAL, "D15")
     }
 }
 
@@ -117,22 +162,13 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
     ) {
         Column(
             modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .aspectRatio(1f)
-                .background(if (isSelected) Color.Red else Color.Black)
+                .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
                 ,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = date.dayOfWeek.toShortString(),
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    lineHeight = 12.sp,
-                    fontWeight = FontWeight.Normal
-                ),
-                color = Color.White
-            )
             Text(
                 text = dateFormatter.format(date),
                 color = Color.White,
@@ -153,5 +189,80 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
                     .align(Alignment.BottomCenter),
             )
         } */
+    }
+}
+
+@Composable
+private fun Course(name: String, lecturer: String, courseType: CourseType, room: String) {
+    Row {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxWidth().background(color = courseType.color).height(8.dp)
+            )
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Text(text = name, style = MaterialTheme.typography.bodyLarge)
+                Text(text = lecturer, style = MaterialTheme.typography.bodyMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = courseType.icon,
+                            contentDescription = "Course Type Icon"
+                        )
+                        Text(courseType.germanString, style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(room, style = MaterialTheme.typography.bodyMedium)
+                        Icon(
+                            imageVector = Icons.Rounded.LocationOn,
+                            contentDescription = "Location Icon"
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Start,
+                            contentDescription = "Course starts at"
+                        )
+                        Text("17:00", style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text("90 min", style = MaterialTheme.typography.bodyMedium)
+                        Icon(
+                            imageVector = Icons.Rounded.Schedule,
+                            contentDescription = "Duration Icon"
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }

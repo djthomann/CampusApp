@@ -140,7 +140,8 @@ fun DepartureEntry(departure: Departure) {
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = departure.direction
+                text = departure.direction,
+                style = MaterialTheme.typography.bodyMedium
             )
 
             Icon(
