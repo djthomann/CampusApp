@@ -108,7 +108,7 @@ fun App() {
                             })
                         NavigationBarItem(
                             selected = isDepartureSelected,
-                            onClick = { navigator.push(DepartureScreen({navigator.push(MapScreen(mapViewModel))})) },
+                            onClick = { navigator.push(DepartureScreen()) },
                             icon = {
                                 Icon(
                                     imageVector = if (isDepartureSelected) Icons.Filled.DepartureBoard else Icons.Outlined.DepartureBoard,

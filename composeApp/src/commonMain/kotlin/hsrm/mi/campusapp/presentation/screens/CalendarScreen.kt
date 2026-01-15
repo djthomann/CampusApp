@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Start
 import androidx.compose.material3.Icon
@@ -55,7 +55,7 @@ class CalendarScreenModel: ScreenModel {
 
 class CalendarScreen: CampusScreen {
 
-    override val title = "Calendar"
+    override val title = "Kalender"
 
     @OptIn(ExperimentalTime::class)
     @Composable
@@ -230,7 +230,7 @@ private fun Course(name: String, lecturer: String, courseType: CourseType, room:
 
                         Text(room, style = MaterialTheme.typography.bodyMedium)
                         Icon(
-                            imageVector = Icons.Rounded.LocationOn,
+                            imageVector = Icons.Outlined.LocationOn,
                             contentDescription = "Location Icon"
                         )
                     }

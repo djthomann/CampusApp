@@ -2,7 +2,9 @@ package hsrm.mi.campusapp.data.api.rmv
 
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.DepartureResponse
+import hsrm.mi.campusapp.domain.model.Journey
 import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.model.StopsWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -12,6 +14,8 @@ import kotlinx.serialization.json.Json
 object RmvAPI {
 
     const val SEARCH_TIMEFRAME_MINUTES = 180
+
+    const val DEFAULT_NUM_DEPARTURES = 3
     private val json = Json {
         ignoreUnknownKeys = true
     }
@@ -26,7 +30,7 @@ object RmvAPI {
         return rmvApiKey
     }
 
-    suspend fun getNextArrivals(stop: Stop, numArrivals: Int = 2): List<Departure> {
+    suspend fun getNextArrivals(stop: Stop, numArrivals: Int = DEFAULT_NUM_DEPARTURES): List<Departure> {
         println("GETTING ARRIVALS FOR: ${stop.name}")
 
         val jsonResponse: String = client.get("https://www.rmv.de/hapi/departureBoard") {
@@ -45,6 +49,25 @@ object RmvAPI {
         } catch (e: Exception) {
             println("Error deserializing DepartureResponse: ${e.message}")
             emptyList()
+        }
+    }
+
+    suspend fun getJourneyDetails(journeyId: String): Journey {
+        println("GETTING JOURNEY DETAILS FOR: ${journeyId}")
+
+        val jsonResponse: String = client.get("https://www.rmv.de/hapi/journeyDetail") {
+            parameter("accessId", rmvApiKey)
+            parameter("id", journeyId)
+            parameter("format", "json")
+        }.bodyAsText()
+
+        println("RAW Response: $jsonResponse")
+
+        return try {
+            json.decodeFromString<Journey>(jsonResponse)
+        } catch (e: Exception) {
+            println("Error deserializing Journey Response: ${e.message}")
+            Journey(StopsWrapper(emptyList()))
         }
     }
 
