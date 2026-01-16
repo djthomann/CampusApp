@@ -1,5 +1,6 @@
 package hsrm.mi.campusapp.presentation.theme
 
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
@@ -17,7 +18,16 @@ val WhitePrimary = Color(0xFFFFFFFF)
 val WhiteSecondary = Color(0x00455dff)
 val DarkGrayButton = Color(0xFF4A4A4A)
 val DarkBackground = Color(0xFF1C1C1C)
+
+val OnDarkBackground = Color.White
 val DarkSurface = Color(0xFF2A2A2A)
+
+val DarkPrimary = Color(0xff455dff)
+val OnDarkPrimary = Color.White
+
+val DarkSecondary = Color(0x0088b6ff)
+
+val OnDarkSecondary = Color.White
 
 internal val LightColorScheme = lightColorScheme(
     primary = DarkGrayPrimary,
@@ -30,12 +40,22 @@ internal val LightColorScheme = lightColorScheme(
 )
 
 internal val DarkColorScheme = darkColorScheme(
-    primary = Color(0xff455dff),
-    onPrimary = Color.White,
-    secondary = Color(0x0088b6ff),
-    onSecondary = Color.White,
+    primary = DarkPrimary,
+    onPrimary = OnDarkPrimary,
+    secondary = DarkSecondary,
+    onSecondary = OnDarkSecondary,
     background = DarkBackground,
-    onBackground = Color.White,
+    onBackground = OnDarkBackground,
     surface = DarkSurface,
     onSurface = WhitePrimary,
+)
+
+internal val NavigationBarItemColors = NavigationBarItemColors(
+    selectedIconColor = OnDarkPrimary,
+    selectedTextColor = DarkPrimary,
+    selectedIndicatorColor = DarkPrimary,
+    unselectedIconColor = OnDarkBackground,
+    unselectedTextColor = OnDarkBackground,
+    disabledIconColor = DarkSurface,
+    disabledTextColor = DarkSurface
 )

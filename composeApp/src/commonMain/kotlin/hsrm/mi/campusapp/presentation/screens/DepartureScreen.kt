@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
+import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.StopRepository
@@ -58,7 +59,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class DepartureScreenModel: ScreenModel {
-    val currentStop = mutableStateOf<String?>(null)
+    val currentStop = mutableStateOf<Stop?>(null)
 
     val departures = mutableStateOf<List<Departure>>( /*
             listOf(Departure(JourneyDetailRef("id"),"Bus 6", LocalTime(17, 4, 0), direction = "Wiesbaden Hauptbahnhof"),
@@ -67,8 +68,9 @@ class DepartureScreenModel: ScreenModel {
     )
 
     fun loadDepartures(stop: Stop, coroutineScope: CoroutineScope) {
+        currentStop.value = stop
         coroutineScope.launch {
-            currentStop.value = stop.name
+
             departures.value = RmvAPI.getNextArrivals(stop)
 
             /* Get all journeys for departures */
@@ -119,7 +121,7 @@ class DepartureScreen(
             ) {
                 items(stops) { stop ->
 
-                    val isActive = stop.name == screenModel.currentStop.value
+                    val isActive = stop == screenModel.currentStop.value
 
                     Button(
                         shape = RoundedCornerShape(8.dp),
@@ -140,16 +142,25 @@ class DepartureScreen(
                 modifier = Modifier.padding(5.dp)
             )
             if(screenModel.departures.value.isEmpty()) {
-                Text("Keine Abfahrt in den nächsten ${RmvAPI.SEARCH_TIMEFRAME_MINUTES} Minuten...")
-            } else {
-                LazyColumn(
+                Column(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(screenModel.departures.value) { dep ->
-                        DepartureEntry(dep)
+                    Text("Keine Abfahrt in den nächsten ${RmvAPI.SEARCH_TIMEFRAME_MINUTES} Minuten...")
+                }
+            } else {
+                screenModel.currentStop.value?.let { currentStop ->
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(screenModel.departures.value) { dep ->
+                            DepartureEntry(dep, currentStop)
+                        }
                     }
                 }
+
             }
 
 
@@ -157,15 +168,16 @@ class DepartureScreen(
     }
 
     fun selectStop(stop: Stop) {
+        /* Impleneted */
     }
 }
 
 @Composable
-fun DepartureEntry(departure: Departure) {
+fun DepartureEntry(departure: Departure, currentStop: Stop) {
 
     val journey = departure.journey
 
-    var expanded = remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(false) }
 
     val backgroundColor by animateColorAsState(
         targetValue = if (expanded.value)
@@ -234,9 +246,38 @@ fun DepartureEntry(departure: Departure) {
                                .padding(start = 10.dp),
                            verticalArrangement = Arrangement.spacedBy(2.dp)
                        ) {
-                           journey.stops.forEach {
-                                   stop -> Text(text = stop.name, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                           val stopId = currentStop.id.normalizeRmvId()
+                           val currentIndex = journey.stops.indexOfFirst { it.id == stopId } /* id doesn't work because somehow it's not identical over different requests? */
+                           val nextStops = journey.stops.drop(currentIndex + 1).take(3)
+
+                           println("CURRENT INDEX $currentIndex")
+                           println("NEXT STOPS: $nextStops")
+
+                           if (nextStops.isEmpty()) {
+                               Text("Endstation", style = MaterialTheme.typography.bodySmall)
+                           } else {
+                               nextStops.forEach { stop ->
+                                   Text(
+                                       text = stop.name,
+                                       style = MaterialTheme.typography.bodyMedium,
+                                       color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                   )
+                               }
                            }
+                           if(journey.stops.size > 3) {
+                               Box(
+                                   modifier = Modifier.padding(10.dp).clickable {
+                                       println("It worked")
+                                   }
+                               ) {
+                                   Text(
+                                       modifier = Modifier,
+                                       text = "Mehr anzeigen",
+                                       style = MaterialTheme.typography.bodyMedium
+                                   )
+                               }
+                           }
+
                        }
                    }
                }

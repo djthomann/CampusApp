@@ -1,6 +1,7 @@
 package hsrm.mi.campusapp
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -35,6 +36,7 @@ import hsrm.mi.campusapp.presentation.screens.HomeScreen
 import hsrm.mi.campusapp.presentation.screens.MapScreen
 import hsrm.mi.campusapp.presentation.theme.AppTypography
 import hsrm.mi.campusapp.presentation.theme.DarkColorScheme
+import hsrm.mi.campusapp.presentation.theme.NavigationBarItemColors
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,7 +94,9 @@ private fun NavBar() {
                     imageVector = if (isFoodSelected) Icons.Filled.Dining else Icons.Outlined.Dining,
                     contentDescription = "Calendar"
                 )
-            })
+            },
+            colors = NavigationBarItemColors
+        )
         NavigationBarItem(
             selected = isCalendarSelected,
             onClick = { navigator.push(CalendarScreen()) },
@@ -101,8 +105,11 @@ private fun NavBar() {
                     imageVector = if (isCalendarSelected) Icons.Filled.CalendarMonth else Icons.Outlined.CalendarMonth,
                     contentDescription = "Calendar"
                 )
-            })
+            },
+            colors = NavigationBarItemColors
+        )
         NavigationBarItem(
+            modifier = Modifier.aspectRatio(1f),
             selected = isHomeSelected,
             onClick = { navigator.push(HomeScreen()) },
             icon = {
@@ -110,7 +117,9 @@ private fun NavBar() {
                     imageVector = if (isHomeSelected) Icons.Filled.Home else Icons.Outlined.Home,
                     contentDescription = "Home"
                 )
-            })
+            },
+            colors = NavigationBarItemColors
+        )
         NavigationBarItem(
             selected = isDepartureSelected,
             onClick = { navigator.push(DepartureScreen()) },
@@ -119,7 +128,9 @@ private fun NavBar() {
                     imageVector = if (isDepartureSelected) Icons.Filled.DepartureBoard else Icons.Outlined.DepartureBoard,
                     contentDescription = "Departures"
                 )
-            })
+            },
+            colors = NavigationBarItemColors
+        )
         NavigationBarItem(
             selected = isMapSelected,
             onClick = { navigator.push(MapScreen()) },
@@ -129,7 +140,7 @@ private fun NavBar() {
                     contentDescription = "Map"
                 )
             },
-
-            )
+            colors = NavigationBarItemColors
+        )
     }
 }

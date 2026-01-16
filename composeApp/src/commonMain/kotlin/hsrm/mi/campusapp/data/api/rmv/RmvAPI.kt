@@ -53,12 +53,17 @@ object RmvAPI {
     }
 
     suspend fun getJourneyDetails(journeyId: String): Journey {
+        return getJourneyDetailsFromStop(journeyId, null)
+    }
+
+    suspend fun getJourneyDetailsFromStop(journeyId: String, stop: Stop?): Journey {
         println("GETTING JOURNEY DETAILS FOR: ${journeyId}")
 
         val jsonResponse: String = client.get("https://www.rmv.de/hapi/journeyDetail") {
             parameter("accessId", rmvApiKey)
             parameter("id", journeyId)
             parameter("format", "json")
+            stop?.let { parameter("fromId", stop.id) }
         }.bodyAsText()
 
         println("RAW Response: $jsonResponse")
@@ -68,6 +73,15 @@ object RmvAPI {
         } catch (e: Exception) {
             println("Error deserializing Journey Response: ${e.message}")
             Journey(StopsWrapper(emptyList()))
+        }
+    }
+
+    fun String.normalizeRmvId(): String {
+        // Removes point in time info
+        return if (this.contains("@p=")) {
+            this.substringBefore("@p=") + "@"
+        } else {
+            this
         }
     }
 

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DepartureBoard
 import androidx.compose.material.icons.filled.Dining
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -93,11 +92,11 @@ class HomeScreen: CampusScreen {
                                         placementSpec = tween(durationMillis = 300)
                                     )
                             ) {
-                                Button(
+                                CampusButton(
+                                    text = campus.name,
                                     onClick = { AppState.selectCampus(campus) },
-                                ) {
-                                    Text(campus.name)
-                                }
+                                    isActive = true
+                                )
                             }
                         }
                     }

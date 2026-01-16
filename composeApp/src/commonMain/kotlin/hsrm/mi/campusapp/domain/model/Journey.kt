@@ -23,5 +23,6 @@ data class StopsWrapper(
 @Serializable
 @SerialName("Stop")
 data class JourneyStop(
-    val name: String
+    val name: String,
+    val id: String
 )
