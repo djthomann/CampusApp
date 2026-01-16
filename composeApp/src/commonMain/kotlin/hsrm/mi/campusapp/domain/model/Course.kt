@@ -5,12 +5,17 @@ import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.DesktopWindows
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
 data class Course(
     val name: String,
+    val dayOfWeek: DayOfWeek,
     val start: LocalTime,
-    val end: LocalTime
+    val durationInMinutes: Int,
+    val lecturer: String,
+    val room: String,
+    val courseType: CourseType
 )
 
 enum class CourseType(

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
@@ -39,7 +41,8 @@ import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
 import com.kizitonwose.calendar.core.now
 import com.kizitonwose.calendar.core.plusDays
-import hsrm.mi.campusapp.domain.model.CourseType
+import hsrm.mi.campusapp.domain.model.Course
+import hsrm.mi.campusapp.domain.repository.CourseRepository
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
@@ -55,7 +58,7 @@ class CalendarScreenModel: ScreenModel {
 
 class CalendarScreen: CampusScreen {
 
-    override val title = "Kalender"
+    override val title = "Stundenplan"
 
     @OptIn(ExperimentalTime::class)
     @Composable
@@ -142,13 +145,30 @@ fun DayOfWeek.toSingleLetter(): String = when (this) {
 
 @Composable
 private fun Schedule(selection: LocalDate) {
+
+    val courses: List<Course> = CourseRepository.getCoursesForDayOfWeek(selection.dayOfWeek)
+
+    println("COURSES: $courses")
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Course("Human Computer Interaction", "Prof. Dr. Marion Koelle", CourseType.LECTURE, "D11")
-        Course("Algorithmen und Datenstrukturen", "Prof. Dr. Dirk Krechel", CourseType.PRACTICAL, "D15")
+
+        if (courses.isEmpty()) {
+            Text("No Courses today :)", style = MaterialTheme.typography.headlineMedium)
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) { items(courses) {
+                    course -> CourseEntry(course)
+            } }
+        }
     }
+
+
 }
 
 @Composable
@@ -191,9 +211,8 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
         } */
     }
 }
-
 @Composable
-private fun Course(name: String, lecturer: String, courseType: CourseType, room: String) {
+private fun CourseEntry(course: Course) {
     Row {
         Column(
             modifier = Modifier
@@ -202,13 +221,13 @@ private fun Course(name: String, lecturer: String, courseType: CourseType, room:
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth().background(color = courseType.color).height(8.dp)
+                modifier = Modifier.fillMaxWidth().background(color = course.courseType.color).height(8.dp)
             )
             Column(
                 modifier = Modifier.padding(12.dp)
             ) {
-                Text(text = name, style = MaterialTheme.typography.bodyLarge)
-                Text(text = lecturer, style = MaterialTheme.typography.bodyMedium)
+                Text(text = course.name, style = MaterialTheme.typography.bodyLarge)
+                Text(text = course.lecturer, style = MaterialTheme.typography.bodyMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -218,17 +237,17 @@ private fun Course(name: String, lecturer: String, courseType: CourseType, room:
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = courseType.icon,
+                            imageVector = course.courseType.icon,
                             contentDescription = "Course Type Icon"
                         )
-                        Text(courseType.germanString, style = MaterialTheme.typography.bodyMedium)
+                        Text(course.courseType.germanString, style = MaterialTheme.typography.bodyMedium)
                     }
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Text(room, style = MaterialTheme.typography.bodyMedium)
+                        Text(course.room, style = MaterialTheme.typography.bodyMedium)
                         Icon(
                             imageVector = Icons.Outlined.LocationOn,
                             contentDescription = "Location Icon"
@@ -247,14 +266,14 @@ private fun Course(name: String, lecturer: String, courseType: CourseType, room:
                             imageVector = Icons.Rounded.Start,
                             contentDescription = "Course starts at"
                         )
-                        Text("17:00", style = MaterialTheme.typography.bodyMedium)
+                        Text(course.start.toString(), style = MaterialTheme.typography.bodyMedium)
                     }
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Text("90 min", style = MaterialTheme.typography.bodyMedium)
+                        Text("${course.durationInMinutes} min", style = MaterialTheme.typography.bodyMedium)
                         Icon(
                             imageVector = Icons.Rounded.Schedule,
                             contentDescription = "Duration Icon"
