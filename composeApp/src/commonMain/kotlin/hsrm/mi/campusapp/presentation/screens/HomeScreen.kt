@@ -2,16 +2,22 @@ package hsrm.mi.campusapp.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DepartureBoard
+import androidx.compose.material.icons.filled.Dining
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,11 +36,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.CampusRepository
+import hsrm.mi.campusapp.domain.repository.CourseRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
+import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.datetime.LocalDate
+import kotlin.time.ExperimentalTime
 
 
 class HomeScreenModel: ScreenModel {
@@ -44,16 +57,19 @@ class HomeScreenModel: ScreenModel {
 
 class HomeScreen: CampusScreen {
 
-    override val title = null
+    override val title = "Campus App"
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
     @Composable
     override fun Content() {
 
         val screenModel = rememberScreenModel { HomeScreenModel() }
 
+        val navigator = LocalNavigator.currentOrThrow
+
         val currentCampus = AppState.selectedCampus.value
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
+        val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
 
         Column(
             modifier = Modifier.fillMaxSize().padding(12.dp)
@@ -89,33 +105,87 @@ class HomeScreen: CampusScreen {
             }
             currentCampus?.let {
                 WelcomeText(it)
+                Spacer(modifier = Modifier.height(20.dp))
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector =  Icons.Filled.DepartureBoard,
-                    contentDescription = "Departures"
-                )
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(stops) { stop ->
-                        Button(
-                            onClick = {
 
-                            },
-                            modifier = Modifier.padding(4.dp)
+            if(currentCampus != null) {
+
+                Column {
+                    Row {
+                        Icon(
+                            imageVector =  Icons.Filled.DepartureBoard,
+                            contentDescription = "Departures"
+                        )
+                        Text("Haltestellen")
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            val text = remember { stop.name }
-                            Text(text)
+                            items(stops) { stop ->
+                                CampusButton(
+                                    text = stop.name,
+                                    onClick = {
+                                        navigator.push(DepartureScreen(stop))
+                                    },
+                                    isActive = true
+                                )
+                            }
                         }
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Column {
+                    Row {
+                        Icon(
+                            imageVector =  Icons.Filled.CalendarMonth ,
+                            contentDescription = "Schedule"
+                        )
+                        Text("Kurse heute")
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(courses) { course ->
+                                CampusButton(
+                                    text = course.name,
+                                    onClick = {
+                                        navigator.push(CalendarScreen())
+                                    },
+                                    isActive = true
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Column {
+                    Row {
+                        Icon(
+                            imageVector =  Icons.Filled.Dining  ,
+                            contentDescription = "Menu"
+                        )
+                        Text("Speiseplan")
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text("Work in Progress...", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
 
             Box(modifier = Modifier.padding(12.dp)) {
-                /* Should display MapScreen */
+                /* Should display MapScreen --> Idea scraped? */
             }
         }
     }

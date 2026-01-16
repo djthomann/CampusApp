@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
@@ -65,7 +67,6 @@ class CalendarScreen: CampusScreen {
     override fun Content() {
 
         val screenModel = rememberScreenModel { CalendarScreenModel() }
-
 
         val state = rememberWeekCalendarState(
             startDate = screenModel.currentDate.minusDays(100),
@@ -213,12 +214,18 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
 }
 @Composable
 private fun CourseEntry(course: Course) {
+
+    val navigator = LocalNavigator.currentOrThrow
+
     Row {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
+                .clickable {
+                    navigator.push(MapScreen())
+                }
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth().background(color = course.courseType.color).height(8.dp)

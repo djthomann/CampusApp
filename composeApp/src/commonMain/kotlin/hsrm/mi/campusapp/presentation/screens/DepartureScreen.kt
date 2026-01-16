@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,17 +46,45 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.domain.model.Departure
-import hsrm.mi.campusapp.domain.model.JourneyDetailRef
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalTime
+
+class DepartureScreenModel: ScreenModel {
+    val currentStop = mutableStateOf<String?>(null)
+
+    val departures = mutableStateOf<List<Departure>>( /*
+            listOf(Departure(JourneyDetailRef("id"),"Bus 6", LocalTime(17, 4, 0), direction = "Wiesbaden Hauptbahnhof"),
+                Departure(JourneyDetailRef("id"), "Bus 6", LocalTime(17, 14, 0), direction = "Unter den Eichen"))
+        */ emptyList()
+    )
+
+    fun loadDepartures(stop: Stop, coroutineScope: CoroutineScope) {
+        coroutineScope.launch {
+            currentStop.value = stop.name
+            departures.value = RmvAPI.getNextArrivals(stop)
+
+            /* Get all journeys for departures */
+            departures.value.map { departure ->
+                async {
+                    departure.journey = RmvAPI.getJourneyDetails(departure.ref)
+                    println(departure.journey)
+                }
+            }
+
+        }
+    }
+}
 
 class DepartureScreen(
+    val initialStop: Stop? = null
 ): CampusScreen {
 
     override val title = "Abfahrten"
@@ -63,16 +92,18 @@ class DepartureScreen(
     @Composable
     override fun Content() {
 
+        val screenModel = rememberScreenModel { DepartureScreenModel() }
+
         val currentCampus = AppState.selectedCampus.value
 
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
         val coroutineScope = rememberCoroutineScope()
-        val departures = remember { mutableStateOf<List<Departure>>(
-            listOf(Departure(JourneyDetailRef("id"),"Bus 6", LocalTime(17, 4, 0), direction = "Wiesbaden Hauptbahnhof"),
-                Departure(JourneyDetailRef("id"), "Bus 6", LocalTime(17, 14, 0), direction = "Unter den Eichen"))
-        ) }
 
-        val currentStop = remember { mutableStateOf<String?>(null) }
+        LaunchedEffect(initialStop) {
+            initialStop?.let {
+                screenModel.loadDepartures(initialStop, coroutineScope)
+            }
+        }
 
         Column(
             modifier = Modifier.fillMaxSize().padding(10.dp)
@@ -88,7 +119,7 @@ class DepartureScreen(
             ) {
                 items(stops) { stop ->
 
-                    val isActive = stop.name == currentStop.value
+                    val isActive = stop.name == screenModel.currentStop.value
 
                     Button(
                         shape = RoundedCornerShape(8.dp),
@@ -96,42 +127,36 @@ class DepartureScreen(
                             containerColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                         ),
                         onClick = {
-                            coroutineScope.launch {
-                                currentStop.value = stop.name
-                                departures.value = RmvAPI.getNextArrivals(stop)
-
-                                departures.value.map { departure ->
-                                    async {
-                                        departure.journey = RmvAPI.getJourneyDetails(departure.ref)
-                                        println(departure.journey)
-                                    }
-                                }
-
-                            }
+                            screenModel.loadDepartures(stop, coroutineScope)
                             /*StopRepository.selectStop((stop))
                             onStopSelected() */
                         }
                     ) {
-                        val text = remember { stop.name }
-                        Text(text)
+                        Text(stop.name)
                     }
                 }
             }
             Spacer(
                 modifier = Modifier.padding(5.dp)
             )
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(departures.value) { dep ->
-                    DepartureEntry(dep)
+            if(screenModel.departures.value.isEmpty()) {
+                Text("Keine Abfahrt in den nächsten ${RmvAPI.SEARCH_TIMEFRAME_MINUTES} Minuten...")
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(screenModel.departures.value) { dep ->
+                        DepartureEntry(dep)
+                    }
                 }
             }
-            if(departures.value.isEmpty()) {
-                Text("Keine Abfahrt in den nächsten ${RmvAPI.SEARCH_TIMEFRAME_MINUTES} Minuten...")
-            }
+
+
         }
+    }
+
+    fun selectStop(stop: Stop) {
     }
 }
 
