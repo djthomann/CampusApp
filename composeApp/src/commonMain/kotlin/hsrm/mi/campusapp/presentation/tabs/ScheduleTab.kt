@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.screens
+package hsrm.mi.campusapp.presentation.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Start
@@ -25,19 +27,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
@@ -50,7 +55,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import kotlin.time.ExperimentalTime
 
-class CalendarScreenModel: ScreenModel {
+class ScheduleScreenModel: ScreenModel {
 
     @OptIn(ExperimentalTime::class)
     val currentDate: LocalDate = LocalDate.now()
@@ -58,15 +63,31 @@ class CalendarScreenModel: ScreenModel {
 
 }
 
-class CalendarScreen: CampusScreen {
+object ScheduleTab: CampusTab {
+    private fun readResolve(): Any = ScheduleTab
 
-    override val title = "Stundenplan"
+    override val topAppBarTitle: String = "Stundenplan"
+    override val activeIcon: ImageVector = Icons.Filled.CalendarMonth
+    override val inactiveIcon: ImageVector = Icons.Outlined.CalendarMonth
 
-    @OptIn(ExperimentalTime::class)
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = "Schedule"
+            val icon = rememberVectorPainter(activeIcon)
+
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = title,
+                    icon = icon
+                )
+            }
+        }
+
     @Composable
     override fun Content() {
-
-        val screenModel = rememberScreenModel { CalendarScreenModel() }
+        val screenModel = rememberScreenModel { ScheduleScreenModel() }
 
         val state = rememberWeekCalendarState(
             startDate = screenModel.currentDate.minusDays(100),
@@ -86,7 +107,7 @@ class CalendarScreen: CampusScreen {
                     .background(MaterialTheme.colorScheme.background),
                 horizontalArrangement = Arrangement.SpaceBetween,
 
-            ) {
+                ) {
                 DayOfWeek.entries.forEach { dayOfWeek ->
                     Box(
                         modifier = Modifier
@@ -117,6 +138,7 @@ class CalendarScreen: CampusScreen {
         }
     }
 }
+
 
 private val dateFormatter by lazy {
     LocalDate.Format {
@@ -186,7 +208,7 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
                 .clip(RoundedCornerShape(8.dp))
                 .aspectRatio(1f)
                 .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-                ,
+            ,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -215,7 +237,7 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
 @Composable
 private fun CourseEntry(course: Course) {
 
-    val navigator = LocalNavigator.currentOrThrow
+    val tabNavigator = LocalTabNavigator.current
 
     Row {
         Column(
@@ -224,7 +246,7 @@ private fun CourseEntry(course: Course) {
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .clickable {
-                    navigator.push(MapScreen())
+                    tabNavigator.current = MapTab
                 }
         ) {
             Box(

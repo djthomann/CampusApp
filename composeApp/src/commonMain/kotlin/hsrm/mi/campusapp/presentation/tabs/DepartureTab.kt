@@ -1,0 +1,337 @@
+package hsrm.mi.campusapp.presentation.tabs
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DepartureBoard
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.DepartureBoard
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.rounded.DirectionsBus
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.navigator.tab.TabOptions
+import hsrm.mi.campusapp.data.api.rmv.RmvAPI
+import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
+import hsrm.mi.campusapp.domain.model.Departure
+import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.repository.StopRepository
+import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.launch
+
+class DepartureScreenModel: ScreenModel {
+    val currentStop = mutableStateOf<Stop?>(null)
+
+    val departures = mutableStateOf<List<Departure>>( /*
+            listOf(Departure(JourneyDetailRef("id"),"Bus 6", LocalTime(17, 4, 0), direction = "Wiesbaden Hauptbahnhof"),
+                Departure(JourneyDetailRef("id"), "Bus 6", LocalTime(17, 14, 0), direction = "Unter den Eichen"))
+        */ emptyList()
+    )
+
+    fun loadDepartures(stop: Stop) {
+        currentStop.value = stop
+        screenModelScope.launch {
+            departures.value = RmvAPI.getNextArrivals(stop)
+
+            departures.value.forEach { departure ->
+                launch {
+                    departure.journey = RmvAPI.getJourneyDetails(departure.ref)
+                }
+            }
+        }
+    }
+}
+
+object DepartureTab: CampusTab {
+    private fun readResolve(): Any = DepartureTab
+
+    override val topAppBarTitle = "Abfahrten"
+    override val activeIcon = Icons.Filled.DepartureBoard
+    override val inactiveIcon = Icons.Outlined.DepartureBoard
+
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = "Departure"
+            val icon = rememberVectorPainter(activeIcon)
+
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = title,
+                    icon = icon
+                )
+            }
+        }
+
+    private val pendingStop = mutableStateOf<Stop?>(null)
+    fun selectStop(stop: Stop) {
+        pendingStop.value = stop
+    }
+
+    @Composable
+    override fun Content() {
+        val screenModel = rememberScreenModel { DepartureScreenModel() }
+
+        val currentCampus = AppState.selectedCampus.value
+
+        val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
+        val coroutineScope = rememberCoroutineScope()
+
+        LaunchedEffect(pendingStop.value) {
+            pendingStop.value?.let { stop ->
+                screenModel.loadDepartures(stop)
+                pendingStop.value = null // Zurücksetzen, nachdem geladen wurde
+            }
+        }
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(10.dp)
+        ) {
+            /* if (currentCampus != null) {
+                CampusName(currentCampus)
+            } else {
+                Text("No campus selected")
+            } */
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(stops) { stop ->
+
+                    val isActive = stop == screenModel.currentStop.value
+
+                    Button(
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        onClick = {
+                            screenModel.loadDepartures(stop)
+                            /*StopRepository.selectStop((stop))
+                            onStopSelected() */
+                        }
+                    ) {
+                        Text(stop.name)
+                    }
+                }
+            }
+            Spacer(
+                modifier = Modifier.padding(5.dp)
+            )
+            if(screenModel.departures.value.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Keine Abfahrt in den nächsten ${RmvAPI.SEARCH_TIMEFRAME_MINUTES} Minuten...")
+                }
+            } else {
+                screenModel.currentStop.value?.let { currentStop ->
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(screenModel.departures.value) { dep ->
+                            DepartureEntry(dep, currentStop)
+                        }
+                    }
+                }
+
+            }
+
+
+        }
+    }
+
+
+}
+
+
+@Composable
+fun DepartureEntry(departure: Departure, currentStop: Stop) {
+
+    val journey = departure.journey
+
+    val expanded = remember { mutableStateOf(false) }
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (expanded.value)
+            MaterialTheme.colorScheme.primary
+        else
+            MaterialTheme.colorScheme.surface,
+        label = "backgroundColor"
+    )
+
+    val iconRotation by animateFloatAsState(
+        targetValue = if (expanded.value) 180f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "iconRotation"
+    )
+
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth()
+            .background(backgroundColor)
+
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded.value = !expanded.value }
+                .padding(12.dp)
+        )    {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.DirectionsBus,
+                        contentDescription = "Course Type Icon",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(modifier = Modifier.padding(end = 10.dp), fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.name)
+                }
+                Text(fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.time.toString())
+            }
+            AnimatedVisibility(
+                visible = expanded.value
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+                ) {
+                    VerticalDivider(color = Color.White, thickness = 2.dp,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(start = 11.dp) // Width Icons / 2 + own width / 2
+                    )
+                    if(journey == null) {
+                        Text("Keine Haltestellen gefunden")
+                    } else {
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(start = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            val stopId = currentStop.id.normalizeRmvId()
+                            val currentIndex = journey.stops.indexOfFirst { it.id == stopId } /* id doesn't work because somehow it's not identical over different requests? */
+                            val nextStops = journey.stops.drop(currentIndex + 1).take(3)
+
+                            println("CURRENT INDEX $currentIndex")
+                            println("NEXT STOPS: $nextStops")
+
+                            if (nextStops.isEmpty()) {
+                                Text("Endstation", style = MaterialTheme.typography.bodySmall)
+                            } else {
+                                nextStops.forEach { stop ->
+                                    Text(
+                                        text = stop.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    )
+                                }
+                            }
+                            if(journey.stops.size > 3) {
+                                Box(
+                                    modifier = Modifier.padding(10.dp).clickable {
+                                        println("It worked")
+                                    }
+                                ) {
+                                    Text(
+                                        modifier = Modifier,
+                                        text = "Mehr anzeigen",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.LocationOn,
+                        contentDescription = "Location Icon"
+                    )
+                    Text(
+                        text = departure.direction,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Icon(
+                    modifier = Modifier.rotate(iconRotation),
+                    imageVector = Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "Open Journey"
+                )
+            }
+
+
+        }
+        Box(
+            modifier = Modifier.fillMaxWidth().background(Color.White).height(4.dp)
+        )
+
+    }
+
+}

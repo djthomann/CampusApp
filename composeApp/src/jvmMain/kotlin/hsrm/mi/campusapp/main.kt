@@ -1,11 +1,13 @@
 package hsrm.mi.campusapp
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import dev.datlag.kcef.KCEF
 import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
 
     LaunchedEffect(Unit) {

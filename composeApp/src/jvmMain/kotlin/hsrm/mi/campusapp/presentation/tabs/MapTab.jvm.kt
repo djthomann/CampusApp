@@ -1,5 +1,4 @@
-package hsrm.mi.campusapp.presentation.screens
-
+package hsrm.mi.campusapp.presentation.tabs
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
@@ -15,6 +14,7 @@ import com.multiplatform.webview.web.rememberWebViewState
 import dev.datlag.kcef.KCEF
 import hsrm.mi.campusapp.presentation.state.MapState
 import java.io.File
+
 
 @Composable
 actual fun MapView(state: MapState) {

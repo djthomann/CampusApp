@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.screens
+package hsrm.mi.campusapp.presentation.tabs
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +13,7 @@ import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.OrnamentOptions
 import org.maplibre.compose.map.RenderOptions
 import org.maplibre.compose.style.BaseStyle
+
 
 @Composable
 actual fun MapView(state: MapState) {

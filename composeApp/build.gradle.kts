@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.bottom)
+            implementation(libs.voyager.tabs)
 
             implementation(libs.ktor.client.core)
         }

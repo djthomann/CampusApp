@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.screens
+package hsrm.mi.campusapp.presentation.tabs
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -18,7 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DepartureBoard
 import androidx.compose.material.icons.filled.Dining
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Stop
@@ -48,23 +51,40 @@ import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.datetime.LocalDate
 import kotlin.time.ExperimentalTime
 
-
 class HomeScreenModel: ScreenModel {
 
 
 }
 
-class HomeScreen: CampusScreen {
+object HomeTab: CampusTab {
 
-    override val title = "Campus App"
+    private fun readResolve(): Any = HomeTab
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+    override val topAppBarTitle = "me@hsrm"
+    override val activeIcon: ImageVector = Icons.Filled.Home
+    override val inactiveIcon: ImageVector = Icons.Outlined.Home
+
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = "Home"
+            val icon = rememberVectorPainter(activeIcon)
+
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = title,
+                    icon = icon
+                )
+            }
+        }
+
+    @OptIn(ExperimentalTime::class)
     @Composable
     override fun Content() {
-
         val screenModel = rememberScreenModel { HomeScreenModel() }
 
-        val navigator = LocalNavigator.currentOrThrow
+        val tabNavigator = LocalTabNavigator.current
 
         val currentCampus = AppState.selectedCampus.value
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
@@ -129,7 +149,8 @@ class HomeScreen: CampusScreen {
                                 CampusButton(
                                     text = stop.name,
                                     onClick = {
-                                        navigator.push(DepartureScreen(stop))
+                                        DepartureTab.selectStop(stop)
+                                        tabNavigator.current = DepartureTab
                                     },
                                     isActive = true
                                 )
@@ -157,7 +178,7 @@ class HomeScreen: CampusScreen {
                                 CampusButton(
                                     text = course.name,
                                     onClick = {
-                                        navigator.push(CalendarScreen())
+                                        tabNavigator.current = ScheduleTab
                                     },
                                     isActive = true
                                 )
@@ -188,7 +209,11 @@ class HomeScreen: CampusScreen {
             }
         }
     }
+
+
+
 }
+
 
 @Composable
 fun CampusName(campus: Campus) {
@@ -235,3 +260,4 @@ fun WelcomeText(campus: Campus) {
     )
     CampusName(campus)
 }
+
