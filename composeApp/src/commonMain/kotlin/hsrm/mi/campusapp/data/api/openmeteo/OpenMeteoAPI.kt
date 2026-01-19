@@ -1,0 +1,48 @@
+package hsrm.mi.campusapp.data.api.openmeteo
+
+import hsrm.mi.campusapp.domain.model.Campus
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
+import kotlinx.serialization.json.Json
+
+object OpenMeteoAPI {
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
+    val client = HttpClient()
+
+    val baseURL = "https://api.open-meteo.com/v1"
+
+    suspend fun getCurrentWeather(campus: Campus, getRain: Boolean = true, getIsDay: Boolean = true, getCloudCoverage: Boolean = true): CurrentWeather? {
+        println("GETTING FORECAST FOR: $campus")
+
+        val currentParameterValues = StringBuilder("temperature_2m")
+        if (getRain) currentParameterValues.append(",rain")
+        if (getIsDay) currentParameterValues.append(",is_day")
+        if (getCloudCoverage) currentParameterValues.append(",cloud_cover")
+
+        println("CURRENT PARAMETER VALUES: $currentParameterValues")
+
+        val jsonResponse: String = client.get("$baseURL/forecast") {
+            parameter("latitude", campus.center.latitude)
+            parameter("longitude", campus.center.longitude)
+            parameter("current", currentParameterValues)
+        }.bodyAsText()
+
+        println("RAW Response: $jsonResponse")
+
+        return try {
+            val response: ForecastResponse = json.decodeFromString(jsonResponse)
+            response.current
+        } catch (e: Exception) {
+            println("Error deserializing ForecastResponse: ${e.message}")
+            null
+        }
+
+    }
+
+}

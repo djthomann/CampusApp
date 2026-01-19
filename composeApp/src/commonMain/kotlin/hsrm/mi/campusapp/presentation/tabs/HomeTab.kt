@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
@@ -39,13 +41,17 @@ import campusapp.composeapp.generated.resources.stops
 import campusapp.composeapp.generated.resources.welcome_campus
 import campusapp.composeapp.generated.resources.work_in_progress
 import com.kizitonwose.calendar.core.now
+import hsrm.mi.campusapp.data.api.openmeteo.CurrentWeather
+import hsrm.mi.campusapp.data.api.openmeteo.OpenMeteoAPI
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CourseRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
+import hsrm.mi.campusapp.presentation.components.WeatherWidget
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.getString
@@ -54,6 +60,13 @@ import kotlin.time.ExperimentalTime
 
 class HomeScreenModel: ScreenModel {
 
+    val currentWeather = mutableStateOf<CurrentWeather?>(null)
+
+    fun loadWeather(campus: Campus) {
+        screenModelScope.launch {
+            currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)
+        }
+    }
 
 }
 
@@ -124,7 +137,18 @@ object HomeTab: CampusTab {
                 }
             }
             currentCampus?.let {
-                WelcomeText(it)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    WelcomeText(it)
+                    screenModel.currentWeather.value?.let { weather ->
+                        WeatherWidget(weather = weather)
+                    }
+                }
+                CampusName(it)
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
@@ -208,6 +232,15 @@ object HomeTab: CampusTab {
             Box(modifier = Modifier.padding(12.dp)) {
                 /* Should display MapScreen --> Idea scraped? */
             }
+
+            if(AppState.selectedCampus.value != null) {
+                CampusButton(
+                    text = "Load Weather",
+                    onClick = {
+                        screenModel.loadWeather(AppState.selectedCampus.value!!)
+                    }
+                )
+            }
         }
     }
 
@@ -242,6 +275,5 @@ fun WelcomeText(campus: Campus) {
         color = MaterialTheme.colorScheme.onBackground,
         style = MaterialTheme.typography.titleLarge
     )
-    CampusName(campus)
 }
 
