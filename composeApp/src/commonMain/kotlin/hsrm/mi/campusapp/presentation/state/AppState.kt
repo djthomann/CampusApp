@@ -14,13 +14,13 @@ object AppState {
         get() = CampusRepository.getCampusByName(selectedCampusName.value)
         private set
 
-    var isDarkMode = mutableStateOf<Boolean>(settings.darkMode)
+    var isDarkMode = mutableStateOf<Boolean>(settings.isDarkMode)
         private set
 
     fun toggleDarkMode() {
         val newModeValue = !isDarkMode.value
         isDarkMode.value = newModeValue
-        settings.darkMode = newModeValue
+        settings.isDarkMode = newModeValue
     }
 
     fun selectCampus(campus: Campus?) {

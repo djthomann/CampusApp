@@ -5,11 +5,16 @@ import com.russhwolf.settings.Settings
 class AppSettings {
     private val settings: Settings = Settings()
 
-    var campus: String
-        get() = settings.getString("selected_campus", "")
-        set(value) = settings.putString("selected_campus", value)
+    enum class SettingsKey() {
+        SELECTED_CAMPUS,
+        IS_DARK_MODE
+    }
 
-    var darkMode: Boolean
-        get() = settings.getBoolean("dark_mode", false)
-        set(value) = settings.putBoolean("dark_mode", value)
+    var campus: String
+        get() = settings.getString(SettingsKey.SELECTED_CAMPUS.name, "")
+        set(value) = settings.putString(SettingsKey.SELECTED_CAMPUS.name, value)
+
+    var isDarkMode: Boolean
+        get() = settings.getBoolean(SettingsKey.IS_DARK_MODE.name, false)
+        set(value) = settings.putBoolean(SettingsKey.IS_DARK_MODE.name, value)
 }

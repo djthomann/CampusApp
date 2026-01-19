@@ -339,7 +339,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
 
         }
         Box(
-            modifier = Modifier.fillMaxWidth().background(Color.White).height(4.dp)
+            modifier = Modifier.fillMaxWidth().background(if(!expanded.value) textColor else Color.Transparent).height(4.dp)
         )
 
     }
