@@ -53,6 +53,12 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import campusapp.composeapp.generated.resources.Res
+import campusapp.composeapp.generated.resources.departures_tab_title
+import campusapp.composeapp.generated.resources.final_stop
+import campusapp.composeapp.generated.resources.no_departure_in_x_minutes
+import campusapp.composeapp.generated.resources.no_stops_found
+import campusapp.composeapp.generated.resources.show_more
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
 import hsrm.mi.campusapp.domain.model.Departure
@@ -60,6 +66,9 @@ import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 
 class DepartureScreenModel: ScreenModel {
     val currentStop = mutableStateOf<Stop?>(null)
@@ -87,14 +96,14 @@ class DepartureScreenModel: ScreenModel {
 object DepartureTab: CampusTab {
     private fun readResolve(): Any = DepartureTab
 
-    override val topAppBarTitle = "Abfahrten"
+    override val topAppBarTitle = runBlocking { getString(Res.string.departures_tab_title) }
     override val activeIcon = Icons.Filled.DepartureBoard
     override val inactiveIcon = Icons.Outlined.DepartureBoard
 
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Departure"
+            val title = topAppBarTitle
             val icon = rememberVectorPainter(activeIcon)
 
             return remember {
@@ -167,7 +176,7 @@ object DepartureTab: CampusTab {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Keine Abfahrt in den nächsten ${RmvAPI.SEARCH_TIMEFRAME_MINUTES} Minuten...")
+                    Text(stringResource(Res.string.no_departure_in_x_minutes, RmvAPI.SEARCH_TIMEFRAME_MINUTES))
                 }
             } else {
                 screenModel.currentStop.value?.let { currentStop ->
@@ -256,7 +265,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                             .padding(start = 11.dp) // Width Icons / 2 + own width / 2
                     )
                     if(journey == null) {
-                        Text("Keine Haltestellen gefunden")
+                        Text(stringResource(Res.string.no_stops_found))
                     } else {
 
                         Column(
@@ -273,7 +282,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                             println("NEXT STOPS: $nextStops")
 
                             if (nextStops.isEmpty()) {
-                                Text("Endstation", style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(Res.string.final_stop), style = MaterialTheme.typography.bodySmall)
                             } else {
                                 nextStops.forEach { stop ->
                                     Text(
@@ -286,12 +295,12 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                             if(journey.stops.size > 3) {
                                 Box(
                                     modifier = Modifier.padding(10.dp).clickable {
-                                        println("It worked")
+                                        println("It worked") /* TODO() */
                                     }
                                 ) {
                                     Text(
                                         modifier = Modifier,
-                                        text = "Mehr anzeigen",
+                                        text = stringResource(Res.string.show_more),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }

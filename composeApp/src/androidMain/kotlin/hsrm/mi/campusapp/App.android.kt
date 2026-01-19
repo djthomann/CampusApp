@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
@@ -38,7 +37,7 @@ actual fun MainScaffold(navigator: TabNavigator) {
         content = {
                 padding ->
             Box(modifier = Modifier.padding(padding)) {
-                CurrentTab()
+                AnimatedTabContent(navigator)
             }
         },
         bottomBar = {

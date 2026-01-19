@@ -5,7 +5,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 
 interface CampusTab: Tab {
 
-    val topAppBarTitle: String?
+    val topAppBarTitle: String
     val activeIcon: ImageVector
     val inactiveIcon: ImageVector
 }

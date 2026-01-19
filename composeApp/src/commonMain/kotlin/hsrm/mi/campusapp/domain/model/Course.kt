@@ -5,8 +5,12 @@ import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.DesktopWindows
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import campusapp.composeapp.generated.resources.Res
+import campusapp.composeapp.generated.resources.course_type_lecture
+import campusapp.composeapp.generated.resources.course_type_practical
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
+import org.jetbrains.compose.resources.StringResource
 
 data class Course(
     val name: String,
@@ -19,10 +23,10 @@ data class Course(
 )
 
 enum class CourseType(
-    val germanString: String,
+    val nameResource: StringResource,
     val color: Color,
     val icon: ImageVector
 ) {
-    LECTURE("Vorlesung", Color.Green, Icons.AutoMirrored.Rounded.MenuBook), PRACTICAL("Praktikum", Color.Red, Icons.Rounded.DesktopWindows)
+    LECTURE(Res.string.course_type_lecture, Color.Green, Icons.AutoMirrored.Rounded.MenuBook), PRACTICAL(Res.string.course_type_practical, Color.Red, Icons.Rounded.DesktopWindows)
 }
 

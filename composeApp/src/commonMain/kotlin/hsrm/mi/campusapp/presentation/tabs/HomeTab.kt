@@ -15,9 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.DepartureBoard
-import androidx.compose.material.icons.filled.Dining
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
@@ -29,17 +26,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import campusapp.composeapp.generated.resources.Res
+import campusapp.composeapp.generated.resources.app_name
+import campusapp.composeapp.generated.resources.choose_your_campus
+import campusapp.composeapp.generated.resources.home
+import campusapp.composeapp.generated.resources.stops
+import campusapp.composeapp.generated.resources.welcome_campus
+import campusapp.composeapp.generated.resources.work_in_progress
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Stop
@@ -48,7 +46,10 @@ import hsrm.mi.campusapp.domain.repository.CourseRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.ExperimentalTime
 
 class HomeScreenModel: ScreenModel {
@@ -60,14 +61,14 @@ object HomeTab: CampusTab {
 
     private fun readResolve(): Any = HomeTab
 
-    override val topAppBarTitle = "me@hsrm"
+    override val topAppBarTitle = runBlocking { getString(Res.string.app_name) }
     override val activeIcon: ImageVector = Icons.Filled.Home
     override val inactiveIcon: ImageVector = Icons.Outlined.Home
 
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Home"
+            val title = stringResource(Res.string.home)
             val icon = rememberVectorPainter(activeIcon)
 
             return remember {
@@ -132,10 +133,10 @@ object HomeTab: CampusTab {
                 Column {
                     Row {
                         Icon(
-                            imageVector =  Icons.Filled.DepartureBoard,
-                            contentDescription = "Departures"
+                            imageVector = DepartureTab.activeIcon,
+                            contentDescription = DepartureTab.topAppBarTitle
                         )
-                        Text("Haltestellen")
+                        Text(stringResource(Res.string.stops))
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -162,10 +163,10 @@ object HomeTab: CampusTab {
                 Column {
                     Row {
                         Icon(
-                            imageVector =  Icons.Filled.CalendarMonth ,
-                            contentDescription = "Schedule"
+                            imageVector = ScheduleTab.activeIcon ,
+                            contentDescription = ScheduleTab.topAppBarTitle
                         )
-                        Text("Kurse heute")
+                        Text(ScheduleTab.topAppBarTitle)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -190,16 +191,16 @@ object HomeTab: CampusTab {
                 Column {
                     Row {
                         Icon(
-                            imageVector =  Icons.Filled.Dining  ,
-                            contentDescription = "Menu"
+                            imageVector =  FoodTab.activeIcon  ,
+                            contentDescription = FoodTab.topAppBarTitle
                         )
-                        Text("Speiseplan")
+                        Text(FoodTab.topAppBarTitle)
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        Text("Work in Progress...", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = stringResource(Res.string.work_in_progress), style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
@@ -225,27 +226,10 @@ fun CampusName(campus: Campus) {
 @Composable
 fun ChooseText() {
 
-    val titleFontSize = MaterialTheme.typography.headlineLarge.fontSize
-    val titleColor = MaterialTheme.colorScheme.onBackground
-
     Text(
         modifier = Modifier.padding(4.dp),
-        text =  buildAnnotatedString {
-            withStyle(
-                style = ParagraphStyle(lineHeight = 50.sp)
-            ) {
-                withStyle(
-                    style = SpanStyle(
-                        fontWeight = FontWeight.Bold,
-                        color = titleColor,
-                        fontSize = titleFontSize
-                    )
-                ) {
-                    append("Wähle Deinen\n")
-                    append("Campus!")
-                }
-            }
-        }
+        text = stringResource(Res.string.choose_your_campus),
+        style = MaterialTheme.typography.headlineLarge
     )
 }
 
@@ -254,7 +238,7 @@ fun WelcomeText(campus: Campus) {
 
     Text(
         modifier = Modifier.padding(4.dp),
-        text =  "Willkommen am Campus:",
+        text = stringResource(Res.string.welcome_campus),
         color = MaterialTheme.colorScheme.onBackground,
         style = MaterialTheme.typography.titleLarge
     )

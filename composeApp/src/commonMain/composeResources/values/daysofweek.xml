@@ -1,0 +1,9 @@
+<resources>
+    <string name="monday-single-letter">M</string>
+    <string name="tuesday-single-letter">T</string>
+    <string name="wednesday-single-letter">W</string>
+    <string name="thursday-single-letter">T</string>
+    <string name="friday-single-letter">F</string>
+    <string name="saturday-single-letter">S</string>
+    <string name="sunday-single-letter">S</string>
+</resources>

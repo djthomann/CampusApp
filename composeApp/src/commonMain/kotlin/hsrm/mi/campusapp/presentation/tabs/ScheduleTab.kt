@@ -43,6 +43,16 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import campusapp.composeapp.generated.resources.Res
+import campusapp.composeapp.generated.resources.friday_single_letter
+import campusapp.composeapp.generated.resources.monday_single_letter
+import campusapp.composeapp.generated.resources.no_courses_today
+import campusapp.composeapp.generated.resources.saturday_single_letter
+import campusapp.composeapp.generated.resources.schedule_tab_title
+import campusapp.composeapp.generated.resources.sunday_single_letter
+import campusapp.composeapp.generated.resources.thursday_single_letter
+import campusapp.composeapp.generated.resources.tuesday_single_letter
+import campusapp.composeapp.generated.resources.wednesday_single_letter
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
@@ -50,9 +60,12 @@ import com.kizitonwose.calendar.core.now
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
 import hsrm.mi.campusapp.domain.repository.CourseRepository
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.ExperimentalTime
 
 class ScheduleScreenModel: ScreenModel {
@@ -66,14 +79,14 @@ class ScheduleScreenModel: ScreenModel {
 object ScheduleTab: CampusTab {
     private fun readResolve(): Any = ScheduleTab
 
-    override val topAppBarTitle: String = "Stundenplan"
+    override val topAppBarTitle: String = runBlocking { getString(Res.string.schedule_tab_title) }
     override val activeIcon: ImageVector = Icons.Filled.CalendarMonth
     override val inactiveIcon: ImageVector = Icons.Outlined.CalendarMonth
 
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Schedule"
+            val title = topAppBarTitle
             val icon = rememberVectorPainter(activeIcon)
 
             return remember {
@@ -146,32 +159,21 @@ private val dateFormatter by lazy {
     }
 }
 
-fun DayOfWeek.toShortString(): String = when (this) {
-    DayOfWeek.MONDAY -> "Mo"
-    DayOfWeek.TUESDAY -> "Di"
-    DayOfWeek.WEDNESDAY -> "Mi"
-    DayOfWeek.THURSDAY -> "Do"
-    DayOfWeek.FRIDAY -> "Fr"
-    DayOfWeek.SATURDAY -> "Sa"
-    DayOfWeek.SUNDAY -> "So"
-}
-
+@Composable
 fun DayOfWeek.toSingleLetter(): String = when (this) {
-    DayOfWeek.MONDAY -> "M"
-    DayOfWeek.TUESDAY -> "D"
-    DayOfWeek.WEDNESDAY -> "M"
-    DayOfWeek.THURSDAY -> "D"
-    DayOfWeek.FRIDAY -> "F"
-    DayOfWeek.SATURDAY -> "S"
-    DayOfWeek.SUNDAY -> "S"
+    DayOfWeek.MONDAY -> stringResource(Res.string.monday_single_letter)
+    DayOfWeek.TUESDAY -> stringResource(Res.string.tuesday_single_letter)
+    DayOfWeek.WEDNESDAY -> stringResource(Res.string.wednesday_single_letter)
+    DayOfWeek.THURSDAY -> stringResource(Res.string.thursday_single_letter)
+    DayOfWeek.FRIDAY -> stringResource(Res.string.friday_single_letter)
+    DayOfWeek.SATURDAY -> stringResource(Res.string.saturday_single_letter)
+    DayOfWeek.SUNDAY -> stringResource(Res.string.sunday_single_letter)
 }
 
 @Composable
 private fun Schedule(selection: LocalDate) {
 
     val courses: List<Course> = CourseRepository.getCoursesForDayOfWeek(selection.dayOfWeek)
-
-    println("COURSES: $courses")
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -180,7 +182,7 @@ private fun Schedule(selection: LocalDate) {
     ) {
 
         if (courses.isEmpty()) {
-            Text("No Courses today :)", style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.headlineMedium)
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(10.dp),
@@ -269,7 +271,7 @@ private fun CourseEntry(course: Course) {
                             imageVector = course.courseType.icon,
                             contentDescription = "Course Type Icon"
                         )
-                        Text(course.courseType.germanString, style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(course.courseType.nameResource), style = MaterialTheme.typography.bodyMedium)
                     }
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
