@@ -31,10 +31,7 @@ fun CampusButton(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-        contentPadding = padding,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-        )
+        contentPadding = padding
     ) {
         Text(text, style = if (buttonType == CampusButtonType.SMALL) MaterialTheme.typography.bodySmall else LocalTextStyle.current)
     }

@@ -10,9 +10,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.HomeTab
 import hsrm.mi.campusapp.presentation.theme.AppTypography
-import hsrm.mi.campusapp.presentation.theme.DarkColorScheme
+import hsrm.mi.campusapp.presentation.theme.darkScheme
+import hsrm.mi.campusapp.presentation.theme.lightScheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,8 +23,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
 
+    val isDark = AppState.isDarkMode
+
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = if(isDark.value) darkScheme else lightScheme,
         typography = AppTypography,
     ) {
         TabNavigator(HomeTab) {

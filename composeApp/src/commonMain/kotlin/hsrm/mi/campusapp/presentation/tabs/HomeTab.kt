@@ -100,16 +100,20 @@ object HomeTab: CampusTab {
 
         val tabNavigator = LocalTabNavigator.current
 
-        val currentCampus = AppState.selectedCampus.value
+        val currentCampus = AppState.selectedCampus
+
+        if(currentCampus != null) {
+            screenModel.loadWeather(currentCampus)
+        }
+
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
 
         Column(
             modifier = Modifier.fillMaxSize().padding(12.dp)
         ) {
-
             AnimatedVisibility(
-                visible = AppState.selectedCampus.value == null,
+                visible = AppState.selectedCampus == null,
             ) {
                 Column {
                     ChooseText()
@@ -128,7 +132,9 @@ object HomeTab: CampusTab {
                             ) {
                                 CampusButton(
                                     text = campus.name,
-                                    onClick = { AppState.selectCampus(campus) },
+                                    onClick = {
+                                        AppState.selectCampus(campus)
+                                              },
                                     isActive = true
                                 )
                             }
@@ -144,12 +150,24 @@ object HomeTab: CampusTab {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     WelcomeText(it)
-                    screenModel.currentWeather.value?.let { weather ->
-                        WeatherWidget(weather = weather)
-                    }
+
                 }
                 CampusName(it)
                 Spacer(modifier = Modifier.height(20.dp))
+
+                screenModel.currentWeather.value?.let { weather ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Wetter am Campus:")
+                        WeatherWidget(weather = weather)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
             }
 
             if(currentCampus != null) {
@@ -232,15 +250,6 @@ object HomeTab: CampusTab {
             Box(modifier = Modifier.padding(12.dp)) {
                 /* Should display MapScreen --> Idea scraped? */
             }
-
-            if(AppState.selectedCampus.value != null) {
-                CampusButton(
-                    text = "Load Weather",
-                    onClick = {
-                        screenModel.loadWeather(AppState.selectedCampus.value!!)
-                    }
-                )
-            }
         }
     }
 
@@ -253,7 +262,7 @@ object HomeTab: CampusTab {
 fun CampusName(campus: Campus) {
     Text(style = MaterialTheme.typography.headlineLarge,
         text = campus.name,
-        color = MaterialTheme.colorScheme.onSecondary)
+        color = MaterialTheme.colorScheme.onBackground)
 }
 
 @Composable

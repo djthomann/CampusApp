@@ -28,8 +28,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.DepartureBoard
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.DirectionsBus
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,7 +37,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +61,7 @@ import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.StopRepository
+import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -124,10 +122,8 @@ object DepartureTab: CampusTab {
     override fun Content() {
         val screenModel = rememberScreenModel { DepartureScreenModel() }
 
-        val currentCampus = AppState.selectedCampus.value
-
+        val currentCampus = AppState.selectedCampus
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
-        val coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(pendingStop.value) {
             pendingStop.value?.let { stop ->
@@ -152,19 +148,14 @@ object DepartureTab: CampusTab {
 
                     val isActive = stop == screenModel.currentStop.value
 
-                    Button(
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-                        ),
+                    CampusButton(
+                        text = stop.name,
                         onClick = {
                             screenModel.loadDepartures(stop)
                             /*StopRepository.selectStop((stop))
                             onStopSelected() */
                         }
-                    ) {
-                        Text(stop.name)
-                    }
+                    )
                 }
             }
             Spacer(
@@ -209,11 +200,16 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
 
     val backgroundColor by animateColorAsState(
         targetValue = if (expanded.value)
-            MaterialTheme.colorScheme.primary
+            MaterialTheme.colorScheme.secondary
         else
-            MaterialTheme.colorScheme.surface,
+            MaterialTheme.colorScheme.surfaceContainerHigh,
         label = "backgroundColor"
     )
+
+    val textColor = if (expanded.value)
+        MaterialTheme.colorScheme.onSecondary
+    else
+        MaterialTheme.colorScheme.onSurface
 
     val iconRotation by animateFloatAsState(
         targetValue = if (expanded.value) 180f else 0f,
@@ -247,11 +243,12 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                     Icon(
                         imageVector = Icons.Rounded.DirectionsBus,
                         contentDescription = "Course Type Icon",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
+                        tint = textColor
                     )
-                    Text(modifier = Modifier.padding(end = 10.dp), fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.name)
+                    Text(color = textColor, modifier = Modifier.padding(end = 10.dp), fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.name)
                 }
-                Text(fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.time.toString())
+                Text(color = textColor, fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.time.toString())
             }
             AnimatedVisibility(
                 visible = expanded.value
@@ -259,13 +256,13 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                 Row(
                     modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
                 ) {
-                    VerticalDivider(color = Color.White, thickness = 2.dp,
+                    VerticalDivider(color = textColor, thickness = 2.dp,
                         modifier = Modifier
                             .fillMaxHeight()
                             .padding(start = 11.dp) // Width Icons / 2 + own width / 2
                     )
                     if(journey == null) {
-                        Text(stringResource(Res.string.no_stops_found))
+                        Text(color = textColor, text = stringResource(Res.string.no_stops_found))
                     } else {
 
                         Column(
@@ -282,13 +279,13 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                             println("NEXT STOPS: $nextStops")
 
                             if (nextStops.isEmpty()) {
-                                Text(stringResource(Res.string.final_stop), style = MaterialTheme.typography.bodySmall)
+                                Text(color = textColor, text = stringResource(Res.string.final_stop), style = MaterialTheme.typography.bodySmall)
                             } else {
                                 nextStops.forEach { stop ->
                                     Text(
                                         text = stop.name,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                        color = textColor.copy(0.5f)
                                     )
                                 }
                             }
@@ -301,7 +298,8 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                                     Text(
                                         modifier = Modifier,
                                         text = stringResource(Res.string.show_more),
-                                        style = MaterialTheme.typography.bodyMedium
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = textColor
                                     )
                                 }
                             }
@@ -321,17 +319,20 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.LocationOn,
-                        contentDescription = "Location Icon"
+                        contentDescription = "Location Icon",
+                        tint = textColor
                     )
                     Text(
                         text = departure.direction,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = textColor
                     )
                 }
                 Icon(
                     modifier = Modifier.rotate(iconRotation),
                     imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Open Journey"
+                    contentDescription = "Open Journey",
+                    tint = textColor
                 )
             }
 

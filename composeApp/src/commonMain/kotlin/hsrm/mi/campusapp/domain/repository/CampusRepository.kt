@@ -11,4 +11,8 @@ object CampusRepository {
         Campus("Rüsselsheim", Position( 8.424, 49.985), 0.0),
     )
 
+    fun getCampusByName(name: String): Campus? {
+        return campuses.find { it.name.equals(name, ignoreCase = true) }
+    }
+
 }

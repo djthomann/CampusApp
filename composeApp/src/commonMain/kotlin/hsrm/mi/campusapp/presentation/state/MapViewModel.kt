@@ -17,7 +17,7 @@ class MapViewModel: ViewModel() {
 
     val defaultCenter = Position(0.0, 0.0)
 
-    val selectedCampus = AppState.selectedCampus.value
+    val selectedCampus = AppState.selectedCampus
     var uiState by mutableStateOf(
         MapState(
             cameraPosition = CameraPosition(

@@ -216,7 +216,7 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
         ) {
             Text(
                 text = dateFormatter.format(date),
-                color = Color.White,
+                color = if(isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                 style = TextStyle(
                     fontSize = 18.sp,
                     lineHeight = 18.sp,
@@ -246,7 +246,7 @@ private fun CourseEntry(course: Course) {
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .clickable {
                     tabNavigator.current = MapTab
                 }

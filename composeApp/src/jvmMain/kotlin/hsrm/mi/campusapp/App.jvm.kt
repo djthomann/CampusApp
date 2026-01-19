@@ -1,9 +1,11 @@
 package hsrm.mi.campusapp
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
@@ -17,17 +19,25 @@ import hsrm.mi.campusapp.presentation.tabs.FoodTab
 import hsrm.mi.campusapp.presentation.tabs.HomeTab
 import hsrm.mi.campusapp.presentation.tabs.MapTab
 import hsrm.mi.campusapp.presentation.tabs.ScheduleTab
+import hsrm.mi.campusapp.presentation.tabs.SettingsTab
 
 @Composable
 actual fun MainScaffold(navigator: TabNavigator) {
     Scaffold { padding ->
         Row(Modifier.fillMaxSize().padding(padding)) {
-            NavigationRail {
+            NavigationRail(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ) {
                 NavItem(HomeTab)
                 NavItem(DepartureTab)
                 NavItem(ScheduleTab)
                 NavItem(FoodTab)
                 NavItem(MapTab)
+
+                Spacer(Modifier.weight(1f))
+
+                NavItem(SettingsTab)
             }
             AnimatedTabContent(navigator)
         }
