@@ -48,7 +48,8 @@ actual fun MainScaffold(navigator: TabNavigator) {
                     }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Open Settings"
+                            contentDescription = "Open Settings",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
