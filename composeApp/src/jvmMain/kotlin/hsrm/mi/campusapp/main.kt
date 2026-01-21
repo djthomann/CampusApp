@@ -8,6 +8,9 @@ import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
 import campusapp.composeapp.generated.resources.logo
 import dev.datlag.kcef.KCEF
+import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
+import hsrm.mi.campusapp.domain.persistence.getDatabaseBuilder
+import hsrm.mi.campusapp.domain.persistence.getRoomDatabase
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.io.File
@@ -15,6 +18,9 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
+
+    val db = getRoomDatabase(getDatabaseBuilder())
+    DatabaseHolder.init(db)
 
     Locale.setDefault(Locale.GERMANY) /* For testing only */
 

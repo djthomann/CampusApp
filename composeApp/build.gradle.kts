@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
@@ -26,6 +28,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.kotlinx.coroutines.android)
             implementation("androidx.core:core-splashscreen:1.0.1")
+            implementation(libs.androidx.room.sqlite.wrapper)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -62,6 +65,9 @@ kotlin {
             implementation(libs.voyager.tabs)
 
             implementation(libs.ktor.client.core)
+
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -73,6 +79,8 @@ kotlin {
         }
     }
 }
+
+
 
 android {
     namespace = "hsrm.mi.campusapp"
@@ -110,6 +118,13 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+
+    listOf(
+        "kspAndroid",
+        "kspJvm"
+    ).forEach {
+        add(it, libs.androidx.room.compiler)
+    }
 }
 
 compose.desktop {
@@ -123,3 +138,8 @@ compose.desktop {
         }
     }
 }
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
