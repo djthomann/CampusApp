@@ -6,4 +6,5 @@ import androidx.room.PrimaryKey
 @Entity
 class MenuEntity(
     @PrimaryKey val date: String,
+    val dateString: String,
 )

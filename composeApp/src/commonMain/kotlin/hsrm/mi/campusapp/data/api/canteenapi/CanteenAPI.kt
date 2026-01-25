@@ -1,13 +1,17 @@
 package hsrm.mi.campusapp.data.api.canteen
 
-import hsrm.mi.campusapp.domain.model.Dish
-import hsrm.mi.campusapp.domain.model.Menu
+import hsrm.mi.campusapp.data.api.canteenapi.DishDTO
+import hsrm.mi.campusapp.data.api.canteenapi.MenuDTO
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 object CanteenAPI {
 
@@ -16,7 +20,8 @@ object CanteenAPI {
     val client = HttpClient()
 
     /* TODO() Make this more beautiful */
-    private suspend fun scrapeCanteenData(): List<Menu> {
+    @OptIn(ExperimentalTime::class)
+    private suspend fun scrapeCanteenData(): List<MenuDTO> {
         val htmlResponse = client.get("$BASE_URL/mensa-point").bodyAsText()
 
         println("RAW Response: $htmlResponse")
@@ -24,7 +29,7 @@ object CanteenAPI {
         val document = Jsoup.parse(htmlResponse)
         val menuDivs: Elements = document.getElementsByClass("speiseplan")
 
-        val menus = mutableListOf<Menu>()
+        val menus = mutableListOf<MenuDTO>()
 
         menuDivs.forEach { div ->
             run {
@@ -32,7 +37,7 @@ object CanteenAPI {
 
                 val dishRows = div.select(".panel-body table tbody tr")
 
-                val dishes = mutableListOf<Dish>()
+                val dishes = mutableListOf<DishDTO>()
 
                 dishRows.forEach { dish ->
                     run {
@@ -52,7 +57,7 @@ object CanteenAPI {
                         val dishPrice = priceCell.select("p strong ").text()
 
                         dishes.add(
-                            Dish(
+                            DishDTO(
                                 name = dishName,
                                 description = dishFurtherInfo,
                                 price = dishPrice,
@@ -62,7 +67,9 @@ object CanteenAPI {
                     }
                 }
 
-                val menu = Menu(dayString, dishes)
+                val menu = MenuDTO(dayString, Clock.System
+                    .todayIn(TimeZone.currentSystemDefault())
+                    .year, dishes)
                 menus.add(menu)
             }
         }
@@ -70,7 +77,7 @@ object CanteenAPI {
         return menus
     }
 
-    suspend fun getMenusForWeek(day: LocalDate): List<Menu> {
+    suspend fun getMenusForWeek(day: LocalDate): List<MenuDTO> {
         return scrapeCanteenData()
     }
 }

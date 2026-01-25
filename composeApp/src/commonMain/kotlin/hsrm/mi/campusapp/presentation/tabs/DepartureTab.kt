@@ -224,7 +224,6 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
             .background(backgroundColor)
 
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -275,8 +274,8 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                             val currentIndex = journey.stops.indexOfFirst { it.id == stopId } /* id doesn't work because somehow it's not identical over different requests? */
                             val nextStops = journey.stops.drop(currentIndex + 1).take(3)
 
-                            println("CURRENT INDEX $currentIndex")
-                            println("NEXT STOPS: $nextStops")
+                            // println("CURRENT INDEX $currentIndex")
+                            // println("NEXT STOPS: $nextStops")
 
                             if (nextStops.isEmpty()) {
                                 Text(color = textColor, text = stringResource(Res.string.final_stop), style = MaterialTheme.typography.bodySmall)

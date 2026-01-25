@@ -20,7 +20,7 @@ fun getRoomDatabase(
 @Database(entities = [
     DishEntity::class,
     MenuEntity::class
-                     ], version = 5)
+                     ], version = 7)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getDishDao(): DishDao
