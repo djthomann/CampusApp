@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -112,33 +113,29 @@ object ScheduleTab: CampusTab {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp, 10.dp, 10.dp, 0.dp)
-                    .background(MaterialTheme.colorScheme.background),
-                horizontalArrangement = Arrangement.SpaceBetween,
-
-                ) {
-                DayOfWeek.entries.forEach { dayOfWeek ->
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(0.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(0.dp),
-                            text = dayOfWeek.toSingleLetter(),
-                            style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            }
             WeekCalendar(
-                modifier = Modifier,
+                modifier = Modifier.width(600.dp),
                 state = state,
                 contentPadding = PaddingValues(10.dp),
+                weekHeader = { week ->
+                    Row {
+                        DayOfWeek.entries.forEach { dayOfWeek ->
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(0.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(0.dp),
+                                    text = dayOfWeek.toSingleLetter(),
+                                    style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                },
                 dayContent = { day ->
                     Day(day.date, isSelected = screenModel.selection == day.date) { clicked ->
                         if (screenModel.selection != clicked) {
@@ -241,11 +238,14 @@ private fun CourseEntry(course: Course) {
 
     val tabNavigator = LocalTabNavigator.current
 
-    Row {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .fillMaxWidth()
+                .width(900.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .clickable {
                     tabNavigator.current = MapTab

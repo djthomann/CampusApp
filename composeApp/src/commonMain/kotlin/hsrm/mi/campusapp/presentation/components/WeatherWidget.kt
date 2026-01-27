@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,8 @@ fun WeatherWidget(
     weather: CurrentWeather
 ) {
     Row(
-        modifier = modifier.padding(8.dp)
+        modifier = modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text("${weather.temperature.toInt()} °C")
         Spacer(modifier = Modifier.width(8.dp))

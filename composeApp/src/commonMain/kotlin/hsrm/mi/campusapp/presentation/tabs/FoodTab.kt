@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -279,53 +281,103 @@ fun MenuEntry(menu: Menu, expanded: Boolean, onClick: () -> Unit) {
                         DishEntry(dish, index % 2 == 0)
                         HorizontalDivider(thickness = 1.dp)
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    BoxWithConstraints(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                        ) {
-                            Column {
-                                Text("Beilagen", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                                menu.sideDishes[SideDishType.GARNISH]?.forEach {
-                                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-                                }
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                        ) {
-                            Column {
-                                Text("Salate", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                                menu.sideDishes[SideDishType.SALAD]?.forEach {
-                                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-                                }
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                        ) {
-                            Column {
-                                Text("Dessert", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                                menu.sideDishes[SideDishType.DESSERT]?.forEach {
-                                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-                                }
-                            }
+                        val isWide = maxWidth > 600.dp
+
+                        if (isWide) {
+                            SideDishesRow(menu.sideDishes)
+                        } else {
+                            SideDishesColumn(menu.sideDishes)
                         }
                     }
+
                 }
             }
         }
         Box(
             modifier = Modifier.fillMaxWidth().background(if(!expanded) textColor else Color.Transparent).height(4.dp)
         )
+    }
+}
+
+@Composable
+fun SideDishesColumn(sideDishes: Map<SideDishType, List<String>>) {
+
+    val textColor = MaterialTheme.colorScheme.onSecondary
+
+    Column(
+        modifier = Modifier.fillMaxHeight(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Column {
+            Text("Beilagen", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+            sideDishes[SideDishType.GARNISH]?.forEach {
+                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+            }
+        }
+        Column {
+            Text("Salate", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+            sideDishes[SideDishType.SALAD]?.forEach {
+                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+            }
+        }
+        Column {
+            Text("Dessert", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+            sideDishes[SideDishType.DESSERT]?.forEach {
+                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun SideDishesRow(sideDishes: Map<SideDishType, List<String>>) {
+
+    val textColor = MaterialTheme.colorScheme.onSecondary
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+        ) {
+            Column {
+                Text("Beilagen", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+                sideDishes[SideDishType.GARNISH]?.forEach {
+                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+        ) {
+            Column {
+                Text("Salate", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+                sideDishes[SideDishType.SALAD]?.forEach {
+                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+        ) {
+            Column {
+                Text("Dessert", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+                sideDishes[SideDishType.DESSERT]?.forEach {
+                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+                }
+            }
+        }
     }
 }
 
@@ -338,10 +390,10 @@ fun DishEntry(dish: Dish, isEven: Boolean) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(dish.name, style = MaterialTheme.typography.bodyMedium, color = textColor)
-        Text(dish.price, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+        Text(modifier = Modifier.weight(1f), text = dish.name, style = MaterialTheme.typography.bodyMedium, color = textColor)
+        Text(modifier = Modifier.wrapContentWidth(), text = dish.price, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
     }
 }

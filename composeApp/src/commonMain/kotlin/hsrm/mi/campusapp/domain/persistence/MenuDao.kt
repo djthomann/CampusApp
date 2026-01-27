@@ -14,6 +14,8 @@ interface MenuDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMenu(menu: MenuEntity)
 
+    @Query("SELECT * FROM MenuEntity WHERE date = :day")
+    fun getMenuForDay(day: String): Flow<MenuWithDishes?>
     @Transaction
     @Query("SELECT * FROM MenuEntity")
     fun getMenusWithDishesAsFlow(): Flow<List<MenuWithDishes>>

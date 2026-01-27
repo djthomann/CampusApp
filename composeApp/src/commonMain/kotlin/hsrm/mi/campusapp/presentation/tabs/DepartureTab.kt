@@ -322,17 +322,19 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                         tint = textColor
                     )
                     Text(
+                        modifier = Modifier.weight(1f),
                         text = departure.direction,
                         style = MaterialTheme.typography.bodyMedium,
                         color = textColor
                     )
+                    Icon(
+                        modifier = Modifier.rotate(iconRotation),
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Open Journey",
+                        tint = textColor
+                    )
                 }
-                Icon(
-                    modifier = Modifier.rotate(iconRotation),
-                    imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Open Journey",
-                    tint = textColor
-                )
+
             }
 
 

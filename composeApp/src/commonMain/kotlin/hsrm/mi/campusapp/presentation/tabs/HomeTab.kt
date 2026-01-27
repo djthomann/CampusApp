@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -39,18 +40,21 @@ import campusapp.composeapp.generated.resources.choose_your_campus
 import campusapp.composeapp.generated.resources.home
 import campusapp.composeapp.generated.resources.stops
 import campusapp.composeapp.generated.resources.welcome_campus
-import campusapp.composeapp.generated.resources.work_in_progress
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.data.api.openmeteo.CurrentWeather
 import hsrm.mi.campusapp.data.api.openmeteo.OpenMeteoAPI
 import hsrm.mi.campusapp.domain.model.Campus
+import hsrm.mi.campusapp.domain.model.Dish
+import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CourseRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.components.WeatherWidget
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
@@ -61,10 +65,34 @@ import kotlin.time.ExperimentalTime
 class HomeScreenModel: ScreenModel {
 
     val currentWeather = mutableStateOf<CurrentWeather?>(null)
+    val todaysMeal = mutableStateOf<Menu?>(null)
 
     fun loadWeather(campus: Campus) {
         screenModelScope.launch {
             currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun loadTodaysMenu() {
+        screenModelScope.launch {
+            val menuEntity = DatabaseHolder.db.getMenuDao().getMenuForDay(LocalDate.now().toString()).first()
+            menuEntity?.let {
+                todaysMeal.value = Menu(
+                    date = LocalDate.parse(menuEntity.menu.date),
+                    dateString = menuEntity.menu.dateString,
+                    dishes = menuEntity.dishes.map { dishEntity ->
+                        Dish(
+                            name = dishEntity.name,
+                            description = dishEntity.description,
+                            price = dishEntity.price,
+                            dishAllergens = dishEntity.dishAllergens
+                        )
+                    },
+                    sideDishes = menuEntity.sideDishes.groupBy { it.type }.mapValues { (_, entities) -> entities.map { it.name } }
+                )
+            }
+
         }
     }
 
@@ -104,6 +132,7 @@ object HomeTab: CampusTab {
 
         if(currentCampus != null) {
             screenModel.loadWeather(currentCampus)
+            screenModel.loadTodaysMenu()
         }
 
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
@@ -143,7 +172,7 @@ object HomeTab: CampusTab {
                 }
             }
             currentCampus?.let {
-
+                /*
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -151,20 +180,17 @@ object HomeTab: CampusTab {
                 ) {
                     WelcomeText(it)
 
-                }
-                CampusName(it)
-                Spacer(modifier = Modifier.height(20.dp))
-
-                screenModel.currentWeather.value?.let { weather ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Wetter am Campus:")
-                        WeatherWidget(weather = weather)
+                }*/
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    CampusName(it, modifier = Modifier.weight(1f))
+                    screenModel.currentWeather.value?.let { weather ->
+                        WeatherWidget(weather = weather, modifier = Modifier.wrapContentWidth())
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -173,7 +199,9 @@ object HomeTab: CampusTab {
             if(currentCampus != null) {
 
                 Column {
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             imageVector = DepartureTab.activeIcon,
                             contentDescription = DepartureTab.topAppBarTitle
@@ -203,7 +231,9 @@ object HomeTab: CampusTab {
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Column {
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             imageVector = ScheduleTab.activeIcon ,
                             contentDescription = ScheduleTab.topAppBarTitle
@@ -230,19 +260,22 @@ object HomeTab: CampusTab {
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
-                Column {
-                    Row {
-                        Icon(
-                            imageVector =  FoodTab.activeIcon  ,
-                            contentDescription = FoodTab.topAppBarTitle
-                        )
-                        Text(FoodTab.topAppBarTitle)
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Text(text = stringResource(Res.string.work_in_progress), style = MaterialTheme.typography.bodyMedium)
+                screenModel.todaysMeal.value?.let {
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector =  FoodTab.activeIcon  ,
+                                contentDescription = FoodTab.topAppBarTitle
+                            )
+                            Text(FoodTab.topAppBarTitle)
+                        }
+                        Column (
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            it.dishes.forEach { dish -> Text("• ${dish.name}", style = MaterialTheme.typography.bodyMedium) }
+                        }
                     }
                 }
             }
@@ -259,10 +292,13 @@ object HomeTab: CampusTab {
 
 
 @Composable
-fun CampusName(campus: Campus) {
-    Text(style = MaterialTheme.typography.headlineLarge,
+fun CampusName(campus: Campus, modifier: Modifier = Modifier) {
+    Text(
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineLarge,
         text = campus.name,
-        color = MaterialTheme.colorScheme.onBackground)
+        color = MaterialTheme.colorScheme.onBackground
+    )
 }
 
 @Composable
