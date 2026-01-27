@@ -2,6 +2,8 @@ package hsrm.mi.campusapp.data.api.canteen
 
 import hsrm.mi.campusapp.data.api.canteenapi.DishDTO
 import hsrm.mi.campusapp.data.api.canteenapi.MenuDTO
+import hsrm.mi.campusapp.data.api.canteenapi.SideDishMapper
+import hsrm.mi.campusapp.domain.model.SideDishType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -9,6 +11,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.jsoup.Jsoup
+import org.jsoup.parser.Parser
 import org.jsoup.select.Elements
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -24,7 +27,7 @@ object CanteenAPI {
     private suspend fun scrapeCanteenData(): List<MenuDTO> {
         val htmlResponse = client.get("$BASE_URL/mensa-point").bodyAsText()
 
-        println("RAW Response: $htmlResponse")
+        // innerHtmlprintln("RAW Response: $htmlResponse")
 
         val document = Jsoup.parse(htmlResponse)
         val menuDivs: Elements = document.getElementsByClass("speiseplan")
@@ -37,7 +40,10 @@ object CanteenAPI {
 
                 val dishRows = div.select(".panel-body table tbody tr")
 
+                val sideDishDivs = div.select(".panel-body > div")
+
                 val dishes = mutableListOf<DishDTO>()
+                val sideDishes = mutableMapOf<SideDishType, List<String>>()
 
                 dishRows.forEach { dish ->
                     run {
@@ -67,10 +73,36 @@ object CanteenAPI {
                     }
                 }
 
+                sideDishDivs.forEach { div ->
+
+                    val sideDishButtons = div.select("a[data-bs-title]")
+
+                    sideDishButtons.forEach { button ->
+
+                        val sideDishTypeString: String = button.ownText()
+
+                        val escapedHtml = button.attr("data-bs-title")
+                        val innerHtml = Parser.unescapeEntities(escapedHtml, true)
+
+                        val doc = Jsoup.parse(innerHtml)
+
+                        val dishes = doc.select("div.sidedish li span").map { it.text().trim() }
+
+                        val sideDishType = SideDishMapper.sideDishTypeFromHTML(sideDishTypeString)
+
+                        sideDishType?.let {
+                            sideDishes[sideDishType] = dishes
+                        }
+
+                    }
+
+                }
+
                 val menu = MenuDTO(dayString, Clock.System
                     .todayIn(TimeZone.currentSystemDefault())
-                    .year, dishes)
+                    .year, dishes, sideDishes)
                 menus.add(menu)
+                println("MENU" + menu)
             }
         }
 

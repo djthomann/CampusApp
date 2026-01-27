@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,9 +49,11 @@ import hsrm.mi.campusapp.data.api.canteen.CanteenAPI
 import hsrm.mi.campusapp.data.api.canteenapi.toDomain
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
+import hsrm.mi.campusapp.domain.model.SideDishType
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.DishEntity
 import hsrm.mi.campusapp.domain.persistence.MenuEntity
+import hsrm.mi.campusapp.domain.persistence.SideDishEntity
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +64,7 @@ import kotlin.time.ExperimentalTime
 
 class FoodScreenModel: ScreenModel {
 
+    private val sideDishDao = DatabaseHolder.db.getSideDishDao()
     private val dishDao = DatabaseHolder.db.getDishDao()
     private val menuDao = DatabaseHolder.db.getMenuDao()
 
@@ -93,6 +97,17 @@ class FoodScreenModel: ScreenModel {
                     )
                     dishDao.insert(newDish)
                 }
+                menu.sideDishes.forEach { entry ->
+                    entry.value.forEach { sideDish ->
+                        val newSideDish = SideDishEntity(
+                            menuId = menu.date.toString(),
+                            type = entry.key,
+                            name = sideDish
+                        )
+                        sideDishDao.insert(newSideDish)
+                    }
+
+                }
             }
         }
     }
@@ -102,17 +117,18 @@ class FoodScreenModel: ScreenModel {
             menuDao.getMenusWithDishesAsFlow().collect { loadedMenus ->
                 print("LOADED:$loadedMenus")
                 menus = loadedMenus.map { menuWithDishesEntity -> Menu(
-                        date = LocalDate.parse(menuWithDishesEntity.menu.date),
-                        dateString = menuWithDishesEntity.menu.dateString,
-                        dishes = menuWithDishesEntity.dishes.map { dishEntity ->
-                            Dish(
-                                name = dishEntity.name,
-                                description = dishEntity.description,
-                                price = dishEntity.price,
-                                dishAllergens = dishEntity.dishAllergens
-                            )
-                        }
-                    )
+                    date = LocalDate.parse(menuWithDishesEntity.menu.date),
+                    dateString = menuWithDishesEntity.menu.dateString,
+                    dishes = menuWithDishesEntity.dishes.map { dishEntity ->
+                        Dish(
+                            name = dishEntity.name,
+                            description = dishEntity.description,
+                            price = dishEntity.price,
+                            dishAllergens = dishEntity.dishAllergens
+                        )
+                    },
+                    sideDishes = menuWithDishesEntity.sideDishes.groupBy { it.type }.mapValues { (_, entities) -> entities.map { it.name } }
+                )
                 }
 
             }
@@ -258,11 +274,52 @@ fun MenuEntry(menu: Menu, expanded: Boolean, onClick: () -> Unit) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
+                    Text("Gerichte", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
                     menu.dishes.sortedBy { dish -> dish.price }.forEachIndexed { index, dish ->
                         DishEntry(dish, index % 2 == 0)
                         HorizontalDivider(thickness = 1.dp)
                     }
-
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                        ) {
+                            Column {
+                                Text("Beilagen", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+                                menu.sideDishes[SideDishType.GARNISH]?.forEach {
+                                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+                                }
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                        ) {
+                            Column {
+                                Text("Salate", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+                                menu.sideDishes[SideDishType.SALAD]?.forEach {
+                                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+                                }
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                        ) {
+                            Column {
+                                Text("Dessert", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
+                                menu.sideDishes[SideDishType.DESSERT]?.forEach {
+                                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

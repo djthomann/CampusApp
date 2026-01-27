@@ -9,5 +9,10 @@ data class MenuWithDishes(
         parentColumn = "date",
         entityColumn = "menuId"
     )
-    val dishes: List<DishEntity>
+    val dishes: List<DishEntity>,
+    @Relation(
+        parentColumn = "date",
+        entityColumn = "menuId"
+    )
+    val sideDishes: List<SideDishEntity>
 )

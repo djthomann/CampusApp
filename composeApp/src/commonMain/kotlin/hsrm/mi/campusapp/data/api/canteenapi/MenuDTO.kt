@@ -1,6 +1,7 @@
 package hsrm.mi.campusapp.data.api.canteenapi
 
 import hsrm.mi.campusapp.domain.model.Menu
+import hsrm.mi.campusapp.domain.model.SideDishType
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
 import kotlin.time.ExperimentalTime
@@ -8,14 +9,16 @@ import kotlin.time.ExperimentalTime
 data class MenuDTO (
     val date: String,
     val year: Int,
-    val dishes: List<DishDTO>
+    val dishes: List<DishDTO>,
+    val sideDishes: Map<SideDishType, List<String>>
 )
 
 fun MenuDTO.toDomain(): Menu {
     return Menu(
         date = dateStringToLocalDate(date, year),
         dateString = date,
-        dishes = dishes.map { it.toDomain() }
+        dishes = dishes.map { it.toDomain() },
+        sideDishes = sideDishes
     )
 }
 

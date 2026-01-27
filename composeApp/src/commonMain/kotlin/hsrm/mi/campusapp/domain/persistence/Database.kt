@@ -4,6 +4,7 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
+import androidx.room.TypeConverters
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
 
@@ -19,12 +20,18 @@ fun getRoomDatabase(
 
 @Database(entities = [
     DishEntity::class,
-    MenuEntity::class
-                     ], version = 7)
+    MenuEntity::class,
+    SideDishEntity::class
+                     ], version = 9)
 @ConstructedBy(AppDatabaseConstructor::class)
+@TypeConverters(
+    SideDishTypeConverter::class
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getDishDao(): DishDao
     abstract fun getMenuDao(): MenuDao
+
+    abstract fun getSideDishDao(): SideDishDao
 }
 
 @Suppress("KotlinNoActualForExpect")
