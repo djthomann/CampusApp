@@ -1,19 +1,37 @@
 package hsrm.mi.campusapp.presentation.tabs
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hsrm.mi.campusapp.domain.repository.CampusRepository
+import hsrm.mi.campusapp.domain.repository.CanteenRepository
 import hsrm.mi.campusapp.presentation.state.AppState
 
 object SettingsTab: CampusTab {
@@ -38,24 +56,121 @@ object SettingsTab: CampusTab {
             }
         }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
 
-        val currentCampus = AppState.selectedCampus
-
         Column(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(text = "Campus: ${currentCampus?.name ?: "None"}")
-            Button(onClick = {AppState.selectCampus(null)}) {
-                Text("Clear Campus")
-            }
-            Button(
-                onClick = {
-                    AppState.toggleDarkMode()
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text("Toggle Dark Mode")
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    CampusSelection()
+                    Button(onClick = {AppState.selectCampus(null)}) {
+                        Text("Clear Campus")
+                    }
+                }
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    CanteenSelection(Modifier.weight(1f))
+
+                }
+
+            }
+
+            Text("Toggle Dark Mode")
+            Switch(
+                checked = AppState.isDarkMode.value,
+                onCheckedChange = { _ -> AppState.toggleDarkMode() },
+                thumbContent = {
+                    if(AppState.isDarkMode.value)
+                        Icon(imageVector =  Icons.Filled.DarkMode, contentDescription = "")
+                    else
+                        Icon(imageVector =  Icons.Filled.LightMode, contentDescription = "")
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CampusSelection(modifier: Modifier = Modifier) {
+    var selectedOption = AppState.selectedCampus
+    var expanded by remember { mutableStateOf(false) }
+    val options = CampusRepository.campuses
+
+    ExposedDropdownMenuBox(
+        modifier = modifier.fillMaxWidth(),
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TextField(
+            value = selectedOption?.name ?: "None",
+            onValueChange = { },
+            readOnly = true,
+            label = { Text("Campus") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.name) },
+                    onClick = {
+                        AppState.selectCampus(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CanteenSelection(modifier: Modifier = Modifier) {
+    val options = CanteenRepository.canteens
+    var selectedOption by remember { mutableStateOf(options[0]) }
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        modifier = Modifier,
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TextField(
+            value = selectedOption.name,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Mensa") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.name) },
+                    onClick = {
+                        selectedOption = option
+                        expanded = false
+                    }
+                )
             }
         }
     }

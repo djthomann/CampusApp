@@ -131,7 +131,10 @@ object HomeTab: CampusTab {
         val currentCampus = AppState.selectedCampus
 
         if(currentCampus != null) {
-            screenModel.loadWeather(currentCampus)
+            if (screenModel.currentWeather.value == null) {
+                screenModel.loadWeather(currentCampus) // TODO() Refresh after a certain time and after campus switch
+            }
+
             screenModel.loadTodaysMenu()
         }
 

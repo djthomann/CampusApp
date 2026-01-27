@@ -20,11 +20,6 @@ object StopRepository {
     var selectedStop by mutableStateOf(stops.first())
         private set
 
-    fun selectStop(stop: Stop) {
-        println("Test")
-        selectedStop = stop
-    }
-
     fun getStopsForCampusName(name: String): List<Stop> {
         return stops.filter { it.campus == name }
     }

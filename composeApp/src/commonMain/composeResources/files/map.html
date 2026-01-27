@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MapLibre 3D Buildings Demo</title>
+    <link
+            href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css"
+            rel="stylesheet"
+    />
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+        #map {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+    let map;
+
+    function initMap() {
+
+        if (map) {
+            map.remove();
+            map = null;
+        }
+
+        map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [8.217, 50.0964],
+            zoom: 16,
+            pitch: 45,
+            bearing: -17.6,
+            antialias: true
+        });
+
+        map.addControl(new maplibregl.NavigationControl());
+
+        map.on('webglcontextlost', (e) => {
+            e.preventDefault();
+            console.warn('WebGL context lost, reinitializing map...');
+            initMap();
+        });
+
+        map.on('load', () => {
+            if (!map.getSource('osm-buildings')) {
+                map.addSource('osm-buildings', {
+                    type: 'vector',
+                    url: 'https://tiles.openfreemap.org/vector-tiles/buildings.json'
+                });
+            }
+
+            if (!map.getLayer('3d-buildings')) {
+                map.addLayer({
+                    id: '3d-buildings',
+                    type: 'fill-extrusion',
+                    source: 'osm-buildings',
+                    'source-layer': 'building',
+                    filter: ['==', 'extrude', 'true'],
+                    minzoom: 15,
+                    paint: {
+                        'fill-extrusion-color': '#aaa',
+                        'fill-extrusion-height': ['get', 'height'],
+                        'fill-extrusion-base': ['get', 'min_height'],
+                        'fill-extrusion-opacity': 0.6
+                    }
+                });
+            }
+        });
+    }
+
+    // Map initialisieren
+    initMap();
+</script>
+</body>
+</html>
