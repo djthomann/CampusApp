@@ -2,6 +2,8 @@ package hsrm.mi.campusapp.presentation.tabs
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
@@ -22,8 +25,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -54,6 +60,7 @@ import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.components.WeatherWidget
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -141,32 +148,44 @@ object HomeTab: CampusTab {
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
 
+        var visibleCount by remember { mutableStateOf(0) }
+
+        LaunchedEffect(Unit) {
+            CampusRepository.campuses.forEachIndexed { index, _ ->
+                visibleCount = index + 1
+                delay(250)
+            }
+        }
+
         Column(
             modifier = Modifier.fillMaxSize().padding(12.dp)
         ) {
             AnimatedVisibility(
                 visible = AppState.selectedCampus == null,
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     ChooseText()
+
+
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(CampusRepository.campuses) { campus ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp).animateItem(
-                                        fadeInSpec = tween(durationMillis = 300),
-                                        fadeOutSpec = tween(durationMillis = 300),
-                                        placementSpec = tween(durationMillis = 300)
-                                    )
+                        itemsIndexed(CampusRepository.campuses) { index, campus ->
+                            AnimatedVisibility(
+                                visible = index < visibleCount,
+                                enter = slideInVertically(
+                                    initialOffsetY = { -it },
+                                    animationSpec = tween(durationMillis = 300)
+                                ) + fadeIn(animationSpec = tween(300))
                             ) {
                                 CampusButton(
                                     text = campus.name,
-                                    onClick = {
-                                        AppState.selectCampus(campus)
-                                              },
+                                    onClick = { AppState.selectCampus(campus) },
                                     isActive = true
                                 )
                             }

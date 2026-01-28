@@ -17,5 +17,6 @@
     <string name="menu_to_be_implemented">Menu is yet to be implemented</string>
     <string name="course_type_lecture">Lecture</string>
     <string name="course_type_practical">Practical</string>
+    <string name="course_type_extra">Extra</string>
     <string name="test_string">Value: %1$s</string>
 </resources>

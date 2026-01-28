@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -62,40 +63,47 @@ object SettingsTab: CampusTab {
 
         Column(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    CampusSelection()
-                    Button(onClick = {AppState.selectCampus(null)}) {
-                        Text("Clear Campus")
-                    }
+                CampusSelection(Modifier.weight(1f))
+                Button(onClick = {AppState.selectCampus(null)}) {
+                    Text("Clear Campus")
                 }
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    CanteenSelection(Modifier.weight(1f))
-
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                CanteenSelection(Modifier.weight(1f))
+                Button(onClick = {}) {
+                    Text("Clear Canteen")
                 }
-
             }
 
-            Text("Toggle Dark Mode")
-            Switch(
-                checked = AppState.isDarkMode.value,
-                onCheckedChange = { _ -> AppState.toggleDarkMode() },
-                thumbContent = {
-                    if(AppState.isDarkMode.value)
-                        Icon(imageVector =  Icons.Filled.DarkMode, contentDescription = "")
-                    else
-                        Icon(imageVector =  Icons.Filled.LightMode, contentDescription = "")
-                }
-            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Switch(
+                    checked = AppState.isDarkMode.value,
+                    onCheckedChange = { _ -> AppState.toggleDarkMode() },
+                    thumbContent = {
+                        if(AppState.isDarkMode.value)
+                            Icon(imageVector =  Icons.Filled.DarkMode, contentDescription = "")
+                        else
+                            Icon(imageVector =  Icons.Filled.LightMode, contentDescription = "")
+                    }
+                )
+                Text("Toggle Dark Mode")
+            }
         }
     }
 }
@@ -103,7 +111,7 @@ object SettingsTab: CampusTab {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CampusSelection(modifier: Modifier = Modifier) {
-    var selectedOption = AppState.selectedCampus
+    val selectedOption = AppState.selectedCampus
     var expanded by remember { mutableStateOf(false) }
     val options = CampusRepository.campuses
 
@@ -146,7 +154,7 @@ fun CanteenSelection(modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
-        modifier = Modifier,
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {

@@ -1,9 +1,11 @@
 package hsrm.mi.campusapp.presentation.state
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.settings.AppSettings
+import kotlinx.coroutines.flow.map
 
 object AppState {
 
@@ -13,6 +15,10 @@ object AppState {
     var selectedCampus: Campus? = null
         get() = CampusRepository.getCampusByName(selectedCampusName.value)
         private set
+
+    val selectedCampusFlow = snapshotFlow { selectedCampusName.value }
+        .map { name -> CampusRepository.getCampusByName(name) }
+
 
     var isDarkMode = mutableStateOf<Boolean>(settings.isDarkMode)
         private set

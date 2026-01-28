@@ -1,7 +1,7 @@
 package hsrm.mi.campusapp.domain.repository
 
 import hsrm.mi.campusapp.domain.model.Campus
-import io.github.dellisd.spatialk.geojson.Position
+import org.maplibre.spatialk.geojson.Position
 
 object CampusRepository {
 

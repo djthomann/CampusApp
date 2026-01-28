@@ -17,5 +17,6 @@
     <string name="menu_to_be_implemented">Speiseplan wird noch umgesetzt</string>
     <string name="course_type_lecture">Vorlesung</string>
     <string name="course_type_practical">Praktikum</string>
+    <string name="course_type_extra">Extra</string>
     <string name="test_string">Wert: %1$s</string>
 </resources>

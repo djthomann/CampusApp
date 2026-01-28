@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import io.github.dellisd.spatialk.geojson.Position
+import org.maplibre.spatialk.geojson.Position
 
 data class Canteen(
     val name: String,

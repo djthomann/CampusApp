@@ -22,6 +22,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
+import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import hsrm.mi.campusapp.presentation.tabs.DepartureTab
 import hsrm.mi.campusapp.presentation.tabs.FoodTab
@@ -34,25 +35,29 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 actual fun MainScaffold(navigator: TabNavigator) {
+
     Scaffold(
         topBar = {
-            val tabNavigator = LocalTabNavigator.current
+
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 ),
                 title = { Text(stringResource(Res.string.app_name)) },
                 actions = {
-                    IconButton(onClick = {
-                        tabNavigator.current = SettingsTab
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Open Settings",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
+                    if(AppState.selectedCampus != null) {
+                        IconButton(onClick = {
+                            navigator.current = SettingsTab
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Open Settings",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
+
                 }
             )
         },
@@ -64,12 +69,14 @@ actual fun MainScaffold(navigator: TabNavigator) {
             }
         },
         bottomBar = {
-            NavigationBar() {
-                NavItem(FoodTab)
-                NavItem(ScheduleTab)
-                NavItem(HomeTab)
-                NavItem(DepartureTab)
-                NavItem(MapTab)
+            if(AppState.selectedCampus != null || navigator.current == SettingsTab) {
+                NavigationBar() {
+                    NavItem(FoodTab)
+                    NavItem(ScheduleTab)
+                    NavItem(HomeTab)
+                    NavItem(DepartureTab)
+                    NavItem(MapTab)
+                }
             }
         }
     )

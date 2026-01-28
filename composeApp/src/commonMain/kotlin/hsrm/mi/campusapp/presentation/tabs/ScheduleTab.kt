@@ -248,6 +248,7 @@ private fun CourseEntry(course: Course) {
                 .width(900.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .clickable {
+                    MapTab.moveToPosition(course.building)
                     tabNavigator.current = MapTab
                 }
         ) {
@@ -258,7 +259,7 @@ private fun CourseEntry(course: Course) {
                 modifier = Modifier.padding(12.dp)
             ) {
                 Text(text = course.name, style = MaterialTheme.typography.bodyLarge)
-                Text(text = course.lecturer, style = MaterialTheme.typography.bodyMedium)
+                if(course.lecturer != null) Text(text = course.lecturer, style = MaterialTheme.typography.bodyMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
