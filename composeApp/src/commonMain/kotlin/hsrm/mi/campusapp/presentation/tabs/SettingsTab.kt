@@ -6,17 +6,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -71,8 +72,11 @@ object SettingsTab: CampusTab {
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 CampusSelection(Modifier.weight(1f))
-                Button(onClick = {AppState.selectCampus(null)}) {
-                    Text("Clear Campus")
+                IconButton(onClick = { AppState.selectCampus(null) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Clear Canteen"
+                    )
                 }
             }
             Row(
@@ -81,8 +85,11 @@ object SettingsTab: CampusTab {
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 CanteenSelection(Modifier.weight(1f))
-                Button(onClick = {}) {
-                    Text("Clear Canteen")
+                IconButton(onClick = {}) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Clear Canteen"
+                    )
                 }
             }
 
