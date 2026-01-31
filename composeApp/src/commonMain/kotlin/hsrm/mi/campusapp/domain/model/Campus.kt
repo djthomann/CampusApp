@@ -5,5 +5,6 @@ import org.maplibre.spatialk.geojson.Position
 data class Campus(
     val name: String,
     val center: Position,
-    val tilt: Double
+    val tilt: Double,
+    val jsonPath: String,
 )

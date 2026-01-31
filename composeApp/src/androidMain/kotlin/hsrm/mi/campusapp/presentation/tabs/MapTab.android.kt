@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.em
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.pin_green
+import hsrm.mi.campusapp.domain.model.Campus
+import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.state.MapState
 import kotlinx.serialization.json.JsonObject
@@ -46,6 +48,7 @@ import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.format
 import org.maplibre.compose.expressions.dsl.image
 import org.maplibre.compose.expressions.dsl.offset
+import org.maplibre.compose.layers.FillExtrusionLayer
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.location.DesiredAccuracy
 import org.maplibre.compose.location.LocationPuck
@@ -86,6 +89,8 @@ actual fun MapView(state: MapState) {
     var selectedFeature by remember {
         mutableStateOf<Feature<Geometry, JsonObject?>?>(null)
     }
+
+    val campuses = CampusRepository.campuses
 
     LaunchedEffect(variant) {
         jsonString = Res
@@ -138,6 +143,9 @@ actual fun MapView(state: MapState) {
                 val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/campus-buildings.geojson")))
                 val marker = painterResource(Res.drawable.pin_green)
 
+                campuses.forEach { campus -> CampusLayers(campus) }
+
+                /* Include for other campuses aswell */
                 SymbolLayer(
                     id = "building-points",
                     source = campusBuildings,
@@ -206,4 +214,18 @@ fun FeatureCard(onDismiss: () -> Unit, feature: Feature<Geometry, JsonObject?>) 
             }
         }
     }
+}
+
+@Composable
+fun CampusLayers(campus: Campus) {
+
+    val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/${campus.jsonPath}")))
+
+    FillExtrusionLayer(
+        id = "buildings-3d-${campus.name}",
+        source = campusBuildings,
+        height = const(10.0f),
+        color = const(MaterialTheme.colorScheme.secondary),
+        opacity = const(0.5f)
+    )
 }
