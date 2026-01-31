@@ -74,7 +74,7 @@ class FoodScreenModel: ScreenModel {
         private set
 
     @OptIn(ExperimentalTime::class)
-    fun loadMenu() {
+    fun loadMenuFromAPI() {
         screenModelScope.launch {
             val result = CanteenAPI.getMenusForWeek(LocalDate.now())
             menus = result.map { it.toDomain() }
@@ -182,6 +182,17 @@ object FoodTab: CampusTab {
         val menus = screenModel.menus
         val expandedMenu = remember { mutableStateOf<Menu?>(null) }
 
+        if(menus.isEmpty()) {
+            // Try loading from DB
+            screenModel.loadMenusWithDishes()
+
+            // If nothing in DB, call API
+            if(menus.isEmpty()) {
+                screenModel.loadMenuFromAPI()
+                screenModel.saveMenus()
+            }
+        }
+
         Column(
             modifier = Modifier.fillMaxSize().padding(10.dp),
         ) {
@@ -189,26 +200,6 @@ object FoodTab: CampusTab {
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                CampusButton(
-                    text = "Plan holen",
-                    onClick = {
-                        screenModel.loadMenu()
-                    }
-                )
-                CampusButton(
-                    text = "Save Menus",
-                    onClick = {
-                        val dish = menus[0].dishes[0]
-                        println("SAVING DISH: $dish")
-                        screenModel.saveMenus()
-                    }
-                )
-                CampusButton(
-                    text = "Get Menus",
-                    onClick = {
-                        screenModel.loadMenusWithDishes()
-                    }
-                )
                 CampusButton(
                     text = "Clear All",
                     onClick = {

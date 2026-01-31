@@ -10,7 +10,7 @@
     <string name="food_tab_title">Menu</string>
     <string name="schedule_tab_title">Schedule</string>
     <string name="map_tab_title">My Campus</string>
-    <string name="choose_your_campus">Choose your\nCampus!</string>
+    <string name="choose_your_campus">Choose your</string>
     <string name="welcome_campus">Welcome to campus</string>
     <string name="work_in_progress">work in progress...</string>
     <string name="no_courses_today">no courses today :)</string>

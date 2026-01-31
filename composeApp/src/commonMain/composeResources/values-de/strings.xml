@@ -10,7 +10,7 @@
     <string name="food_tab_title">Speiseplan</string>
     <string name="schedule_tab_title">Stundenplan</string>
     <string name="map_tab_title">Mein Campus</string>
-    <string name="choose_your_campus">Wähle deinen\nCampus!</string>
+    <string name="choose_your_campus">Wähle deinen</string>
     <string name="welcome_campus">Willkommen am Campus</string>
     <string name="work_in_progress">Wird noch entwickelt...</string>
     <string name="no_courses_today">Keine Veranstaltungen heute :)</string>

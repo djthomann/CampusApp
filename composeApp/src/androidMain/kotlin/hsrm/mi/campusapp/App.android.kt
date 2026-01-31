@@ -38,15 +38,14 @@ actual fun MainScaffold(navigator: TabNavigator) {
 
     Scaffold(
         topBar = {
-
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                title = { Text(stringResource(Res.string.app_name)) },
-                actions = {
-                    if(AppState.selectedCampus != null) {
+            if(AppState.selectedCampus != null || navigator.current == SettingsTab) {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    title = { Text(stringResource(Res.string.app_name)) },
+                    actions = {
                         IconButton(onClick = {
                             navigator.current = SettingsTab
                         }) {
@@ -57,9 +56,8 @@ actual fun MainScaffold(navigator: TabNavigator) {
                             )
                         }
                     }
-
-                }
-            )
+                )
+            }
         },
         content = {
                 padding ->

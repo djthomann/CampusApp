@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -27,12 +28,18 @@ fun CampusButton(
     val modifier = if (buttonType == CampusButtonType.SMALL) modifier.height(32.dp) else modifier
     val padding = if (buttonType == CampusButtonType.SMALL) PaddingValues(4.dp) else  ButtonDefaults.ContentPadding
 
+    val backgroundColor = if(isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh
+    val textColor = if(isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
     Button(
         onClick = onClick,
         modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = backgroundColor
+        ),
         shape = RoundedCornerShape(8.dp),
-        contentPadding = padding
+        contentPadding = padding,
     ) {
-        Text(text, style = if (buttonType == CampusButtonType.SMALL) MaterialTheme.typography.bodySmall else LocalTextStyle.current)
+        Text(text = text, color = textColor, style = if (buttonType == CampusButtonType.SMALL) MaterialTheme.typography.bodySmall else LocalTextStyle.current)
     }
 }

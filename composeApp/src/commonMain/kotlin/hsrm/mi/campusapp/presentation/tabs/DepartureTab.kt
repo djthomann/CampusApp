@@ -132,6 +132,11 @@ object DepartureTab: CampusTab {
             }
         }
 
+        if(screenModel.departures.value.isEmpty()) {
+            // Try loading initial departures
+            screenModel.loadDepartures(stops.first())
+        }
+
         Column(
             modifier = Modifier.fillMaxSize().padding(10.dp)
         ) {
@@ -154,7 +159,8 @@ object DepartureTab: CampusTab {
                             screenModel.loadDepartures(stop)
                             /*StopRepository.selectStop((stop))
                             onStopSelected() */
-                        }
+                        },
+                        isActive = screenModel.currentStop.value == stop
                     )
                 }
             }
