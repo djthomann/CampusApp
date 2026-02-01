@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">me@hsrm</string>
     <string name="home">Home</string>
+    <string name="settings">Einstellungen</string>
+    <string name="transport-settings">Nahverkehr</string>
     <string name="departures_tab_title">Abfahrten</string>
-    <string name="no_departure_in_x_minutes">Keine Abfahrt in den nächsten %1$s Minuten...</string>
+    <string name="no_departure_in_x_minutes">Keine Abfahrt in den nächsten \n%1$s Minuten...</string>
     <string name="no_stops_found">Keine Haltestellen gefunden</string>
     <string name="final_stop">Endhaltestelle</string>
     <string name="show_more">mehr anzeigen</string>
@@ -14,6 +16,9 @@
     <string name="welcome_campus">Willkommen am Campus</string>
     <string name="work_in_progress">Wird noch entwickelt...</string>
     <string name="no_courses_today">Keine Veranstaltungen heute :)</string>
+    <string name="no_menu_today">Kein Speiseplan für heute verfügbar :(</string>
+    <string name="no_weather_data">Keine Wetterdaten verfügbar</string>
+    <string name="weather">Wetter</string>
     <string name="menu_to_be_implemented">Speiseplan wird noch umgesetzt</string>
     <string name="course_type_lecture">Vorlesung</string>
     <string name="course_type_practical">Praktikum</string>

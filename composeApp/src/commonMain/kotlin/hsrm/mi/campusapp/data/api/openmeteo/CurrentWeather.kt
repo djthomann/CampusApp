@@ -13,6 +13,8 @@ data class CurrentWeather(
 
     @SerialName("temperature_2m")
     val temperature: Float,
+    @SerialName("wind_speed_10m")
+    val windSpeed: Float,
     val rain: Float?,
     @SerialName("cloud_cover")
     val cloudCover: Int,

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -63,6 +65,10 @@ import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -132,9 +138,9 @@ object DepartureTab: CampusTab {
             }
         }
 
-        if(screenModel.departures.value.isEmpty()) {
+        if(screenModel.currentStop.value == null) {
             // Try loading initial departures
-            screenModel.loadDepartures(stops.first())
+            pendingStop.value = stops.first()
         }
 
         Column(
@@ -157,8 +163,6 @@ object DepartureTab: CampusTab {
                         text = stop.name,
                         onClick = {
                             screenModel.loadDepartures(stop)
-                            /*StopRepository.selectStop((stop))
-                            onStopSelected() */
                         },
                         isActive = screenModel.currentStop.value == stop
                     )
@@ -167,14 +171,10 @@ object DepartureTab: CampusTab {
             Spacer(
                 modifier = Modifier.padding(5.dp)
             )
+
+
             if(screenModel.departures.value.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(stringResource(Res.string.no_departure_in_x_minutes, RmvAPI.SEARCH_TIMEFRAME_MINUTES))
-                }
+                EmptyIndicator()
             } else {
                 screenModel.currentStop.value?.let { currentStop ->
                     LazyColumn(
@@ -194,6 +194,34 @@ object DepartureTab: CampusTab {
     }
 
 
+}
+
+@Composable
+private fun EmptyIndicator() {
+
+    val composition by rememberLottieComposition {
+        LottieCompositionSpec.JsonString(
+            Res.readBytes("files/lottie/no-transport.json").decodeToString()
+        )
+    }
+    val progress by animateLottieCompositionAsState(composition)
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Image(
+            painter = rememberLottiePainter(
+                composition = composition,
+                progress = { progress },
+            ),
+            contentDescription = "Lottie animation"
+        )
+
+        Text(textAlign = TextAlign.Center, text = stringResource(Res.string.no_departure_in_x_minutes, RmvAPI.SEARCH_TIMEFRAME_MINUTES))
+    }
 }
 
 

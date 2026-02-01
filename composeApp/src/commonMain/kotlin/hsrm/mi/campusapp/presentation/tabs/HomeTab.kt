@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,17 +54,23 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
 import campusapp.composeapp.generated.resources.choose_your_campus
 import campusapp.composeapp.generated.resources.home
+import campusapp.composeapp.generated.resources.no_courses_today
+import campusapp.composeapp.generated.resources.no_menu_today
+import campusapp.composeapp.generated.resources.no_weather_data
 import campusapp.composeapp.generated.resources.stops
+import campusapp.composeapp.generated.resources.weather
 import campusapp.composeapp.generated.resources.welcome_campus
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.data.api.openmeteo.CurrentWeather
 import hsrm.mi.campusapp.data.api.openmeteo.OpenMeteoAPI
 import hsrm.mi.campusapp.domain.model.Campus
+import hsrm.mi.campusapp.domain.model.Course
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
@@ -159,10 +166,16 @@ object HomeTab: CampusTab {
             screenModel.loadTodaysMenu()
         }
 
+        LaunchedEffect(currentCampus) {
+            if(currentCampus != null) {
+                screenModel.loadWeather(currentCampus)
+            }
+        }
+
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
 
-        var visibleCount by remember { mutableStateOf(0) }
+        var visibleCount by remember { mutableIntStateOf(0) }
 
         LaunchedEffect(Unit) {
             CampusRepository.campuses.forEachIndexed { index, _ ->
@@ -214,113 +227,19 @@ object HomeTab: CampusTab {
                     }
                 }
             }
-            currentCampus?.let {
-                /*
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    WelcomeText(it)
 
-                }*/
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Top
-                ) {
-                    CampusName(it, modifier = Modifier.weight(1f))
-                    screenModel.currentWeather.value?.let { weather ->
-                        WeatherWidget(weather = weather, modifier = Modifier.wrapContentWidth())
-                    }
-                }
-
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-            }
 
             if(currentCampus != null) {
-
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = DepartureTab.activeIcon,
-                            contentDescription = DepartureTab.topAppBarTitle
-                        )
-                        Text(stringResource(Res.string.stops))
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(stops) { stop ->
-                                CampusButton(
-                                    text = stop.name,
-                                    onClick = {
-                                        DepartureTab.selectStop(stop)
-                                        tabNavigator.current = DepartureTab
-                                    },
-                                    isActive = true
-                                )
-                            }
-                        }
-                    }
-                }
                 Spacer(modifier = Modifier.height(20.dp))
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = ScheduleTab.activeIcon ,
-                            contentDescription = ScheduleTab.topAppBarTitle
-                        )
-                        Text(ScheduleTab.topAppBarTitle)
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            items(courses) { course ->
-                                CampusButton(
-                                    text = course.name,
-                                    onClick = {
-                                        tabNavigator.current = ScheduleTab
-                                    },
-                                    isActive = true
-                                )
-                            }
-                        }
-                    }
-                }
+                CampusName(currentCampus)
                 Spacer(modifier = Modifier.height(20.dp))
-                screenModel.todaysMeal.value?.let {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector =  FoodTab.activeIcon  ,
-                                contentDescription = FoodTab.topAppBarTitle
-                            )
-                            Text(FoodTab.topAppBarTitle)
-                        }
-                        Column (
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            it.dishes.forEach { dish -> Text("• ${dish.name}", style = MaterialTheme.typography.bodyMedium) }
-                        }
-                    }
-                }
+                WeatherInfo(screenModel.currentWeather.value)
+                Spacer(modifier = Modifier.height(20.dp))
+                DepartureInfo(stops, tabNavigator)
+                Spacer(modifier = Modifier.height(20.dp))
+                ScheduleInfo(courses, tabNavigator) // TODO() Probably migrate to ScreenModel
+                Spacer(modifier = Modifier.height(20.dp))
+                MenuInfo(screenModel.todaysMeal.value)
             }
 
             Box(modifier = Modifier.padding(12.dp)) {
@@ -328,9 +247,128 @@ object HomeTab: CampusTab {
             }
         }
     }
+}
 
+@Composable
+fun WeatherInfo(currentWeather: CurrentWeather?) {
 
+    if(currentWeather == null) {
+        Text(stringResource(Res.string.no_weather_data), style = MaterialTheme.typography.bodyMedium)
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(Res.string.weather))
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            WeatherWidget(weather = currentWeather, modifier = Modifier.wrapContentWidth())
+        }
+    }
 
+}
+
+@Composable
+fun DepartureInfo(stops: List<Stop>, tabNavigator: TabNavigator) {
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = DepartureTab.activeIcon,
+                contentDescription = DepartureTab.topAppBarTitle
+            )
+            Text(stringResource(Res.string.stops))
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(stops) { stop ->
+                    CampusButton(
+                        text = stop.name,
+                        onClick = {
+                            DepartureTab.selectStop(stop)
+                            tabNavigator.current = DepartureTab
+                        },
+                        isActive = true
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ScheduleInfo(courses: List<Course>, tabNavigator: TabNavigator) {
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ScheduleTab.activeIcon ,
+                contentDescription = ScheduleTab.topAppBarTitle
+            )
+            Text(ScheduleTab.topAppBarTitle)
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            if(courses.isEmpty()) {
+                Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.bodyMedium)
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(courses) { course ->
+                        CampusButton(
+                            text = course.name,
+                            onClick = {
+                                tabNavigator.current = ScheduleTab
+                            },
+                            isActive = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MenuInfo(menu: Menu?) {
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector =  FoodTab.activeIcon,
+                contentDescription = FoodTab.topAppBarTitle
+            )
+            Text(FoodTab.topAppBarTitle)
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column (
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if(menu == null) {
+                    Text(stringResource(Res.string.no_menu_today), style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    menu.dishes.sortedBy { it.price }.forEach { dish -> Text("• ${dish.name}", style = MaterialTheme.typography.bodyMedium) }
+                }
+            }
+        }
+    }
 }
 
 

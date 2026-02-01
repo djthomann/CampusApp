@@ -3,9 +3,11 @@ package hsrm.mi.campusapp.presentation.components
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Umbrella
+import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.WbCloudy
@@ -47,8 +49,11 @@ fun WeatherWidget(
         modifier = modifier.padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Icon(modifier = Modifier.size(30.dp),imageVector = getWeatherIcon(weather), contentDescription = "Current Weather Icon")
+        Spacer(modifier = Modifier.width(12.dp))
         Text("${weather.temperature.toInt()} °C")
-        Spacer(modifier = Modifier.width(8.dp))
-        Icon(imageVector = getWeatherIcon(weather), contentDescription = "Current Weather Icon")
+        Spacer(modifier = Modifier.width(12.dp))
+        Icon(modifier = Modifier.size(30.dp), imageVector = Icons.Outlined.Air, contentDescription = "Wind Icon")
+        Text("${weather.windSpeed} km/h")
     }
 }

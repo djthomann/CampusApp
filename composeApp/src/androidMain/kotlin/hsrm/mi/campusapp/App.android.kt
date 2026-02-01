@@ -67,7 +67,7 @@ actual fun MainScaffold(navigator: TabNavigator) {
             }
         },
         bottomBar = {
-            if(AppState.selectedCampus != null || navigator.current == SettingsTab) {
+            if(AppState.selectedCampus != null) {
                 NavigationBar() {
                     NavItem(FoodTab)
                     NavItem(ScheduleTab)

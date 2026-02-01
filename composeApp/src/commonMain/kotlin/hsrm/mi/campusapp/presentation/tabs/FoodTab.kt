@@ -377,7 +377,7 @@ fun DishEntry(dish: Dish, isEven: Boolean) {
 
     val textColor = MaterialTheme.colorScheme.onSecondary
 
-    val backgroundColor = if(isEven) Color.Transparent else Color.DarkGray
+    val backgroundColor = if(isEven) Color.Transparent else Color.DarkGray // TODO() Get rid of this
 
     Row(
         modifier = Modifier.fillMaxWidth(),

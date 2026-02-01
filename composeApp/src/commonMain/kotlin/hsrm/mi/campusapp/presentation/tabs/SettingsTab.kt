@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
@@ -18,6 +20,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -30,11 +34,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import campusapp.composeapp.generated.resources.Res
+import campusapp.composeapp.generated.resources.settings
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CanteenRepository
 import hsrm.mi.campusapp.presentation.state.AppState
+import org.jetbrains.compose.resources.stringResource
 
 object SettingsTab: CampusTab {
     private fun readResolve(): Any = ScheduleTab
@@ -62,10 +71,41 @@ object SettingsTab: CampusTab {
     @Composable
     override fun Content() {
 
+        val tabNavigator = LocalTabNavigator.current
+
         Column(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { tabNavigator.current = HomeTab }) {
+                        Icon(
+                            imageVector = Icons.Filled.ChevronLeft,
+                            contentDescription = "Go Back Home"
+                        )
+                    }
+                    Text(text = stringResource(Res.string.settings))
+                }
+                Switch(
+                    checked = AppState.isDarkMode.value,
+                    onCheckedChange = { _ -> AppState.toggleDarkMode() },
+                    thumbContent = {
+                        if(AppState.isDarkMode.value)
+                            Icon(imageVector =  Icons.Filled.DarkMode, contentDescription = "")
+                        else
+                            Icon(imageVector =  Icons.Filled.LightMode, contentDescription = "")
+                    }
+                )
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -93,23 +133,34 @@ object SettingsTab: CampusTab {
                 }
             }
 
+            var value by remember { mutableStateOf("") }
+            OutlinedTextField(
+                value = value,
+                onValueChange = { input ->
+                    if (input.all { it.isDigit() } || input.isEmpty()) {
+                        value = input
+                    }
+                },
+                label = { Text("Anzahl") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                singleLine = true
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Switch(
-                    checked = AppState.isDarkMode.value,
-                    onCheckedChange = { _ -> AppState.toggleDarkMode() },
-                    thumbContent = {
-                        if(AppState.isDarkMode.value)
-                            Icon(imageVector =  Icons.Filled.DarkMode, contentDescription = "")
-                        else
-                            Icon(imageVector =  Icons.Filled.LightMode, contentDescription = "")
-                    }
+
+                var text by remember { mutableStateOf("") }
+
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    label = { Text("RMV") }
                 )
-                Text("Toggle Dark Mode")
             }
         }
     }
@@ -131,6 +182,7 @@ fun CampusSelection(modifier: Modifier = Modifier) {
             value = selectedOption?.name ?: "None",
             onValueChange = { },
             readOnly = true,
+            textStyle = MaterialTheme.typography.headlineMedium,
             label = { Text("Campus") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth()
@@ -170,6 +222,7 @@ fun CanteenSelection(modifier: Modifier = Modifier) {
             onValueChange = {},
             readOnly = true,
             label = { Text("Mensa") },
+            textStyle = MaterialTheme.typography.headlineMedium,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth()
         )

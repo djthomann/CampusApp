@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -106,7 +105,7 @@ actual fun MapView(state: MapState) {
     LaunchedEffect(selectedFeature) {
         selectedFeature?.let {
             val point = it.geometry as Point
-            MapTab.moveToPosition(Position(point.longitude, point.latitude))
+            cameraState.animateTo(state.cameraPosition.copy(target = Position(point.longitude, point.latitude), zoom = 18.0))
         }
     }
 
@@ -193,23 +192,23 @@ fun FeatureCard(onDismiss: () -> Unit, feature: Feature<Geometry, JsonObject?>) 
     Card(
         modifier = Modifier.padding(10.dp),
         colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = Color.Transparent,
             disabledContainerColor = Color.Transparent,
             disabledContentColor = Color.Transparent
         )
     ) {
         Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            feature.properties?.get("name")?.let { Text(it.jsonPrimitive.content, color = MaterialTheme.colorScheme.onSurface) }
+            feature.properties?.get("name")?.let { Text(it.jsonPrimitive.content, color = MaterialTheme.colorScheme.onSecondary) }
             IconButton(onClick = { onDismiss() }) {
                 Icon(
                     imageVector = Icons.Filled.Clear,
                     contentDescription = "Clear Feature",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSecondary
                 )
             }
         }

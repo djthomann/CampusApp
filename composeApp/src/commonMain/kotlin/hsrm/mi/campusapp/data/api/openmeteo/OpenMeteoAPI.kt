@@ -15,19 +15,20 @@ object OpenMeteoAPI {
 
     val client = HttpClient()
 
-    val baseURL = "https://api.open-meteo.com/v1"
+    const val BASE_URL = "https://api.open-meteo.com/v1"
 
-    suspend fun getCurrentWeather(campus: Campus, getRain: Boolean = true, getIsDay: Boolean = true, getCloudCoverage: Boolean = true): CurrentWeather? {
+    suspend fun getCurrentWeather(campus: Campus, getIsRaining: Boolean = true, getIsDay: Boolean = true, getCloudCoverage: Boolean = true, getWindSpeed: Boolean = true): CurrentWeather? {
         println("GETTING FORECAST FOR: $campus")
 
         val currentParameterValues = StringBuilder("temperature_2m")
-        if (getRain) currentParameterValues.append(",rain")
+        if(getIsRaining) currentParameterValues.append(",rain")
         if (getIsDay) currentParameterValues.append(",is_day")
         if (getCloudCoverage) currentParameterValues.append(",cloud_cover")
+        if (getWindSpeed) currentParameterValues.append(",wind_speed_10m")
 
         println("CURRENT PARAMETER VALUES: $currentParameterValues")
 
-        val jsonResponse: String = client.get("$baseURL/forecast") {
+        val jsonResponse: String = client.get("$BASE_URL/forecast") {
             parameter("latitude", campus.center.latitude)
             parameter("longitude", campus.center.longitude)
             parameter("current", currentParameterValues)

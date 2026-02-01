@@ -1,5 +1,6 @@
 package hsrm.mi.campusapp.presentation.tabs
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +62,10 @@ import com.kizitonwose.calendar.core.now
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
 import hsrm.mi.campusapp.domain.repository.CourseRepository
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -179,7 +184,7 @@ private fun Schedule(selection: LocalDate) {
     ) {
 
         if (courses.isEmpty()) {
-            Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.headlineMedium)
+            EmptyIndicator()
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(10.dp),
@@ -190,6 +195,28 @@ private fun Schedule(selection: LocalDate) {
         }
     }
 
+
+}
+
+@Composable
+private fun EmptyIndicator() {
+
+    val composition by rememberLottieComposition {
+        LottieCompositionSpec.JsonString(
+            Res.readBytes("files/lottie/no-courses.json").decodeToString()
+        )
+    }
+    val progress by animateLottieCompositionAsState(composition)
+
+    Image(
+        painter = rememberLottiePainter(
+            composition = composition,
+            progress = { progress },
+        ),
+        contentDescription = "Lottie animation"
+    )
+
+    Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.headlineMedium)
 
 }
 
