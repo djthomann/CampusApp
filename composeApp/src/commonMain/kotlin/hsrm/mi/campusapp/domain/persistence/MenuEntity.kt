@@ -1,10 +1,16 @@
 package hsrm.mi.campusapp.domain.persistence
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(
+    indices = [Index(value = ["canteen", "date"], unique = true)],
+)
 class MenuEntity(
-    @PrimaryKey val date: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val canteen: String, // TODO() Change later
+    val date: String,
     val dateString: String,
 )

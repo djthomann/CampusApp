@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface MenuDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMenu(menu: MenuEntity)
+    suspend fun insertMenu(menu: MenuEntity): Long
 
     @Query("SELECT * FROM MenuEntity WHERE date = :day")
     fun getMenuForDay(day: String): Flow<MenuWithDishes?>

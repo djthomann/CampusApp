@@ -17,6 +17,7 @@
     <string name="work_in_progress">Wird noch entwickelt...</string>
     <string name="no_courses_today">Keine Veranstaltungen heute :)</string>
     <string name="no_menu_today">Kein Speiseplan für heute verfügbar :(</string>
+    <string name="no_menu_available">Kein Speiseplan verfügbar :(</string>
     <string name="no_weather_data">Keine Wetterdaten verfügbar</string>
     <string name="weather">Wetter</string>
     <string name="menu_to_be_implemented">Speiseplan wird noch umgesetzt</string>

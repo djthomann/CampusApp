@@ -5,5 +5,6 @@ import org.maplibre.spatialk.geojson.Position
 data class Canteen(
     val name: String,
     val campus: String, // TODO() Change later
-    val position: Position
+    val position: Position,
+    val url: String
 )

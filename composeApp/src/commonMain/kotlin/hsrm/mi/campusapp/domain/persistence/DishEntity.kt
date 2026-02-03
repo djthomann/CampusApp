@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey
     foreignKeys = [
         ForeignKey(
             entity = MenuEntity::class,
-            parentColumns = ["date"],
+            parentColumns = ["id"],
             childColumns = ["menuId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -20,7 +20,7 @@ import androidx.room.PrimaryKey
 data class DishEntity(
     @PrimaryKey(autoGenerate = true)
     val dishId: Long = 0,
-    val menuId: String,
+    val menuId: Long,
     val name: String,
     val description: String?,
     val price: String,

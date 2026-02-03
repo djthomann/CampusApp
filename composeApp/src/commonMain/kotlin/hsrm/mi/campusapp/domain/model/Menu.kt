@@ -3,6 +3,7 @@ package hsrm.mi.campusapp.domain.model
 import kotlinx.datetime.LocalDate
 
 data class Menu (
+    val canteen: String,
     val date: LocalDate,
     val dateString: String,
     val dishes: List<Dish>,

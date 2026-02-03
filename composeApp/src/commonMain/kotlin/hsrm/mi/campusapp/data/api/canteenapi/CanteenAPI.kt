@@ -3,6 +3,7 @@ package hsrm.mi.campusapp.data.api.canteen
 import hsrm.mi.campusapp.data.api.canteenapi.DishDTO
 import hsrm.mi.campusapp.data.api.canteenapi.MenuDTO
 import hsrm.mi.campusapp.data.api.canteenapi.SideDishMapper
+import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.SideDishType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -24,10 +25,10 @@ object CanteenAPI {
 
     /* TODO() Make this more beautiful */
     @OptIn(ExperimentalTime::class)
-    private suspend fun scrapeCanteenData(): List<MenuDTO> {
-        val htmlResponse = client.get("$BASE_URL/mensa-point").bodyAsText()
+    private suspend fun scrapeCanteenData(canteen: Canteen): List<MenuDTO> {
+        val htmlResponse = client.get("$BASE_URL/${canteen.url}").bodyAsText()
 
-        // innerHtmlprintln("RAW Response: $htmlResponse")
+        // println("RAW Response: $htmlResponse")
 
         val document = Jsoup.parse(htmlResponse)
         val menuDivs: Elements = document.getElementsByClass("speiseplan")
@@ -98,9 +99,12 @@ object CanteenAPI {
 
                 }
 
-                val menu = MenuDTO(dayString, Clock.System
-                    .todayIn(TimeZone.currentSystemDefault())
-                    .year, dishes, sideDishes)
+                val menu = MenuDTO(
+                    canteen = canteen.name,
+                    date = dayString,
+                    year = Clock.System.todayIn(TimeZone.currentSystemDefault()).year,
+                    dishes = dishes,
+                    sideDishes = sideDishes)
                 menus.add(menu)
                 println("MENU" + menu)
             }
@@ -109,7 +113,7 @@ object CanteenAPI {
         return menus
     }
 
-    suspend fun getMenusForWeek(day: LocalDate): List<MenuDTO> {
-        return scrapeCanteenData()
+    suspend fun getMenusForWeek(canteen: Canteen, day: LocalDate): List<MenuDTO> {
+        return scrapeCanteenData(canteen)
     }
 }

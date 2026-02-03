@@ -6,12 +6,12 @@ import androidx.room.Relation
 data class MenuWithDishes(
     @Embedded val menu: MenuEntity,
     @Relation(
-        parentColumn = "date",
+        parentColumn = "id",
         entityColumn = "menuId"
     )
     val dishes: List<DishEntity>,
     @Relation(
-        parentColumn = "date",
+        parentColumn = "id",
         entityColumn = "menuId"
     )
     val sideDishes: List<SideDishEntity>

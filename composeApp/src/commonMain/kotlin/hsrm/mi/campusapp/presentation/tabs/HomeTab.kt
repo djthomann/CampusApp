@@ -107,6 +107,7 @@ class HomeScreenModel: ScreenModel {
             val menuEntity = DatabaseHolder.db.getMenuDao().getMenuForDay(LocalDate.now().toString()).first()
             menuEntity?.let {
                 todaysMeal.value = Menu(
+                    canteen = menuEntity.menu.canteen,
                     date = LocalDate.parse(menuEntity.menu.date),
                     dateString = menuEntity.menu.dateString,
                     dishes = menuEntity.dishes.map { dishEntity ->

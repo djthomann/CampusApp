@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -18,8 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dining
@@ -39,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -46,9 +46,11 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.food_tab_title
+import campusapp.composeapp.generated.resources.no_menu_available
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.data.api.canteen.CanteenAPI
 import hsrm.mi.campusapp.data.api.canteenapi.toDomain
+import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.SideDishType
@@ -56,12 +58,15 @@ import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.DishEntity
 import hsrm.mi.campusapp.domain.persistence.MenuEntity
 import hsrm.mi.campusapp.domain.persistence.SideDishEntity
+import hsrm.mi.campusapp.domain.repository.CanteenRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
+import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.ExperimentalTime
 
 class FoodScreenModel: ScreenModel {
@@ -74,25 +79,28 @@ class FoodScreenModel: ScreenModel {
         private set
 
     @OptIn(ExperimentalTime::class)
-    fun loadMenuFromAPI() {
-        screenModelScope.launch {
-            val result = CanteenAPI.getMenusForWeek(LocalDate.now())
-            menus = result.map { it.toDomain() }
-        }
+    suspend fun loadMenuFromAPI(canteen: Canteen): List<Menu> {
+        val result = CanteenAPI.getMenusForWeek(canteen, LocalDate.now())
+        return result.map { it.toDomain() }
     }
 
-    fun saveMenus() {
+    fun saveMenus(menus: List<Menu>) {
+
+        println("SAVING MENUS")
+
         screenModelScope.launch(Dispatchers.IO) {
             menus.forEach { menu ->
                 val newMenu = MenuEntity(
+                    canteen = menu.canteen,
                     date = menu.date.toString(),
                     dateString = menu.dateString
                 )
-                menuDao.insertMenu(newMenu)
+                println("INSERTING MENU $newMenu")
+                val menuId = menuDao.insertMenu(newMenu)
                 menu.dishes.forEach { dish ->
                     val newDish = DishEntity(
                         name = dish.name,
-                        menuId = menu.date.toString(),
+                        menuId = menuId,
                         description = dish.description,
                         price = dish.price,
                         dishAllergens = dish.dishAllergens
@@ -102,7 +110,7 @@ class FoodScreenModel: ScreenModel {
                 menu.sideDishes.forEach { entry ->
                     entry.value.forEach { sideDish ->
                         val newSideDish = SideDishEntity(
-                            menuId = menu.date.toString(),
+                            menuId = menuId,
                             type = entry.key,
                             name = sideDish
                         )
@@ -114,11 +122,12 @@ class FoodScreenModel: ScreenModel {
         }
     }
 
-    fun loadMenusWithDishes() {
+    fun loadMenusWithDishes(canteen: Canteen) {
         screenModelScope.launch {
             menuDao.getMenusWithDishesAsFlow().collect { loadedMenus ->
-                print("LOADED:$loadedMenus")
+                println("LOADED FROM DB:$loadedMenus")
                 menus = loadedMenus.map { menuWithDishesEntity -> Menu(
+                    canteen = menuWithDishesEntity.menu.canteen,
                     date = LocalDate.parse(menuWithDishesEntity.menu.date),
                     dateString = menuWithDishesEntity.menu.dateString,
                     dishes = menuWithDishesEntity.dishes.map { dishEntity ->
@@ -131,8 +140,27 @@ class FoodScreenModel: ScreenModel {
                     },
                     sideDishes = menuWithDishesEntity.sideDishes.groupBy { it.type }.mapValues { (_, entities) -> entities.map { it.name } }
                 )
-                }
+                }.filter { menu -> menu.canteen == canteen.name }
 
+            }
+        }
+    }
+
+    // TODO() Faulty logic probably
+    fun loadMenu(canteen: Canteen) {
+
+        // loadMenuFromAPI(canteen)
+
+        screenModelScope.launch {
+            // Lade aus DB
+            loadMenusWithDishes(canteen)
+
+            // Wenn nichts im DB, lade von API
+            if (menus.isEmpty()) {
+                println("Try API for loading menus")
+                val loadedMenus = loadMenuFromAPI(canteen)  // suspend, wartet jetzt
+                saveMenus(loadedMenus)                       // wartet ebenfalls
+                menus = loadedMenus
             }
         }
     }
@@ -149,7 +177,7 @@ class FoodScreenModel: ScreenModel {
         }
     }
 
-}
+}     // TODO() CLEAN THIS UP!!!!
 
 object FoodTab: CampusTab {
 
@@ -179,24 +207,33 @@ object FoodTab: CampusTab {
     override fun Content() {
 
         val screenModel = rememberScreenModel { FoodScreenModel() }
+
+        val selectedCanteen = AppState.selectedCanteen
+        val canteens = CanteenRepository.canteens
+
         val menus = screenModel.menus
         val expandedMenu = remember { mutableStateOf<Menu?>(null) }
-
-        if(menus.isEmpty()) {
-            // Try loading from DB
-            screenModel.loadMenusWithDishes()
-
-            // If nothing in DB, call API
-            if(menus.isEmpty()) {
-                screenModel.loadMenuFromAPI()
-                screenModel.saveMenus()
-            }
-        }
 
         Column(
             modifier = Modifier.fillMaxSize().padding(10.dp),
         ) {
-            Row(
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(canteens) { canteen ->
+
+                    CampusButton(
+                        text = canteen.name,
+                        onClick = {
+                            screenModel.loadMenu(canteen)
+                            AppState.selectCanteen(canteen)
+                        },
+                        isActive = canteen == selectedCanteen
+                    )
+                }
+            }
+            /*Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -207,10 +244,24 @@ object FoodTab: CampusTab {
                         screenModel.clearDishes()
                     }
                 )
-            }
+            }*/
             Spacer(
                 modifier = Modifier.padding(5.dp)
             )
+            if(menus.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text = stringResource(
+                            Res.string.no_menu_available
+                        )
+                    )
+                }
+            } else{
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -223,6 +274,7 @@ object FoodTab: CampusTab {
                     }
 
                 }) }
+            }
             }
         }
     }

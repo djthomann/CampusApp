@@ -12,7 +12,7 @@ import hsrm.mi.campusapp.domain.model.SideDishType
     foreignKeys = [
         ForeignKey(
             entity = MenuEntity::class,
-            parentColumns = ["date"],
+            parentColumns = ["id"],
             childColumns = ["menuId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -21,7 +21,7 @@ import hsrm.mi.campusapp.domain.model.SideDishType
 data class SideDishEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val menuId: String,
+    val menuId: Long,
     val type: SideDishType,
     val name: String
 )

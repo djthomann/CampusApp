@@ -7,6 +7,7 @@ import kotlinx.datetime.Month
 import kotlin.time.ExperimentalTime
 
 data class MenuDTO (
+    val canteen: String,
     val date: String,
     val year: Int,
     val dishes: List<DishDTO>,
@@ -15,6 +16,7 @@ data class MenuDTO (
 
 fun MenuDTO.toDomain(): Menu {
     return Menu(
+        canteen = canteen,
         date = dateStringToLocalDate(date, year),
         dateString = date,
         dishes = dishes.map { it.toDomain() },

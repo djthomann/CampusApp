@@ -22,7 +22,7 @@ fun getRoomDatabase(
     DishEntity::class,
     MenuEntity::class,
     SideDishEntity::class
-                     ], version = 9)
+                     ], version = 12)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(
     SideDishTypeConverter::class

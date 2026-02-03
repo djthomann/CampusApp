@@ -157,8 +157,6 @@ object DepartureTab: CampusTab {
             ) {
                 items(stops) { stop ->
 
-                    val isActive = stop == screenModel.currentStop.value
-
                     CampusButton(
                         text = stop.name,
                         onClick = {
@@ -188,8 +186,6 @@ object DepartureTab: CampusTab {
                 }
 
             }
-
-
         }
     }
 

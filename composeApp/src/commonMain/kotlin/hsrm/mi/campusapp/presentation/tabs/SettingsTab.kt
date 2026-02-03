@@ -209,7 +209,7 @@ fun CampusSelection(modifier: Modifier = Modifier) {
 @Composable
 fun CanteenSelection(modifier: Modifier = Modifier) {
     val options = CanteenRepository.canteens
-    var selectedOption by remember { mutableStateOf(options[0]) }
+    val selectedOption = AppState.selectedCanteen
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -218,7 +218,7 @@ fun CanteenSelection(modifier: Modifier = Modifier) {
         onExpandedChange = { expanded = !expanded },
     ) {
         TextField(
-            value = selectedOption.name,
+            value = selectedOption?.name ?: "None",
             onValueChange = {},
             readOnly = true,
             label = { Text("Mensa") },
@@ -235,7 +235,7 @@ fun CanteenSelection(modifier: Modifier = Modifier) {
                 DropdownMenuItem(
                     text = { Text(option.name) },
                     onClick = {
-                        selectedOption = option
+                        AppState.selectCanteen(option)
                         expanded = false
                     }
                 )
