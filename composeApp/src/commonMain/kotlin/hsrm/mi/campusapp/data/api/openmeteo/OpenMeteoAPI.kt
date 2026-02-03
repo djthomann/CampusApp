@@ -17,7 +17,7 @@ object OpenMeteoAPI {
 
     const val BASE_URL = "https://api.open-meteo.com/v1"
 
-    suspend fun getCurrentWeather(campus: Campus, getIsRaining: Boolean = true, getIsDay: Boolean = true, getCloudCoverage: Boolean = true, getWindSpeed: Boolean = true): CurrentWeather? {
+    suspend fun getCurrentWeather(campus: Campus, getIsRaining: Boolean = true, getIsDay: Boolean = true, getCloudCoverage: Boolean = true, getWindSpeed: Boolean = true): WeatherDTO? {
         println("GETTING FORECAST FOR: $campus")
 
         val currentParameterValues = StringBuilder("temperature_2m")
@@ -38,6 +38,7 @@ object OpenMeteoAPI {
 
         return try {
             val response: ForecastResponse = json.decodeFromString(jsonResponse)
+            response.current
             response.current
         } catch (e: Exception) {
             println("Error deserializing ForecastResponse: ${e.message}")

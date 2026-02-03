@@ -67,13 +67,14 @@ import campusapp.composeapp.generated.resources.stops
 import campusapp.composeapp.generated.resources.weather
 import campusapp.composeapp.generated.resources.welcome_campus
 import com.kizitonwose.calendar.core.now
-import hsrm.mi.campusapp.data.api.openmeteo.CurrentWeather
 import hsrm.mi.campusapp.data.api.openmeteo.OpenMeteoAPI
+import hsrm.mi.campusapp.data.api.openmeteo.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Course
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.model.Weather
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CourseRepository
@@ -92,12 +93,12 @@ import kotlin.time.ExperimentalTime
 
 class HomeScreenModel: ScreenModel {
 
-    val currentWeather = mutableStateOf<CurrentWeather?>(null)
+    val currentWeather = mutableStateOf<Weather?>(null)
     val todaysMeal = mutableStateOf<Menu?>(null)
 
     fun loadWeather(campus: Campus) {
         screenModelScope.launch {
-            currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)
+            currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)?.toDomain(campus)
         }
     }
 
@@ -251,7 +252,7 @@ object HomeTab: CampusTab {
 }
 
 @Composable
-fun WeatherInfo(currentWeather: CurrentWeather?) {
+fun WeatherInfo(currentWeather: Weather?) {
 
     if(currentWeather == null) {
         Text(stringResource(Res.string.no_weather_data), style = MaterialTheme.typography.bodyMedium)

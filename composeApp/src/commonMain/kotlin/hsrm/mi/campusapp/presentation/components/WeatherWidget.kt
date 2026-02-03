@@ -19,9 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import hsrm.mi.campusapp.data.api.openmeteo.CurrentWeather
+import hsrm.mi.campusapp.domain.model.Weather
 
-fun getWeatherIcon(weather: CurrentWeather): ImageVector {
+fun getWeatherIcon(weather: Weather): ImageVector {
     val isCloudy = weather.cloudCover >= 50
     val isRaining = weather.rain?.let { it > 0.0 } ?: false
     val isDay = weather.isDay
@@ -43,7 +43,7 @@ fun getWeatherIcon(weather: CurrentWeather): ImageVector {
 @Composable
 fun WeatherWidget(
     modifier: Modifier = Modifier,
-    weather: CurrentWeather
+    weather: Weather
 ) {
     Row(
         modifier = modifier.padding(8.dp),
