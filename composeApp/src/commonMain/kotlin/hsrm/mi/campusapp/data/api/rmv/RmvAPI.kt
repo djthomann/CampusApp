@@ -1,10 +1,6 @@
 package hsrm.mi.campusapp.data.api.rmv
 
-import hsrm.mi.campusapp.domain.model.Departure
-import hsrm.mi.campusapp.domain.model.DepartureResponse
-import hsrm.mi.campusapp.domain.model.Journey
 import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.model.StopsWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -20,24 +16,19 @@ object RmvAPI {
         ignoreUnknownKeys = true
     }
 
-
     val client = HttpClient()
 
-    val baseURL = "localhost"
+    const val BASE_URL = "https://www.rmv.de/hapi/departureBoard"
     val rmvApiKey = ApiKeys.RMV
 
-    fun getArrivalBoard(stop: Stop): String {
-        return rmvApiKey
-    }
-
-    suspend fun getNextArrivals(stop: Stop, numArrivals: Int = DEFAULT_NUM_DEPARTURES): List<Departure> {
+    suspend fun getNextDepartures(stop: Stop, numDepartures: Int = DEFAULT_NUM_DEPARTURES): List<DepartureDTO> {
         println("GETTING ARRIVALS FOR: ${stop.name}")
 
-        val jsonResponse: String = client.get("https://www.rmv.de/hapi/departureBoard") {
+        val jsonResponse: String = client.get(BASE_URL) {
             parameter("accessId", rmvApiKey)
             parameter("id", stop.id)
             parameter("duration", SEARCH_TIMEFRAME_MINUTES)
-            parameter("maxJourneys", numArrivals)
+            parameter("maxJourneys", numDepartures)
             parameter("format", "json")
         }.bodyAsText()
 
@@ -45,18 +36,18 @@ object RmvAPI {
 
         return try {
             val response: DepartureResponse = json.decodeFromString(jsonResponse)
-            response.departure
+            response.departures
         } catch (e: Exception) {
             println("Error deserializing DepartureResponse: ${e.message}")
             emptyList()
         }
     }
 
-    suspend fun getJourneyDetails(journeyId: String): Journey {
+    suspend fun getJourneyDetails(journeyId: String): JourneyDTO {
         return getJourneyDetailsFromStop(journeyId, null)
     }
 
-    suspend fun getJourneyDetailsFromStop(journeyId: String, stop: Stop?): Journey {
+    suspend fun getJourneyDetailsFromStop(journeyId: String, stop: Stop?): JourneyDTO {
         println("GETTING JOURNEY DETAILS FOR: ${journeyId}")
 
         val jsonResponse: String = client.get("https://www.rmv.de/hapi/journeyDetail") {
@@ -69,10 +60,10 @@ object RmvAPI {
         println("RAW Response: $jsonResponse")
 
         return try {
-            json.decodeFromString<Journey>(jsonResponse)
+            json.decodeFromString<JourneyDTO>(jsonResponse)
         } catch (e: Exception) {
             println("Error deserializing Journey Response: ${e.message}")
-            Journey(StopsWrapper(emptyList()))
+            JourneyDTO(StopsWrapper(emptyList()))
         }
     }
 

@@ -6,11 +6,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ForecastResponse(
-    val current: WeatherDTO
-)
-
-@Serializable
 data class WeatherDTO(
     @SerialName("temperature_2m")
     val temperature: Float,

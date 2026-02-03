@@ -60,6 +60,7 @@ import campusapp.composeapp.generated.resources.no_stops_found
 import campusapp.composeapp.generated.resources.show_more
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
+import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.repository.StopRepository
@@ -77,20 +78,16 @@ import org.jetbrains.compose.resources.stringResource
 class DepartureScreenModel: ScreenModel {
     val currentStop = mutableStateOf<Stop?>(null)
 
-    val departures = mutableStateOf<List<Departure>>( /*
-            listOf(Departure(JourneyDetailRef("id"),"Bus 6", LocalTime(17, 4, 0), direction = "Wiesbaden Hauptbahnhof"),
-                Departure(JourneyDetailRef("id"), "Bus 6", LocalTime(17, 14, 0), direction = "Unter den Eichen"))
-        */ emptyList()
-    )
+    val departures = mutableStateOf<List<Departure>>(emptyList())
 
     fun loadDepartures(stop: Stop) {
         currentStop.value = stop
         screenModelScope.launch {
-            departures.value = RmvAPI.getNextArrivals(stop)
+            departures.value = RmvAPI.getNextDepartures(stop).map { it.toDomain() }
 
             departures.value.forEach { departure ->
                 launch {
-                    departure.journey = RmvAPI.getJourneyDetails(departure.ref)
+                    departure.journey = RmvAPI.getJourneyDetails(departure.journeyDetailRef).toDomain()
                 }
             }
         }
