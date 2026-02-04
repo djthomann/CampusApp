@@ -5,7 +5,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 
 interface CampusTab: Tab {
 
-    val topAppBarTitle: String
+    val topAppBarTitle: String // Actually deprecated
     val activeIcon: ImageVector
     val inactiveIcon: ImageVector
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -25,6 +26,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.ModeOfTravel
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -58,22 +62,26 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
+import campusapp.composeapp.generated.resources.arrive_on_time
 import campusapp.composeapp.generated.resources.choose_your_campus
 import campusapp.composeapp.generated.resources.home
+import campusapp.composeapp.generated.resources.next_course
 import campusapp.composeapp.generated.resources.no_courses_today
 import campusapp.composeapp.generated.resources.no_menu_today
 import campusapp.composeapp.generated.resources.no_weather_data
 import campusapp.composeapp.generated.resources.stops
-import campusapp.composeapp.generated.resources.weather
 import campusapp.composeapp.generated.resources.welcome_campus
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.data.api.openmeteo.OpenMeteoAPI
 import hsrm.mi.campusapp.data.api.openmeteo.toDomain
+import hsrm.mi.campusapp.data.api.rmv.RmvAPI
+import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Course
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.domain.model.Weather
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.repository.CampusRepository
@@ -81,14 +89,17 @@ import hsrm.mi.campusapp.domain.repository.CourseRepository
 import hsrm.mi.campusapp.domain.repository.StopRepository
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.components.WeatherWidget
+import hsrm.mi.campusapp.presentation.components.getWeatherIcon
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.maplibre.spatialk.geojson.Position
 import kotlin.time.ExperimentalTime
 
 class HomeScreenModel: ScreenModel {
@@ -96,12 +107,16 @@ class HomeScreenModel: ScreenModel {
     val currentWeather = mutableStateOf<Weather?>(null)
     val todaysMeal = mutableStateOf<Menu?>(null)
 
+    val isLoadingArrivalTrip = mutableStateOf(false)
+    val arrivalTrip = mutableStateOf<Trip?>(null)
+
     fun loadWeather(campus: Campus) {
         screenModelScope.launch {
             currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)?.toDomain(campus)
         }
     }
 
+    // TODO() Fix the logic
     @OptIn(ExperimentalTime::class)
     fun loadTodaysMenu() {
         screenModelScope.launch {
@@ -123,6 +138,29 @@ class HomeScreenModel: ScreenModel {
                 )
             }
 
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun loadArrivalTrip(campus: Campus, course: Course) {
+
+        val stop = Stop(
+            id = "A=2@O=Bauhofstraße 55116 Mainz@X=8266930@Y=50004816@U=103@b=990123759@p=1716290195@",
+            name = "Bauhofstraße Mainz",
+            position = Position(longitude = 0.0, latitude = 0.0),
+            campus = null
+        )
+
+        screenModelScope.launch {
+            isLoadingArrivalTrip.value = true
+            val trips: List<Trip> = RmvAPI.getArrivalTripFromStopToCampus(stop, campus, LocalDateTime(date = LocalDate.now(), course.start)).map { it.toDomain() }            // Filter trip with latest startTime
+            val tripsOnTime = trips.filter { trip -> trip.arrivalTime <= course.start }
+
+            // Filter latest trip
+            arrivalTrip.value = tripsOnTime.maxByOrNull { it.startTime }
+
+            // println("TRIP: ${arrivalTrip.value}")
+            isLoadingArrivalTrip.value = false
         }
     }
 
@@ -176,6 +214,13 @@ object HomeTab: CampusTab {
 
         val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
+        val nextCourse = courses.minByOrNull { it.start }
+
+        LaunchedEffect(nextCourse) {
+            if(nextCourse != null && currentCampus != null) {
+                screenModel.loadArrivalTrip(currentCampus, nextCourse)
+            }
+        }
 
         var visibleCount by remember { mutableIntStateOf(0) }
 
@@ -239,13 +284,50 @@ object HomeTab: CampusTab {
                 Spacer(modifier = Modifier.height(20.dp))
                 DepartureInfo(stops, tabNavigator)
                 Spacer(modifier = Modifier.height(20.dp))
-                ScheduleInfo(courses, tabNavigator) // TODO() Probably migrate to ScreenModel
+                ScheduleInfo(nextCourse, tabNavigator) // TODO() Probably migrate to ScreenModel
+                nextCourse?.let {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    ArrivalInfo(screenModel.arrivalTrip.value, screenModel.isLoadingArrivalTrip.value)
+                }
                 Spacer(modifier = Modifier.height(20.dp))
                 MenuInfo(screenModel.todaysMeal.value)
             }
 
             Box(modifier = Modifier.padding(12.dp)) {
                 /* Should display MapScreen --> Idea scraped? */
+            }
+        }
+    }
+}
+
+@Composable
+fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.ModeOfTravel,
+            contentDescription = "arrive on time"
+        )
+        Text(stringResource(Res.string.arrive_on_time))
+        Spacer(modifier = Modifier.width(12.dp))
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if(trip != null) {
+            Column {
+                Text(style = MaterialTheme.typography.bodyMedium, text = "Von ${trip.startTime} Bis ${trip.arrivalTime}")
+                trip.legs.filter { leg -> leg.name != "Fußweg" }.forEach { leg ->
+                    Text(style = MaterialTheme.typography.bodyMedium, text = "• ${leg.name}: ${leg.origin} → ${leg.destination} ")
+                }
+            }
+        } else {
+            if(isLoading) {
+                Text(text = "Lade Verbindungen...", style = MaterialTheme.typography.bodyMedium)
+            } else {
+                Text(text = "Keine Verbindung gefunden...", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -261,12 +343,10 @@ fun WeatherInfo(currentWeather: Weather?) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(stringResource(Res.string.weather))
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+            Icon(
+                imageVector = getWeatherIcon(currentWeather),
+                contentDescription = "current weather"
+            )
             WeatherWidget(weather = currentWeather, modifier = Modifier.wrapContentWidth())
         }
     }
@@ -280,7 +360,7 @@ fun DepartureInfo(stops: List<Stop>, tabNavigator: TabNavigator) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = DepartureTab.activeIcon,
+                imageVector = Icons.Outlined.LocationOn,
                 contentDescription = DepartureTab.topAppBarTitle
             )
             Text(stringResource(Res.string.stops))
@@ -309,37 +389,31 @@ fun DepartureInfo(stops: List<Stop>, tabNavigator: TabNavigator) {
 }
 
 @Composable
-fun ScheduleInfo(courses: List<Course>, tabNavigator: TabNavigator) {
+fun ScheduleInfo(nextCourse: Course?, tabNavigator: TabNavigator) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = ScheduleTab.activeIcon ,
-                contentDescription = ScheduleTab.topAppBarTitle
+                imageVector = Icons.Outlined.Schedule,
+                contentDescription = "Next course"
             )
-            Text(ScheduleTab.topAppBarTitle)
+            Text(stringResource(Res.string.next_course))
         }
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            if(courses.isEmpty()) {
+            if(nextCourse == null) {
                 Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.bodyMedium)
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(courses) { course ->
-                        CampusButton(
-                            text = course.name,
-                            onClick = {
-                                tabNavigator.current = ScheduleTab
-                            },
-                            isActive = true
-                        )
-                    }
-                }
+                CampusButton(
+                    text = nextCourse.name,
+                    onClick = {
+                        tabNavigator.current = ScheduleTab
+                    },
+                    isActive = true
+                )
             }
         }
     }

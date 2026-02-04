@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Umbrella
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Bedtime
 import androidx.compose.material.icons.outlined.NightsStay
+import androidx.compose.material.icons.outlined.Thermostat
 import androidx.compose.material.icons.outlined.WbCloudy
 import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
@@ -49,11 +50,11 @@ fun WeatherWidget(
         modifier = modifier.padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(modifier = Modifier.size(30.dp),imageVector = getWeatherIcon(weather), contentDescription = "Current Weather Icon")
-        Spacer(modifier = Modifier.width(12.dp))
+
         Text("${weather.temperature.toInt()} °C")
+        Icon(modifier = Modifier.size(24.dp),imageVector = Icons.Outlined.Thermostat, contentDescription = "Current Temperature Icon")
         Spacer(modifier = Modifier.width(12.dp))
-        Icon(modifier = Modifier.size(30.dp), imageVector = Icons.Outlined.Air, contentDescription = "Wind Icon")
         Text("${weather.windSpeed} km/h")
+        Icon(modifier = Modifier.size(24.dp), imageVector = Icons.Outlined.Air, contentDescription = "Wind Icon")
     }
 }

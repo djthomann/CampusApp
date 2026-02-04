@@ -20,6 +20,8 @@
     <string name="no_menu_available">no menu available :(</string>
     <string name="no_weather_data">no weather data avaiable</string>
     <string name="weather">Weather</string>
+    <string name="arrive_on_time">On-time Arrival</string>
+    <string name="next_course">Next Course</string>
     <string name="menu_to_be_implemented">Menu is yet to be implemented</string>
     <string name="course_type_lecture">Lecture</string>
     <string name="course_type_practical">Practical</string>

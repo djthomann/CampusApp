@@ -16,6 +16,8 @@ object CourseRepository {
         Course("Angewandte Mathematik", DayOfWeek.FRIDAY,LocalTime(13, 15), 90, lecturer = "Prof. Dr. Schwanecke", room = "D15", courseType = CourseType.PRACTICAL,
             Position( 8.215954211691997, 50.09850095851942)),
         Course("Senatssitzung", DayOfWeek.TUESDAY,LocalTime(17, 15), 90, room = "A115", courseType = CourseType.EXTRA_CURRICULAR,
+            building = Position( 8.217439687773457, 50.08093675702284)),
+        Course("Fachschaftssitzung", DayOfWeek.TUESDAY,LocalTime(18, 30), 90, room = "A115", courseType = CourseType.EXTRA_CURRICULAR,
             building = Position( 8.217439687773457, 50.08093675702284))
     )
 

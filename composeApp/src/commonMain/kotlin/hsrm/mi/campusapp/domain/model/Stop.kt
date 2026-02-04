@@ -4,7 +4,7 @@ import org.maplibre.spatialk.geojson.Position
 
 data class Stop(
     val id: String,
-    val campus: String, // TODO() Change later
+    val campus: String?, // TODO() Change later
     val name: String,
     val position: Position
 )
