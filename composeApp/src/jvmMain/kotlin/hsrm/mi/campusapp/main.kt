@@ -11,6 +11,9 @@ import dev.datlag.kcef.KCEF
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.getDatabaseBuilder
 import hsrm.mi.campusapp.domain.persistence.getRoomDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.io.File
@@ -19,7 +22,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
 
-    val db = getRoomDatabase(getDatabaseBuilder())
+    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    val db = getRoomDatabase(getDatabaseBuilder(), appScope)
     DatabaseHolder.init(db)
 
     Locale.setDefault(Locale.GERMANY) /* For testing only */
