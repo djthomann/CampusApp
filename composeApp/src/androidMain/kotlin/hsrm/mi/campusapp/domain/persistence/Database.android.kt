@@ -13,7 +13,3 @@ fun getDatabaseBuilder(context: Context): RoomDatabase.Builder<AppDatabase> {
         name = dbFile.absolutePath
     )
 }
-
-fun createDatabase(context: Context): AppDatabase {
-    return getRoomDatabase(getDatabaseBuilder(context))
-}

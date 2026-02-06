@@ -7,8 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.room.Room
-import hsrm.mi.campusapp.domain.persistence.AppDatabase
+import androidx.lifecycle.lifecycleScope
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.getDatabaseBuilder
 import hsrm.mi.campusapp.domain.persistence.getRoomDatabase
@@ -18,7 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val db = getRoomDatabase(getDatabaseBuilder(applicationContext))
+        val db = getRoomDatabase(getDatabaseBuilder(applicationContext), scope = lifecycleScope)
         DatabaseHolder.init(db)
 
         installSplashScreen()

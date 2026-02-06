@@ -10,7 +10,3 @@ fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
         name = dbFile.absolutePath,
     )
 }
-
-fun createDatabase(): AppDatabase {
-    return getRoomDatabase(getDatabaseBuilder())
-}

@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -58,10 +59,13 @@ import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.DishEntity
 import hsrm.mi.campusapp.domain.persistence.MenuEntity
 import hsrm.mi.campusapp.domain.persistence.SideDishEntity
-import hsrm.mi.campusapp.domain.repository.CanteenRepository
+import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
@@ -77,6 +81,12 @@ class FoodScreenModel: ScreenModel {
 
     var menus by mutableStateOf<List<Menu>>(emptyList())
         private set
+
+    val canteens: StateFlow<List<Canteen>> = CanteenService.getAllCanteens().stateIn(
+        scope = screenModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     @OptIn(ExperimentalTime::class)
     suspend fun loadMenuFromAPI(canteen: Canteen): List<Menu> {
@@ -209,10 +219,11 @@ object FoodTab: CampusTab {
         val screenModel = rememberScreenModel { FoodScreenModel() }
 
         val selectedCanteen = AppState.selectedCanteen
-        val canteens = CanteenRepository.canteens
 
         val menus = screenModel.menus
         val expandedMenu = remember { mutableStateOf<Menu?>(null) }
+
+        val canteens by screenModel.canteens.collectAsStateWithLifecycle()
 
         Column(
             modifier = Modifier.fillMaxSize().padding(10.dp),
