@@ -18,7 +18,9 @@ object CourseRepository {
         Course("Senatssitzung", DayOfWeek.TUESDAY,LocalTime(17, 15), 90, room = "A115", courseType = CourseType.EXTRA_CURRICULAR,
             building = Position( 8.217439687773457, 50.08093675702284)),
         Course("Fachschaftssitzung", DayOfWeek.TUESDAY,LocalTime(18, 30), 90, room = "A115", courseType = CourseType.EXTRA_CURRICULAR,
-            building = Position( 8.217439687773457, 50.08093675702284))
+            building = Position( 8.217439687773457, 50.08093675702284)),
+        Course("Elektrotechnik", DayOfWeek.THURSDAY,LocalTime(10, 0), 90, room = "F2", courseType = CourseType.PRACTICAL,
+            building = Position( 8.425203705070214, 49.98527172708337))
     )
 
     fun getCoursesForDayOfWeek(dayOfWeek: DayOfWeek): List<Course> {

@@ -1,6 +1,5 @@
 package hsrm.mi.campusapp.data.api.rmv
 
-import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Stop
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -12,9 +11,13 @@ import kotlinx.serialization.json.Json
 
 object RmvAPI {
 
+    /* TODO() Work with result types instead to mirror images when fetching */
+
     const val SEARCH_TIMEFRAME_MINUTES = 180
 
     const val DEFAULT_NUM_DEPARTURES = 3
+
+    const val DEFAULT_NUM_LOCATIONS = 4
 
     const val ARRIVAL_MINUTES_BEFORE_COURSE_STARTS = 10
 
@@ -39,7 +42,7 @@ object RmvAPI {
             parameter("format", "json")
         }.bodyAsText()
 
-        // println("RAW Response: $jsonResponse")
+        println("RAW Response: $jsonResponse")
 
         return try {
             val response: DepartureResponse = json.decodeFromString(jsonResponse)
@@ -74,8 +77,8 @@ object RmvAPI {
         }
     }
 
-    suspend fun getArrivalTripFromStopToCampus(stop: Stop, campus: Campus, arrivalDateTime: LocalDateTime): List<TripDTO> {
-        println("GETTING TRIP FROM $stop TO $campus")
+    suspend fun getArrivalTripFromStopToCampus(stop: Stop, latitude: Double, longitude: Double, arrivalDateTime: LocalDateTime): List<TripDTO> {
+        println("GETTING TRIP FROM $stop TO $latitude|$longitude")
 
         // Arrive earlier than strictly necessary
         val originalTime = arrivalDateTime.time
@@ -89,8 +92,8 @@ object RmvAPI {
             parameter("originId", stop.id)
             parameter("numF", 1)
             parameter("numB", 3)
-            parameter("destCoordLat", campus.center.latitude)
-            parameter("destCoordLong", campus.center.longitude)
+            parameter("destCoordLat", latitude)
+            parameter("destCoordLong", longitude)
             parameter("date", arrivalDateTime.date.toString())
             parameter("time", bufferedTime.toString())
             parameter("searchForArrival", 1)
@@ -107,6 +110,35 @@ object RmvAPI {
             tripResponse.trips
         } catch (e: Exception) {
             println("Error deserializing Trip Response: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun searchStopByName(input: String, numSearchResults: Int = DEFAULT_NUM_LOCATIONS): List<StopLocationDTO> {
+        println("SEARCHING FOR LOCATION WITH SEARCH: $input")
+
+        val jsonResponse: String = client.get("$BASE_URL/location.name") {
+            parameter("accessId", rmvApiKey)
+            parameter("format", "json")
+            parameter("input", input)
+            parameter("maxNo", numSearchResults)
+            parameter("type", "S")
+            parameter("withEquivalentLocations", 0)
+            parameter("restrictSelection", "S")
+            parameter("withProducts", 0)
+            parameter("productRepresentatives", 1)
+            parameter("r", 1000)
+            parameter("filterMode", "DIST_PERI")
+            parameter("withMastNames", 1)
+        }.bodyAsText()
+
+        // println("RAW Response: $jsonResponse")
+
+        return try {
+            val locationResponse = json.decodeFromString<LocationResponse>(jsonResponse)
+            locationResponse.stopsWrapper.map { it.stopLocation }
+        } catch (e: Exception) {
+            println("Error deserializing Location Response: ${e.message}")
             emptyList()
         }
     }

@@ -29,6 +29,13 @@ object AppState {
     val selectedCanteenFlow = snapshotFlow { selectedCampusName.value }
         .map { name -> CampusRepository.getCampusByName(name) }
 
+    private var _homeStopId = mutableStateOf<String>(settings.homeStopId)
+
+    /* TODO() Save real Stop object later and retrieve it here */
+    var homeStopId: String? = null
+        get() = _homeStopId.value.ifEmpty { null }
+        private set
+
 
     var isDarkMode = mutableStateOf<Boolean>(settings.isDarkMode)
         private set
@@ -49,8 +56,12 @@ object AppState {
         selectedCanteenName.value = canteen?.name ?: ""
         selectedCanteen = canteen
         settings.canteen = canteen?.name ?: ""
+    }
 
-        println(selectedCanteen)
+    fun selectHomeStop(stopId: String?) {
+        _homeStopId.value = stopId?: ""
+        homeStopId = stopId
+        settings.homeStopId = stopId?: ""
     }
 
 }

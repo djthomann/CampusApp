@@ -142,18 +142,18 @@ class HomeScreenModel: ScreenModel {
     }
 
     @OptIn(ExperimentalTime::class)
-    fun loadArrivalTrip(campus: Campus, course: Course) {
+    fun loadArrivalTrip(stopId: String, course: Course) {
 
         val stop = Stop(
-            id = "A=2@O=Bauhofstraße 55116 Mainz@X=8266930@Y=50004816@U=103@b=990123759@p=1716290195@",
-            name = "Bauhofstraße Mainz",
+            id = stopId,
+            name = "Placeholder",
             position = Position(longitude = 0.0, latitude = 0.0),
             campus = null
         )
 
         screenModelScope.launch {
             isLoadingArrivalTrip.value = true
-            val trips: List<Trip> = RmvAPI.getArrivalTripFromStopToCampus(stop, campus, LocalDateTime(date = LocalDate.now(), course.start)).map { it.toDomain() }            // Filter trip with latest startTime
+            val trips: List<Trip> = RmvAPI.getArrivalTripFromStopToCampus(stop, course.building.latitude, course.building.longitude, LocalDateTime(date = LocalDate.now(), course.start)).map { it.toDomain() }            // Filter trip with latest startTime
             val tripsOnTime = trips.filter { trip -> trip.arrivalTime <= course.start }
 
             // Filter latest trip
@@ -162,6 +162,15 @@ class HomeScreenModel: ScreenModel {
             // println("TRIP: ${arrivalTrip.value}")
             isLoadingArrivalTrip.value = false
         }
+    }
+
+    fun searchHomeStopByName(input: String) {
+
+        screenModelScope.launch {
+            val stops = RmvAPI.searchStopByName(input)
+            println("FOUND: $stops")
+        }
+
     }
 
 }
@@ -216,9 +225,13 @@ object HomeTab: CampusTab {
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
         val nextCourse = courses.minByOrNull { it.start }
 
-        LaunchedEffect(nextCourse) {
-            if(nextCourse != null && currentCampus != null) {
-                screenModel.loadArrivalTrip(currentCampus, nextCourse)
+        LaunchedEffect(nextCourse, AppState.homeStopId) {
+            if(nextCourse != null) {
+                // Necessary because of concurrent edit of homeStopId
+                AppState.homeStopId?.let {
+                    screenModel.loadArrivalTrip(it, nextCourse)
+                }
+
             }
         }
 
@@ -316,19 +329,24 @@ fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if(trip != null) {
-            Column {
-                Text(style = MaterialTheme.typography.bodyMedium, text = "Von ${trip.startTime} Bis ${trip.arrivalTime}")
-                trip.legs.filter { leg -> leg.name != "Fußweg" }.forEach { leg ->
-                    Text(style = MaterialTheme.typography.bodyMedium, text = "• ${leg.name}: ${leg.origin} → ${leg.destination} ")
+        // TODO() Make string resources
+        if(AppState.homeStopId != null) {
+            if(trip != null) {
+                Column {
+                    Text(style = MaterialTheme.typography.bodyMedium, text = "Von ${trip.startTime} Bis ${trip.arrivalTime}")
+                    trip.legs.filter { leg -> leg.name != "Fußweg" }.forEach { leg ->
+                        Text(style = MaterialTheme.typography.bodyMedium, text = "• ${leg.name}: ${leg.origin} → ${leg.destination} ")
+                    }
+                }
+            } else {
+                if(isLoading) {
+                    Text(text = "Lade Verbindungen...", style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    Text(text = "Keine Verbindung gefunden...", style = MaterialTheme.typography.bodyMedium)
                 }
             }
         } else {
-            if(isLoading) {
-                Text(text = "Lade Verbindungen...", style = MaterialTheme.typography.bodyMedium)
-            } else {
-                Text(text = "Keine Verbindung gefunden...", style = MaterialTheme.typography.bodyMedium)
-            }
+            Text(text = "No home stop selected...", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

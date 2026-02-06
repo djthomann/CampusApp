@@ -15,7 +15,7 @@ object StopRepository {
         Stop("A=1@O=Wiesbaden Unter den Eichen@X=8219278@Y=50096281@U=80@L=3018170@p=1767293043@","Unter den Eichen", "Unter den Eichen",  Position( 8.219030, 50.096314)),
         Stop("A=1@O=Rüsselsheim Hochschule-Rhein-Main@X=8422371@Y=49985453@U=80@L=3014366@p=1767293043@", "Rüsselsheim", "Hochschule Rhein-Main", Position( 8.218216, 50.081457)),
         Stop("A=1@O=Rüsselsheim Bahnhof@X=8413804@Y=49991755@U=80@L=3004912@p=1767379514@", "Rüsselsheim", "Rüsselsheim Bahnhof", Position( 8.218216, 50.081457)),
-                Stop("A=1@O=Rüsselsheim Teufelseestraße@X=8429491@Y=49985346@U=80@L=3012034@p=1767379514@", "Rüsselsheim", "Rüsselsheim Bahnhof", Position( 8.218216, 50.081457))
+        Stop("A=1@O=Rüsselsheim Klinikum/Hochschule@X=8423405@Y=49983620@U=80@L=3004915@p=1770279446@", "Rüsselsheim", "Rüsselsheim Klinikum/Hochschule", Position( 8.218216, 50.081457))
     )
 
     var selectedStop by mutableStateOf(stops.first())
