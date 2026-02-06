@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -56,13 +58,32 @@ import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.settings
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
+import hsrm.mi.campusapp.domain.model.Campus
+import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CanteenRepository
+import hsrm.mi.campusapp.domain.service.CampusService
+import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 class SettingsScreenModel: ScreenModel {
+
+    val canteens: StateFlow<List<Canteen>> = CanteenService.getAllCanteens().stateIn(
+        scope = screenModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    val campuses: StateFlow<List<Campus>> = CampusService.getAllCampuses().stateIn(
+        scope = screenModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     var homeStopResults = mutableStateOf(emptyList<StopLocationDTO>())
 
@@ -72,6 +93,14 @@ class SettingsScreenModel: ScreenModel {
             homeStopResults.value = RmvAPI.searchStopByName(input)
         }
 
+    }
+
+    fun updateCanteen(canteen: Canteen) {
+        AppState.updateCanteen(canteen, screenModelScope)
+    }
+
+    fun updateCampus(campus: Campus?) {
+        AppState.updateCampus(campus, screenModelScope)
     }
 
 }
@@ -104,6 +133,9 @@ object SettingsTab: CampusTab {
 
         val screenModel = rememberScreenModel { SettingsScreenModel() }
         val tabNavigator = LocalTabNavigator.current
+
+        val canteens by screenModel.canteens.collectAsStateWithLifecycle()
+        val campuses by screenModel.campuses.collectAsStateWithLifecycle()
 
         Column(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -143,8 +175,8 @@ object SettingsTab: CampusTab {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                CampusSelection(Modifier.weight(1f))
-                IconButton(onClick = { AppState.selectCampus(null) }) {
+                CampusSelection(campuses = campuses, Modifier.weight(1f), updateCampus =  screenModel::updateCampus)
+                IconButton(onClick = { screenModel.updateCampus(null) }) {
                     Icon(
                         imageVector = Icons.Filled.Clear,
                         contentDescription = "Clear Canteen"
@@ -156,7 +188,11 @@ object SettingsTab: CampusTab {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                CanteenSelection(Modifier.weight(1f))
+                CanteenSelection(
+                    canteens = canteens,
+                    modifier = Modifier.weight(1f),
+                    updateCanteen = screenModel::updateCanteen
+                    )
                 IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.Filled.Clear,
@@ -318,10 +354,10 @@ fun HomeStopSearchBar(results: List<StopLocationDTO>, onSearch: (String) -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CampusSelection(modifier: Modifier = Modifier) {
-    val selectedOption = AppState.selectedCampus
+fun CampusSelection(campuses: List<Campus>, modifier: Modifier = Modifier, updateCampus: (Campus) -> Unit) {
+    val options = campuses
+    val selectedOption by AppState.selectedCampus.collectAsState()
     var expanded by remember { mutableStateOf(false) }
-    val options = CampusRepository.campuses
 
     ExposedDropdownMenuBox(
         modifier = modifier.fillMaxWidth(),
@@ -346,7 +382,7 @@ fun CampusSelection(modifier: Modifier = Modifier) {
                 DropdownMenuItem(
                     text = { Text(option.name) },
                     onClick = {
-                        AppState.selectCampus(option)
+                        updateCampus(option)
                         expanded = false
                     }
                 )
@@ -357,8 +393,8 @@ fun CampusSelection(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CanteenSelection(modifier: Modifier = Modifier) {
-    val options = CanteenRepository.canteens
+fun CanteenSelection(canteens: List<Canteen>, modifier: Modifier = Modifier, updateCanteen: (Canteen) -> Unit) {
+    val options = canteens
     val selectedOption = AppState.selectedCanteen
     var expanded by remember { mutableStateOf(false) }
 
@@ -368,7 +404,7 @@ fun CanteenSelection(modifier: Modifier = Modifier) {
         onExpandedChange = { expanded = !expanded },
     ) {
         TextField(
-            value = selectedOption?.name ?: "None",
+            value = selectedOption.value?.name ?: "None",
             onValueChange = {},
             readOnly = true,
             label = { Text("Mensa") },
@@ -385,7 +421,7 @@ fun CanteenSelection(modifier: Modifier = Modifier) {
                 DropdownMenuItem(
                     text = { Text(option.name) },
                     onClick = {
-                        AppState.selectCanteen(option)
+                        updateCanteen(option)
                         expanded = false
                     }
                 )

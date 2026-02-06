@@ -14,6 +14,8 @@ interface CanteenDao {
     @Insert
     suspend fun insertAll(items: List<CanteenEntity>)
 
+    @Query("SELECT * FROM CanteenEntity WHERE name = :name")
+    fun getByName(name: String): CanteenEntity?
     @Query("SELECT * FROM CanteenEntity")
     fun getAllAsFlow(): Flow<List<CanteenEntity>>
 

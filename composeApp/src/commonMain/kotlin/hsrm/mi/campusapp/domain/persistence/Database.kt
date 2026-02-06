@@ -24,6 +24,7 @@ fun getRoomDatabase(
 
     // Seed Database
     scope.launch {
+        seedCampusFromResource(db.getCampusDao())
         seedStopsFromResource(db.getStopDao())
         seedCanteensFromResource(db.getCanteenDao())
     }
@@ -48,6 +49,24 @@ suspend fun seedStopsFromResource(dao: StopDao) {
     println("LOADED STOPS: ${dao.count()}")
 }
 
+suspend fun seedCampusFromResource(dao: CampusDao) {
+
+    if (dao.count() == 0) {
+        println("SEEDING DB WITH CAMPUSES...")
+        try {
+            val jsonString = Res.readBytes("files/model/campuses.json").decodeToString()
+            val items = Json.decodeFromString<List<CampusEntity>>(jsonString)
+            dao.insertAll(items)
+            println("SEEDING CAMPUSES FINISHED")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    println("LOADED CAMPUSES: ${dao.count()}")
+
+}
+
 suspend fun seedCanteensFromResource(dao: CanteenDao) {
 
     if (dao.count() == 0) {
@@ -66,12 +85,13 @@ suspend fun seedCanteensFromResource(dao: CanteenDao) {
 }
 
 @Database(entities = [
+    CampusEntity::class,
     DishEntity::class,
     MenuEntity::class,
     SideDishEntity::class,
     StopEntity::class,
     CanteenEntity::class
-                     ], version = 15)
+                     ], version = 20)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(
     SideDishTypeConverter::class
@@ -82,6 +102,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getSideDishDao(): SideDishDao
     abstract fun getStopDao(): StopDao
     abstract fun getCanteenDao(): CanteenDao
+
+    abstract fun getCampusDao(): CampusDao
 }
 
 @Suppress("KotlinNoActualForExpect")

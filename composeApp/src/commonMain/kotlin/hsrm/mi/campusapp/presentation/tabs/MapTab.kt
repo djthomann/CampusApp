@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -37,7 +38,7 @@ class MapScreenModel: ScreenModel {
     var uiState by mutableStateOf(
         MapState(
             cameraPosition = CameraPosition(
-                target = selectedCampus?.center ?: defaultCenter,
+                target = selectedCampus.value?.center ?: defaultCenter,
                 zoom = 16.0,
                 tilt = 45.0,
                 bearing = 0.0
@@ -48,13 +49,14 @@ class MapScreenModel: ScreenModel {
 
     init {
         screenModelScope.launch {
-            AppState.selectedCampusFlow.collect { campus ->
-                campus?.let {
-                    uiState = uiState.copy(
-                        cameraPosition = uiState.cameraPosition.copy(target = it.center)
-                    )
+            snapshotFlow { AppState.selectedCampus }
+                .collect { campus ->
+                    campus.let {
+                        uiState = uiState.copy(
+                            cameraPosition = uiState.cameraPosition.copy(target = it.value?.center ?: defaultCenter)
+                        )
+                    }
                 }
-            }
         }
     }
 

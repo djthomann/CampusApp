@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -110,8 +111,18 @@ class HomeScreenModel: ScreenModel {
     val isLoadingArrivalTrip = mutableStateOf(false)
     val arrivalTrip = mutableStateOf<Trip?>(null)
 
+    fun updateCampus(campus: Campus?) {
+        AppState.updateCampus(campus, screenModelScope)
+    }
+
     fun loadWeather(campus: Campus) {
         screenModelScope.launch {
+            /* Tried loading API in IO Thread. Was bad for performance though
+            val result = withContext(Dispatchers.IO) {
+                OpenMeteoAPI.getCurrentWeather(campus)
+            }
+            currentWeather.value = result?.toDomain(campus)*/
+
             currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)?.toDomain(campus)
         }
     }
@@ -205,23 +216,18 @@ object HomeTab: CampusTab {
 
         val tabNavigator = LocalTabNavigator.current
 
-        val currentCampus = AppState.selectedCampus
-
-        if(currentCampus != null) {
-            if (screenModel.currentWeather.value == null) {
-                screenModel.loadWeather(currentCampus) // TODO() Refresh after a certain time and after campus switch
-            }
-
-            screenModel.loadTodaysMenu()
-        }
+        val currentCampus by AppState.selectedCampus.collectAsState()
 
         LaunchedEffect(currentCampus) {
-            if(currentCampus != null) {
-                screenModel.loadWeather(currentCampus)
+            val campus = currentCampus
+            if (campus != null) {
+                screenModel.loadWeather(campus)
+                screenModel.loadTodaysMenu()
             }
         }
 
-        val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
+        val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(
+            currentCampus!!.name) } ?: emptyList() }
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
         val nextCourse = courses.minByOrNull { it.start }
 
@@ -248,7 +254,7 @@ object HomeTab: CampusTab {
             modifier = Modifier.fillMaxSize().padding(12.dp)
         ) {
             AnimatedVisibility(
-                visible = AppState.selectedCampus == null,
+                visible = currentCampus == null,
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -279,7 +285,7 @@ object HomeTab: CampusTab {
                             ) {
                                 CampusButton(
                                     text = campus.name,
-                                    onClick = { AppState.selectCampus(campus) },
+                                    onClick = { screenModel.updateCampus(campus) },
                                     isActive = true
                                 )
                             }
@@ -291,7 +297,7 @@ object HomeTab: CampusTab {
 
             if(currentCampus != null) {
                 Spacer(modifier = Modifier.height(20.dp))
-                CampusName(currentCampus)
+                CampusName(currentCampus!!)
                 Spacer(modifier = Modifier.height(20.dp))
                 WeatherInfo(screenModel.currentWeather.value)
                 Spacer(modifier = Modifier.height(20.dp))

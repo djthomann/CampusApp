@@ -11,13 +11,18 @@ import androidx.lifecycle.lifecycleScope
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.getDatabaseBuilder
 import hsrm.mi.campusapp.domain.persistence.getRoomDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val db = getRoomDatabase(getDatabaseBuilder(applicationContext), scope = lifecycleScope)
+        val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+        val db = getRoomDatabase(getDatabaseBuilder(applicationContext), scope = applicationScope)
         DatabaseHolder.init(db)
 
         installSplashScreen()

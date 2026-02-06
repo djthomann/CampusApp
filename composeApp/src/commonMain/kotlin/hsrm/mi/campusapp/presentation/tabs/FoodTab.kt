@@ -238,7 +238,6 @@ object FoodTab: CampusTab {
                         text = canteen.name,
                         onClick = {
                             screenModel.loadMenu(canteen)
-                            AppState.selectCanteen(canteen)
                         },
                         isActive = canteen == selectedCanteen
                     )

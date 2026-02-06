@@ -126,7 +126,7 @@ object DepartureTab: CampusTab {
         val screenModel = rememberScreenModel { DepartureScreenModel() }
 
         val currentCampus = AppState.selectedCampus
-        val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(currentCampus.name) } ?: emptyList() }
+        val stops: List<Stop> = remember(currentCampus) { currentCampus.value?.name?.let { it -> StopRepository.getStopsForCampusName(it) } ?: emptyList() }
 
         LaunchedEffect(pendingStop.value) {
             pendingStop.value?.let { stop ->

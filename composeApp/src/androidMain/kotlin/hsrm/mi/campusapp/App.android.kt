@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
@@ -36,9 +38,11 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 actual fun MainScaffold(navigator: TabNavigator) {
 
+    val selectedCampus by AppState.selectedCampus.collectAsState()
+
     Scaffold(
         topBar = {
-            if(AppState.selectedCampus != null || navigator.current == SettingsTab) {
+            if(selectedCampus != null || navigator.current == SettingsTab) {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -67,7 +71,7 @@ actual fun MainScaffold(navigator: TabNavigator) {
             }
         },
         bottomBar = {
-            if(AppState.selectedCampus != null) {
+            if(selectedCampus != null) {
                 NavigationBar() {
                     NavItem(FoodTab)
                     NavItem(ScheduleTab)

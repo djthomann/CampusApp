@@ -1,33 +1,54 @@
 package hsrm.mi.campusapp.presentation.state
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
+import hsrm.mi.campusapp.domain.persistence.CanteenDao
+import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
+import hsrm.mi.campusapp.domain.persistence.toDomain
 import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CanteenRepository
+import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.settings.AppSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object AppState {
 
+    init {
+
+        // Load from settings
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val campusName = settings.campus
+            if(campusName.isNotBlank()) {
+                val campus = DatabaseHolder.db.getCampusDao().getByName(campusName)?.toDomain()
+                _selectedCampus.value = campus
+            }
+
+            val canteenName = settings.canteen
+            if (canteenName.isNotBlank()) {
+                val canteen = DatabaseHolder.db.getCanteenDao().getByName(canteenName)?.toDomain()
+                _selectedCanteen.value = canteen
+            }
+        }
+    }
+
     private val settings: AppSettings = AppSettings()
 
-    private var selectedCampusName = mutableStateOf<String>(settings.campus)
-    var selectedCampus: Campus? = null
-        get() = CampusRepository.getCampusByName(selectedCampusName.value)
-        private set
+    private var _selectedCampus = MutableStateFlow<Campus?>(null)
+    val selectedCampus = _selectedCampus.asStateFlow()
 
-    val selectedCampusFlow = snapshotFlow { selectedCampusName.value }
-        .map { name -> CampusRepository.getCampusByName(name) }
-
-    private var selectedCanteenName = mutableStateOf<String>(settings.canteen)
-    var selectedCanteen: Canteen? = null
-        get() = CanteenRepository.getCanteenByName(selectedCanteenName.value)
-        private set
-
-    val selectedCanteenFlow = snapshotFlow { selectedCampusName.value }
-        .map { name -> CampusRepository.getCampusByName(name) }
+    private val _selectedCanteen = MutableStateFlow<Canteen?>(null)
+    val selectedCanteen = _selectedCanteen.asStateFlow()
 
     private var _homeStopId = mutableStateOf<String>(settings.homeStopId)
 
@@ -46,16 +67,18 @@ object AppState {
         settings.isDarkMode = newModeValue
     }
 
-    fun selectCampus(campus: Campus?) {
-        selectedCampusName.value = campus?.name ?: ""
-        selectedCampus = campus
-        settings.campus = campus?.name ?: ""
+    fun updateCampus(campus: Campus?, scope: CoroutineScope) {
+        scope.launch {
+            settings.campus = campus?.name ?: ""
+            _selectedCampus.value = campus
+        }
     }
 
-    fun selectCanteen(canteen: Canteen?) {
-        selectedCanteenName.value = canteen?.name ?: ""
-        selectedCanteen = canteen
-        settings.canteen = canteen?.name ?: ""
+    fun updateCanteen(canteen: Canteen?, scope: CoroutineScope) {
+        scope.launch {
+            settings.canteen = canteen?.name ?: ""
+            _selectedCanteen.value = canteen
+        }
     }
 
     fun selectHomeStop(stopId: String?) {

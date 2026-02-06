@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Unter den Eichen",
+    "latitude": 50.0964,
+    "longitude": 8.217,
+    "tilt": 0.0,
+    "jsonPath": "ude.geojson"
+  },
+  {
+    "name": "Kurt-Schumacher-Ring",
+    "latitude": 50.08,
+    "longitude": 8.217,
+    "tilt": 0.0,
+    "jsonPath": "ksr.geojson"
+  },
+  {
+    "name": "Rüsselsheim",
+    "latitude": 49.985,
+    "longitude": 8.424,
+    "tilt": 0.0,
+    "jsonPath": "ruesselsheim.geojson"
+  }
+]
