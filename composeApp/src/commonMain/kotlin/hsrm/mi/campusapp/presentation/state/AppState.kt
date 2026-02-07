@@ -1,25 +1,16 @@
 package hsrm.mi.campusapp.presentation.state
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
-import hsrm.mi.campusapp.domain.persistence.CanteenDao
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.toDomain
-import hsrm.mi.campusapp.domain.repository.CampusRepository
-import hsrm.mi.campusapp.domain.repository.CanteenRepository
+import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.settings.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object AppState {
 
@@ -30,13 +21,13 @@ object AppState {
 
             val campusName = settings.campus
             if(campusName.isNotBlank()) {
-                val campus = DatabaseHolder.db.getCampusDao().getByName(campusName)?.toDomain()
+                val campus = CampusService.getCampusByName(campusName)
                 _selectedCampus.value = campus
             }
 
             val canteenName = settings.canteen
             if (canteenName.isNotBlank()) {
-                val canteen = DatabaseHolder.db.getCanteenDao().getByName(canteenName)?.toDomain()
+                val canteen = CanteenService.getCanteenByName(canteenName)
                 _selectedCanteen.value = canteen
             }
         }

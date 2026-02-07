@@ -15,7 +15,7 @@ interface CampusDao {
     suspend fun insertAll(items: List<CampusEntity>)
 
     @Query("SELECT * FROM CampusEntity WHERE name = :name")
-    fun getByName(name: String): CampusEntity?
+    suspend fun getByName(name: String): CampusEntity?
     @Query("SELECT * FROM CampusEntity")
     fun getAllAsFlow(): Flow<List<CampusEntity>>
 

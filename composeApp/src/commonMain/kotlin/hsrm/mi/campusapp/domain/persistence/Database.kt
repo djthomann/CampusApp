@@ -91,7 +91,7 @@ suspend fun seedCanteensFromResource(dao: CanteenDao) {
     SideDishEntity::class,
     StopEntity::class,
     CanteenEntity::class
-                     ], version = 20)
+                     ], version = 22)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(
     SideDishTypeConverter::class

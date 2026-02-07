@@ -15,6 +15,8 @@ interface StopDao {
     @Insert
     suspend fun insertAll(items: List<StopEntity>)
 
+    @Query("SELECT * FROM StopEntity WHERE name = :name")
+    suspend fun getByName(name: String): StopEntity?
     @Query("SELECT * FROM StopEntity")
     fun getAllAsFlow(): Flow<List<StopEntity>>
 

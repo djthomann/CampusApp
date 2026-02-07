@@ -3,7 +3,6 @@ package hsrm.mi.campusapp.domain.service
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.toDomain
-import hsrm.mi.campusapp.domain.repository.CanteenRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -15,7 +14,7 @@ object CanteenService {
         return dao.getAllAsFlow().map { entities -> entities.map { it.toDomain() } }
     }
 
-    fun getCanteenByName(name: String): Canteen? {
+    suspend fun getCanteenByName(name: String): Canteen? {
         return dao.getByName(name)?.toDomain()
     }
 

@@ -1,12 +1,10 @@
 package hsrm.mi.campusapp.domain.repository
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import hsrm.mi.campusapp.domain.model.Stop
 import org.maplibre.spatialk.geojson.Position
 
 object StopRepository {
+
     val stops = listOf<Stop>(
         Stop("A=1@O=Wiesbaden Hochschule RheinMain@X=8218604@Y=50081135@U=80@L=3018265@p=1767293043@","Kurt-Schumacher-Ring", "Hochschule RheinMain",
             Position( 8.218216, 50.081457)),
@@ -17,9 +15,6 @@ object StopRepository {
         Stop("A=1@O=Rüsselsheim Bahnhof@X=8413804@Y=49991755@U=80@L=3004912@p=1767379514@", "Rüsselsheim", "Rüsselsheim Bahnhof", Position( 8.218216, 50.081457)),
         Stop("A=1@O=Rüsselsheim Klinikum/Hochschule@X=8423405@Y=49983620@U=80@L=3004915@p=1770279446@", "Rüsselsheim", "Rüsselsheim Klinikum/Hochschule", Position( 8.218216, 50.081457))
     )
-
-    var selectedStop by mutableStateOf(stops.first())
-        private set
 
     fun getStopsForCampusName(name: String): List<Stop> {
         return stops.filter { it.campus == name }

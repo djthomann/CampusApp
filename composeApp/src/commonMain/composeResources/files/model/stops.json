@@ -1,10 +1,51 @@
 [
   {
-    "id": 1,
-    "name": "Eins"
+    "id": "A=1@O=Wiesbaden Hochschule RheinMain@X=8218604@Y=50081135@U=80@L=3018265@p=1767293043@",
+    "name": "Hochschule RheinMain",
+    "campus": "Kurt-Schumacher-Ring",
+    "longitude": 8.218216,
+    "latitude": 50.081457
   },
   {
-    "id": 2,
-    "name": "Two"
+    "id": "A=1@O=Wiesbaden Klarenthaler Straße@X=8226649@Y=50077961@U=80@L=3025274@p=1767379514@",
+    "name": "Klarenthaler Straße",
+    "campus": "Kurt-Schumacher-Ring",
+    "longitude": 8.218216,
+    "latitude": 50.081457
+  },
+  {
+    "id": "A=1@O=Wiesbaden Nordfriedhof@X=8221031@Y=50097028@U=80@L=3025457@p=1767293043@",
+    "name": "Nordfriedhof",
+    "campus": "Unter den Eichen",
+    "longitude": 8.220445,
+    "latitude": 50.096314
+  },
+  {
+    "id": "A=1@O=Wiesbaden Unter den Eichen@X=8219278@Y=50096281@U=80@L=3018170@p=1767293043@",
+    "name": "Unter den Eichen",
+    "campus": "Unter den Eichen",
+    "longitude": 8.219030,
+    "latitude": 50.096314
+  },
+  {
+    "id": "A=1@O=Rüsselsheim Hochschule-Rhein-Main@X=8422371@Y=49985453@U=80@L=3014366@p=1767293043@",
+    "name": "Hochschule Rhein-Main",
+    "campus": "Rüsselsheim",
+    "longitude": 8.218216,
+    "latitude": 50.081457
+  },
+  {
+    "id": "A=1@O=Rüsselsheim Bahnhof@X=8413804@Y=49991755@U=80@L=3004912@p=1767379514@",
+    "name": "Rüsselsheim Bahnhof",
+    "campus": "Rüsselsheim",
+    "longitude": 8.218216,
+    "latitude": 50.081457
+  },
+  {
+    "id": "A=1@O=Rüsselsheim Klinikum/Hochschule@X=8423405@Y=49983620@U=80@L=3004915@p=1770279446@",
+    "name": "Rüsselsheim Klinikum/Hochschule",
+    "campus": "Rüsselsheim",
+    "longitude": 8.218216,
+    "latitude": 50.081457
   }
 ]

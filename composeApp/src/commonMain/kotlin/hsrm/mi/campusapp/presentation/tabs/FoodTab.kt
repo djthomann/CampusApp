@@ -61,7 +61,6 @@ import hsrm.mi.campusapp.domain.persistence.MenuEntity
 import hsrm.mi.campusapp.domain.persistence.SideDishEntity
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.presentation.components.CampusButton
-import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -82,6 +81,7 @@ class FoodScreenModel: ScreenModel {
     var menus by mutableStateOf<List<Menu>>(emptyList())
         private set
 
+    var selectedCanteen by mutableStateOf<Canteen?>(null)
     val canteens: StateFlow<List<Canteen>> = CanteenService.getAllCanteens().stateIn(
         scope = screenModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -159,7 +159,10 @@ class FoodScreenModel: ScreenModel {
     // TODO() Faulty logic probably
     fun loadMenu(canteen: Canteen) {
 
+        selectedCanteen = canteen
         // loadMenuFromAPI(canteen)
+
+        println("LOADING MENUS FOR: ${canteen.name}")
 
         screenModelScope.launch {
             // Lade aus DB
@@ -218,11 +221,10 @@ object FoodTab: CampusTab {
 
         val screenModel = rememberScreenModel { FoodScreenModel() }
 
-        val selectedCanteen = AppState.selectedCanteen
-
         val menus = screenModel.menus
         val expandedMenu = remember { mutableStateOf<Menu?>(null) }
 
+        val selectedCanteen = screenModel.selectedCanteen
         val canteens by screenModel.canteens.collectAsStateWithLifecycle()
 
         Column(

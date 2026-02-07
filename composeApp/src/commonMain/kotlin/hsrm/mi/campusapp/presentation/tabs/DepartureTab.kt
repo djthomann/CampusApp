@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -63,7 +65,7 @@ import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
 import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.repository.StopRepository
+import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
@@ -125,8 +127,8 @@ object DepartureTab: CampusTab {
     override fun Content() {
         val screenModel = rememberScreenModel { DepartureScreenModel() }
 
-        val currentCampus = AppState.selectedCampus
-        val stops: List<Stop> = remember(currentCampus) { currentCampus.value?.name?.let { it -> StopRepository.getStopsForCampusName(it) } ?: emptyList() }
+        val currentCampus by AppState.selectedCampus.collectAsState()
+        val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
 
         LaunchedEffect(pendingStop.value) {
             pendingStop.value?.let { stop ->
@@ -137,7 +139,9 @@ object DepartureTab: CampusTab {
 
         if(screenModel.currentStop.value == null) {
             // Try loading initial departures
-            pendingStop.value = stops.first()
+            if(stops.isNotEmpty())  {
+                pendingStop.value = stops.first()
+            }
         }
 
         Column(

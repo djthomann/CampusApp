@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.pin_green
 import hsrm.mi.campusapp.domain.model.Campus
-import hsrm.mi.campusapp.domain.repository.CampusRepository
+import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.state.MapState
 import kotlinx.serialization.json.JsonObject
@@ -89,7 +89,7 @@ actual fun MapView(state: MapState) {
         mutableStateOf<Feature<Geometry, JsonObject?>?>(null)
     }
 
-    val campuses = CampusRepository.campuses
+    val campuses by CampusService.getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
 
     LaunchedEffect(variant) {
         jsonString = Res

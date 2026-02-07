@@ -55,6 +55,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -85,9 +86,9 @@ import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.domain.model.Weather
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.repository.CampusRepository
 import hsrm.mi.campusapp.domain.repository.CourseRepository
-import hsrm.mi.campusapp.domain.repository.StopRepository
+import hsrm.mi.campusapp.domain.service.CampusService
+import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.components.WeatherWidget
 import hsrm.mi.campusapp.presentation.components.getWeatherIcon
@@ -226,8 +227,8 @@ object HomeTab: CampusTab {
             }
         }
 
-        val stops: List<Stop> = remember(currentCampus) { currentCampus?.let { StopRepository.getStopsForCampusName(
-            currentCampus!!.name) } ?: emptyList() }
+        val campuses by CampusService.getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
+        val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
         val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
         val nextCourse = courses.minByOrNull { it.start }
 
@@ -243,8 +244,8 @@ object HomeTab: CampusTab {
 
         var visibleCount by remember { mutableIntStateOf(0) }
 
-        LaunchedEffect(Unit) {
-            CampusRepository.campuses.forEachIndexed { index, _ ->
+        LaunchedEffect(campuses) {
+            campuses.forEachIndexed { index, _ ->
                 visibleCount = index + 1
                 delay(250)
             }
@@ -275,7 +276,7 @@ object HomeTab: CampusTab {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        itemsIndexed(CampusRepository.campuses) { index, campus ->
+                        itemsIndexed(campuses) { index, campus ->
                             AnimatedVisibility(
                                 visible = index < visibleCount,
                                 enter = slideInVertically(
