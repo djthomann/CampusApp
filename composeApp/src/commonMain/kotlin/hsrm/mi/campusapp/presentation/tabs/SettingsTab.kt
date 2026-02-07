@@ -60,8 +60,6 @@ import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
-import hsrm.mi.campusapp.domain.repository.CampusRepository
-import hsrm.mi.campusapp.domain.repository.CanteenRepository
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.presentation.state.AppState

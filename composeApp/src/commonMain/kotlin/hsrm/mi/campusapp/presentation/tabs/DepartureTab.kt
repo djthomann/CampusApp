@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +58,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.departures_tab_title
 import campusapp.composeapp.generated.resources.final_stop
+import campusapp.composeapp.generated.resources.loading_departures
 import campusapp.composeapp.generated.resources.no_departure_in_x_minutes
 import campusapp.composeapp.generated.resources.no_stops_found
 import campusapp.composeapp.generated.resources.show_more
@@ -78,13 +80,18 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 class DepartureScreenModel: ScreenModel {
+
+    var isLoadingDepartures by mutableStateOf<Boolean>(false)
     val currentStop = mutableStateOf<Stop?>(null)
 
     val departures = mutableStateOf<List<Departure>>(emptyList())
 
     fun loadDepartures(stop: Stop) {
+        departures.value = emptyList()
+        isLoadingDepartures = true
         currentStop.value = stop
         screenModelScope.launch {
+
             departures.value = RmvAPI.getNextDepartures(stop).map { it.toDomain() }
 
             departures.value.forEach { departure ->
@@ -92,6 +99,7 @@ class DepartureScreenModel: ScreenModel {
                     departure.journey = RmvAPI.getJourneyDetails(departure.journeyDetailRef).toDomain()
                 }
             }
+            isLoadingDepartures = false
         }
     }
 }
@@ -173,7 +181,12 @@ object DepartureTab: CampusTab {
 
 
             if(screenModel.departures.value.isEmpty()) {
-                EmptyIndicator()
+                if (screenModel.isLoadingDepartures) {
+                    Text(textAlign = TextAlign.Center, text = stringResource(Res.string.loading_departures))
+                } else {
+                    EmptyIndicator()
+                }
+
             } else {
                 screenModel.currentStop.value?.let { currentStop ->
                     LazyColumn(
