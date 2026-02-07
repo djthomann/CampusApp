@@ -9,6 +9,7 @@
     <string name="no_stops_found">no stops found</string>
     <string name="final_stop">final stop</string>
     <string name="show_more">show more</string>
+    <string name="show_less">show less</string>
     <string name="stops">Stops</string>
     <string name="food_tab_title">Menu</string>
     <string name="schedule_tab_title">Schedule</string>

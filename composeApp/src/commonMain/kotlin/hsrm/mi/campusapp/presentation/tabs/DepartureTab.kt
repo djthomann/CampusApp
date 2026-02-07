@@ -61,6 +61,7 @@ import campusapp.composeapp.generated.resources.final_stop
 import campusapp.composeapp.generated.resources.loading_departures
 import campusapp.composeapp.generated.resources.no_departure_in_x_minutes
 import campusapp.composeapp.generated.resources.no_stops_found
+import campusapp.composeapp.generated.resources.show_less
 import campusapp.composeapp.generated.resources.show_more
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
@@ -138,6 +139,8 @@ object DepartureTab: CampusTab {
         val currentCampus by AppState.selectedCampus.collectAsState()
         val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
 
+        var selectedEntry by remember { mutableStateOf<SelectedDepartureEntry?>(null) }
+
         LaunchedEffect(pendingStop.value) {
             pendingStop.value?.let { stop ->
                 screenModel.loadDepartures(stop)
@@ -194,7 +197,22 @@ object DepartureTab: CampusTab {
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         items(screenModel.departures.value) { dep ->
-                            DepartureEntry(dep, currentStop)
+                            DepartureEntry(dep, currentStop, selectedDepartureEntry = selectedEntry,
+                                expandClick = {
+                                    selectedEntry?.let {
+                                        if(it.departure == dep) {
+                                            selectedEntry = SelectedDepartureEntry(dep, it.getNextState())
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    selectedEntry = if(selectedEntry?.departure == dep) {
+                                        null
+                                    } else {
+                                        SelectedDepartureEntry(dep, DepartureEntryState.COLLAPSED_JOURNEY)
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -234,29 +252,48 @@ private fun EmptyIndicator() {
     }
 }
 
+enum class DepartureEntryState {
+     COLLAPSED_JOURNEY, OPEN
+}
+
+class SelectedDepartureEntry(
+    var departure: Departure,
+    var entryState: DepartureEntryState
+) {
+    fun getNextState(): DepartureEntryState {
+        return if (entryState == DepartureEntryState.COLLAPSED_JOURNEY) {
+            DepartureEntryState.OPEN
+        } else {
+            DepartureEntryState.COLLAPSED_JOURNEY
+        }
+    }
+}
+
 
 @Composable
-fun DepartureEntry(departure: Departure, currentStop: Stop) {
+fun DepartureEntry(departure: Departure, currentStop: Stop, selectedDepartureEntry: SelectedDepartureEntry?, expandClick: () -> Unit, onClick: () -> Unit) {
 
     val journey = departure.journey
 
-    val expanded = remember { mutableStateOf(false) }
+    val expanded = selectedDepartureEntry != null && selectedDepartureEntry.departure == departure
+
+    val journeyOpen = expanded && selectedDepartureEntry.entryState == DepartureEntryState.OPEN
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (expanded.value)
+        targetValue = if (expanded)
             MaterialTheme.colorScheme.secondary
         else
             MaterialTheme.colorScheme.surfaceContainerHigh,
         label = "backgroundColor"
     )
 
-    val textColor = if (expanded.value)
+    val textColor = if (expanded)
         MaterialTheme.colorScheme.onSecondary
     else
         MaterialTheme.colorScheme.onSurface
 
     val iconRotation by animateFloatAsState(
-        targetValue = if (expanded.value) 180f else 0f,
+        targetValue = if (expanded) 180f else 0f,
         animationSpec = tween(durationMillis = 300),
         label = "iconRotation"
     )
@@ -271,7 +308,9 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded.value = !expanded.value }
+                .clickable {
+                    onClick()
+                }
                 .padding(12.dp)
         )    {
             Row(
@@ -294,7 +333,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                 Text(color = textColor, fontSize =  24.sp, fontWeight = FontWeight.Bold, text = departure.time.toString())
             }
             AnimatedVisibility(
-                visible = expanded.value
+                visible = expanded
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
@@ -316,7 +355,13 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                         ) {
                             val stopId = currentStop.id.normalizeRmvId()
                             val currentIndex = journey.stops.indexOfFirst { it.id == stopId } /* id doesn't work because somehow it's not identical over different requests? */
-                            val nextStops = journey.stops.drop(currentIndex + 1).take(3)
+
+                            val journeyStops = journey.stops.drop(currentIndex + 1)
+                            val nextStops = if(!journeyOpen) {
+                                journeyStops.take(3)
+                            } else {
+                                journeyStops.dropLast(1)
+                            }
 
                             // println("CURRENT INDEX $currentIndex")
                             // println("NEXT STOPS: $nextStops")
@@ -328,25 +373,24 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
                                     Text(
                                         text = stop.name,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = textColor.copy(0.5f)
+                                        color = textColor.copy(alpha = 0.5f)
                                     )
                                 }
                             }
                             if(journey.stops.size > 3) {
                                 Box(
                                     modifier = Modifier.padding(10.dp).clickable {
-                                        println("It worked") /* TODO() */
+                                        expandClick()
                                     }
                                 ) {
                                     Text(
                                         modifier = Modifier,
-                                        text = stringResource(Res.string.show_more),
+                                        text = if(!journeyOpen) stringResource(Res.string.show_more) else stringResource(Res.string.show_less),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = textColor
                                     )
                                 }
                             }
-
                         }
                     }
                 }
@@ -384,7 +428,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop) {
 
         }
         Box(
-            modifier = Modifier.fillMaxWidth().background(if(!expanded.value) textColor else Color.Transparent).height(4.dp)
+            modifier = Modifier.fillMaxWidth().background(if(!expanded) textColor else Color.Transparent).height(4.dp)
         )
 
     }

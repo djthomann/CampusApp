@@ -9,6 +9,7 @@
     <string name="no_stops_found">Keine Haltestellen gefunden</string>
     <string name="final_stop">Endhaltestelle</string>
     <string name="show_more">mehr anzeigen</string>
+    <string name="show_less">weniger anzeigen</string>
     <string name="stops">Haltestellen</string>
     <string name="food_tab_title">Speiseplan</string>
     <string name="schedule_tab_title">Stundenplan</string>

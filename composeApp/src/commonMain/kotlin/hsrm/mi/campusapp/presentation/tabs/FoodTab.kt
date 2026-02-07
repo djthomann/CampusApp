@@ -274,19 +274,19 @@ object FoodTab: CampusTab {
                     )
                 }
             } else{
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(menus) { MenuEntry(it, expanded = expandedMenu.value == it, onClick = {
-                    if (expandedMenu.value != it) {
-                        expandedMenu.value = it
-                    } else {
-                        expandedMenu.value = null
-                    }
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(menus) { MenuEntry(it, expanded = expandedMenu.value == it, onClick = {
+                        if (expandedMenu.value != it) {
+                            expandedMenu.value = it
+                        } else {
+                            expandedMenu.value = null
+                        }
 
-                }) }
-            }
+                    }) }
+                }
             }
         }
     }
