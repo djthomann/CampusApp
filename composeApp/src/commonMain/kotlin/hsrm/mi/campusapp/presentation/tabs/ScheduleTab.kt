@@ -28,9 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,8 +39,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
@@ -61,11 +61,17 @@ import com.kizitonwose.calendar.core.minusDays
 import com.kizitonwose.calendar.core.now
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
-import hsrm.mi.campusapp.domain.repository.CourseRepository
+import hsrm.mi.campusapp.domain.service.CourseService
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -78,7 +84,18 @@ class ScheduleScreenModel: ScreenModel {
 
     @OptIn(ExperimentalTime::class)
     val currentDate: LocalDate = LocalDate.now()
-    var selection by mutableStateOf(currentDate)
+    var selectedDay = MutableStateFlow(currentDate)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val todaysCourses: StateFlow<List<Course>> = selectedDay
+        .flatMapLatest { date ->
+            CourseService.getCoursesForDayOfWeek(date.dayOfWeek)
+        }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun setDay(day: LocalDate) {
+        selectedDay.value = day
+    }
 
 }
 
@@ -107,6 +124,9 @@ object ScheduleTab: CampusTab {
     @Composable
     override fun Content() {
         val screenModel = rememberScreenModel { ScheduleScreenModel() }
+
+        val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
+        val selectedDay by screenModel.selectedDay.collectAsStateWithLifecycle()
 
         val state = rememberWeekCalendarState(
             startDate = screenModel.currentDate.minusDays(100),
@@ -142,14 +162,14 @@ object ScheduleTab: CampusTab {
                     }
                 },
                 dayContent = { day ->
-                    Day(day.date, isSelected = screenModel.selection == day.date) { clicked ->
-                        if (screenModel.selection != clicked) {
-                            screenModel.selection = clicked
+                    Day(day.date, isSelected = selectedDay == day.date) { clicked ->
+                        if (selectedDay != clicked) {
+                            screenModel.setDay(clicked)
                         }
                     }
                 }
             )
-            Schedule(screenModel.selection)
+            Schedule(courses)
         }
     }
 }
@@ -173,9 +193,7 @@ fun DayOfWeek.toSingleLetter(): String = when (this) {
 }
 
 @Composable
-private fun Schedule(selection: LocalDate) {
-
-    val courses: List<Course> = CourseRepository.getCoursesForDayOfWeek(selection.dayOfWeek)
+private fun Schedule(courses: List<Course>) {
 
     Column(
         modifier = Modifier.fillMaxSize(),

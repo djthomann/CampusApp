@@ -86,15 +86,19 @@ import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.domain.model.Weather
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.repository.CourseRepository
 import hsrm.mi.campusapp.domain.service.CampusService
+import hsrm.mi.campusapp.domain.service.CourseService
 import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.components.WeatherWidget
 import hsrm.mi.campusapp.presentation.components.getWeatherIcon
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
@@ -111,6 +115,16 @@ class HomeScreenModel: ScreenModel {
 
     val isLoadingArrivalTrip = mutableStateOf(false)
     val arrivalTrip = mutableStateOf<Trip?>(null)
+
+    @OptIn(ExperimentalTime::class)
+    val todaysCourses: StateFlow<List<Course>> = CourseService.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val earliestCourse: StateFlow<Course?> = todaysCourses
+        .map { courses ->
+            courses.minByOrNull { it.start }
+        }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun updateCampus(campus: Campus?) {
         AppState.updateCampus(campus, screenModelScope)
@@ -168,21 +182,12 @@ class HomeScreenModel: ScreenModel {
             val trips: List<Trip> = RmvAPI.getArrivalTripFromStopToCampus(stop, course.building.latitude, course.building.longitude, LocalDateTime(date = LocalDate.now(), course.start)).map { it.toDomain() }            // Filter trip with latest startTime
             val tripsOnTime = trips.filter { trip -> trip.arrivalTime <= course.start }
 
-            // Filter latest trip
-            arrivalTrip.value = tripsOnTime.maxByOrNull { it.startTime }
+            // Filter display trip
+            arrivalTrip.value = if(tripsOnTime.isNotEmpty()) tripsOnTime.first() else null
 
             // println("TRIP: ${arrivalTrip.value}")
             isLoadingArrivalTrip.value = false
         }
-    }
-
-    fun searchHomeStopByName(input: String) {
-
-        screenModelScope.launch {
-            val stops = RmvAPI.searchStopByName(input)
-            println("FOUND: $stops")
-        }
-
     }
 
 }
@@ -229,16 +234,14 @@ object HomeTab: CampusTab {
 
         val campuses by CampusService.getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
         val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
-        val courses = CourseRepository.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
-        val nextCourse = courses.minByOrNull { it.start }
+        val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
+        val nextCourse by screenModel.earliestCourse.collectAsStateWithLifecycle()
 
         LaunchedEffect(nextCourse, AppState.homeStopId) {
-            if(nextCourse != null) {
-                // Necessary because of concurrent edit of homeStopId
+            nextCourse?.let { it1 ->
                 AppState.homeStopId?.let {
-                    screenModel.loadArrivalTrip(it, nextCourse)
+                    screenModel.loadArrivalTrip(it, nextCourse!!)
                 }
-
             }
         }
 

@@ -1,0 +1,108 @@
+[
+  {
+    "name": "Human Computer Interaction",
+    "dayOfWeek": "MONDAY",
+    "start": "10:00",
+    "durationInMinutes": "90",
+    "lecturer": "Prof. Dr. Marion Koelle",
+    "room": "D14",
+    "courseType": "LECTURE",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Human Computer Interaction",
+    "dayOfWeek": "MONDAY",
+    "start": "16:00",
+    "durationInMinutes": "90",
+    "lecturer": "Prof. Dr. Marion Koelle",
+    "room": "D15",
+    "courseType": "PRACTICAL",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Algorithmen und Datenstrukturen",
+    "dayOfWeek": "WEDNESDAY",
+    "start": "14:15",
+    "durationInMinutes": "90",
+    "lecturer": "Prof. Dr. Dirk Krechel",
+    "room": "D12",
+    "courseType": "LECTURE",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Algorithmen und Datenstrukturen",
+    "dayOfWeek": "SATURDAY",
+    "start": "14:15",
+    "durationInMinutes": "90",
+    "lecturer": "Prof. Dr. Dirk Krechel",
+    "room": "D12",
+    "courseType": "EXTRA_CURRICULAR",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Algorithmen und Datenstrukturen",
+    "dayOfWeek": "WEDNESDAY",
+    "start": "16:00",
+    "durationInMinutes": "90",
+    "lecturer": "Prof. Dr. Dirk Krechel",
+    "room": "D12",
+    "courseType": "PRACTICAL",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Angewandte Mathematik",
+    "dayOfWeek": "FRIDAY",
+    "start": "10:00",
+    "durationInMinutes": "90",
+    "lecturer": "Prof. Dr. Schwanecke",
+    "room": "D11",
+    "courseType": "LECTURE",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Senatssitzung",
+    "dayOfWeek": "TUESDAY",
+    "start": "17:30",
+    "durationInMinutes": "60",
+    "room": "A113",
+    "courseType": "EXTRA_CURRICULAR",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Fachschaftssitzung",
+    "dayOfWeek": "TUESDAY",
+    "start": "18:30",
+    "durationInMinutes": "60",
+    "room": "A115",
+    "courseType": "EXTRA_CURRICULAR",
+    "longitude": 8.21618070647615,
+    "latitude": 50.097631477365795
+  },
+  {
+    "name": "Elektrotechnik",
+    "dayOfWeek": "THURSDAY",
+    "start": "10:00",
+    "durationInMinutes": "90",
+    "room": "F2",
+    "courseType": "LECTURE",
+    "longitude": 8.425203705070214,
+    "latitude": 49.98527172708337
+  },
+  {
+    "name": "Elektrotechnik",
+    "dayOfWeek": "THURSDAY",
+    "start": "10:00",
+    "durationInMinutes": "90",
+    "room": "F201",
+    "courseType": "PRACTICAL",
+    "longitude": 8.425203705070214,
+    "latitude": 49.98527172708337
+  }
+]
