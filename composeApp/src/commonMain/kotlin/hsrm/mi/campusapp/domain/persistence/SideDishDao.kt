@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface SideDishDao {
 
     @Insert
-    suspend fun insert(item: SideDishEntity)
+    suspend fun insert(item: SideDishEntity): Long
 
     @Query("SELECT * FROM SideDishEntity")
     fun getAllAsFlow(): Flow<List<SideDishEntity>>

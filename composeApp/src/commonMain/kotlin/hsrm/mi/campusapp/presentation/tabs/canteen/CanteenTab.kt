@@ -67,7 +67,7 @@ object CanteenTab: CampusTab {
 
         val screenModel = rememberScreenModel { CanteenScreenModel() }
 
-        val menus = screenModel.menus
+        val menus by screenModel.menus.collectAsStateWithLifecycle()
         val expandedMenu = remember { mutableStateOf<Menu?>(null) }
 
         val selectedCanteen = screenModel.selectedCanteen
@@ -124,14 +124,17 @@ object CanteenTab: CampusTab {
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(menus) { MenuEntry(it, expanded = expandedMenu.value == it, onClick = {
-                        if (expandedMenu.value != it) {
-                            expandedMenu.value = it
-                        } else {
-                            expandedMenu.value = null
-                        }
-
-                    }) }
+                    items(menus) {
+                        MenuEntry(it, expanded = expandedMenu.value == it,
+                            onClick = {
+                                if (expandedMenu.value != it) {
+                                    expandedMenu.value = it
+                                } else {
+                                    expandedMenu.value = null
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

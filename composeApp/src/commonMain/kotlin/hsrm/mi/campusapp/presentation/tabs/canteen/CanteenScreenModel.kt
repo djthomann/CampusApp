@@ -3,35 +3,29 @@ package hsrm.mi.campusapp.presentation.tabs.canteen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.kizitonwose.calendar.core.now
 import hsrm.mi.campusapp.data.api.canteen.CanteenAPI
 import hsrm.mi.campusapp.data.api.canteenapi.toDomain
 import hsrm.mi.campusapp.domain.model.Canteen
-import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.DishEntity
-import hsrm.mi.campusapp.domain.persistence.MenuEntity
-import hsrm.mi.campusapp.domain.persistence.SideDishEntity
 import hsrm.mi.campusapp.domain.service.CanteenService
+import hsrm.mi.campusapp.domain.service.MenuService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlin.time.ExperimentalTime
 
 class CanteenScreenModel: ScreenModel {
-
-    private val sideDishDao = DatabaseHolder.db.getSideDishDao()
-    private val dishDao = DatabaseHolder.db.getDishDao()
-    private val menuDao = DatabaseHolder.db.getMenuDao()
-
-    var menus by mutableStateOf<List<Menu>>(emptyList())
-        private set
 
     var selectedCanteen by mutableStateOf<Canteen?>(null)
     val canteens: StateFlow<List<Canteen>> = CanteenService.getAllCanteens().stateIn(
@@ -40,10 +34,23 @@ class CanteenScreenModel: ScreenModel {
         initialValue = emptyList()
     )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val menus: StateFlow<List<Menu>> = snapshotFlow { selectedCanteen }
+        .flatMapLatest { canteen ->
+            if (canteen == null) flowOf(emptyList())
+            else MenuService.getMenusWithDishesAsFlow().map { list ->
+                list.filter { it.canteen == canteen.name }
+            }
+        }
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     @OptIn(ExperimentalTime::class)
-    suspend fun loadMenuFromAPI(canteen: Canteen): List<Menu> {
-        val result = CanteenAPI.getMenusForWeek(canteen, LocalDate.now())
-        return result.map { it.toDomain() }
+    private suspend fun loadMenuFromAPI(canteen: Canteen): List<Menu> {
+        return CanteenAPI.getMenusForWeek(canteen, LocalDate.now()).map { it.toDomain() }
     }
 
     fun saveMenus(menus: List<Menu>) {
@@ -51,59 +58,18 @@ class CanteenScreenModel: ScreenModel {
         println("SAVING MENUS")
 
         screenModelScope.launch(Dispatchers.IO) {
+            // Move this logic to MenuService
             menus.forEach { menu ->
-                val newMenu = MenuEntity(
-                    canteen = menu.canteen,
-                    date = menu.date.toString(),
-                    dateString = menu.dateString
-                )
-                println("INSERTING MENU $newMenu")
-                val menuId = menuDao.insertMenu(newMenu)
+                println("INSERTING MENU $menu")
+                val menuId = MenuService.saveMenu(menu)
                 menu.dishes.forEach { dish ->
-                    val newDish = DishEntity(
-                        name = dish.name,
-                        menuId = menuId,
-                        description = dish.description,
-                        price = dish.price,
-                        dishAllergens = dish.dishAllergens
-                    )
-                    dishDao.insert(newDish)
+                    MenuService.saveDish(dish, menuId)
                 }
                 menu.sideDishes.forEach { entry ->
                     entry.value.forEach { sideDish ->
-                        val newSideDish = SideDishEntity(
-                            menuId = menuId,
-                            type = entry.key,
-                            name = sideDish
-                        )
-                        sideDishDao.insert(newSideDish)
+                        MenuService.saveSideDish(sideDish, entry.key, menuId)
                     }
-
                 }
-            }
-        }
-    }
-
-    fun loadMenusWithDishes(canteen: Canteen) {
-        screenModelScope.launch {
-            menuDao.getMenusWithDishesAsFlow().collect { loadedMenus ->
-                println("LOADED FROM DB:$loadedMenus")
-                menus = loadedMenus.map { menuWithDishesEntity -> Menu(
-                    canteen = menuWithDishesEntity.menu.canteen,
-                    date = LocalDate.parse(menuWithDishesEntity.menu.date),
-                    dateString = menuWithDishesEntity.menu.dateString,
-                    dishes = menuWithDishesEntity.dishes.map { dishEntity ->
-                        Dish(
-                            name = dishEntity.name,
-                            description = dishEntity.description,
-                            price = dishEntity.price,
-                            dishAllergens = dishEntity.dishAllergens
-                        )
-                    },
-                    sideDishes = menuWithDishesEntity.sideDishes.groupBy { it.type }.mapValues { (_, entities) -> entities.map { it.name } }
-                )
-                }.filter { menu -> menu.canteen == canteen.name }
-
             }
         }
     }
@@ -111,34 +77,22 @@ class CanteenScreenModel: ScreenModel {
     // TODO() Faulty logic probably
     fun loadMenu(canteen: Canteen) {
 
+        println("LOADING MENUS FOR $canteen")
         selectedCanteen = canteen
-        // loadMenuFromAPI(canteen)
-
-        println("LOADING MENUS FOR: ${canteen.name}")
 
         screenModelScope.launch {
-            // Lade aus DB
-            loadMenusWithDishes(canteen)
-
-            // Wenn nichts im DB, lade von API
-            if (menus.isEmpty()) {
-                println("Try API for loading menus")
-                val loadedMenus = loadMenuFromAPI(canteen)  // suspend, wartet jetzt
-                saveMenus(loadedMenus)                       // wartet ebenfalls
-                menus = loadedMenus
+            // Wir warten kurz, bis der DB-Flow oben (menus) den ersten Wert geliefert hat
+            // Falls die DB für diese Mensa leer ist -> API Call
+            if (menus.value.isEmpty()) {
+                println("Try API for loading menus for ${canteen.name}")
+                try {
+                    val loadedMenus = loadMenuFromAPI(canteen)
+                    println("LOADED MENUS: $loadedMenus")
+                    saveMenus(loadedMenus)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
-        }
-    }
-
-    fun clearMenus() {
-        screenModelScope.launch {
-            menuDao.deleteAllMenus()
-        }
-    }
-
-    fun clearDishes() {
-        screenModelScope.launch {
-            dishDao.deleteAllDishes()
         }
     }
 

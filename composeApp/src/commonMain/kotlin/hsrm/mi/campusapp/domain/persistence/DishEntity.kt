@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import hsrm.mi.campusapp.domain.model.Dish
 
 @Entity(
     tableName = "DishEntity",
@@ -26,3 +27,12 @@ data class DishEntity(
     val price: String,
     val dishAllergens: String?
 )
+
+fun DishEntity.toDomain(): Dish {
+    return Dish(
+        name = name,
+        description = description,
+        price = price,
+        dishAllergens = dishAllergens
+    )
+}
