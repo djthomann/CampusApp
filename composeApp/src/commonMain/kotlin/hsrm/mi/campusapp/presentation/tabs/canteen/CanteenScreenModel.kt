@@ -13,7 +13,6 @@ import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.domain.service.MenuService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,9 +44,6 @@ class CanteenScreenModel: ScreenModel {
                     screenModelScope.launch {
                         try {
                             val apiData = CanteenAPI.getMenusForWeek(canteen, LocalDate.now())
-
-                            println("FROM API: $apiData")
-
                             MenuService.saveMenus(apiData.map { it.toDomain() })
                         } catch (e: Exception) { /* Log error */ }
                     }
@@ -60,31 +56,5 @@ class CanteenScreenModel: ScreenModel {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-    @OptIn(ExperimentalTime::class)
-    private suspend fun loadMenuFromAPI(canteen: Canteen): List<Menu> {
-        return CanteenAPI.getMenusForWeek(canteen, LocalDate.now()).map { it.toDomain() }
-    }
-
-    fun saveMenus(menus: List<Menu>) {
-
-        println("SAVING MENUS")
-
-        screenModelScope.launch(Dispatchers.IO) {
-            // TODO() Move this logic to Service layer in the future
-            menus.forEach { menu ->
-                println("INSERTING MENU $menu")
-                val menuId = MenuService.saveMenu(menu)
-                menu.dishes.forEach { dish ->
-                    MenuService.saveDish(dish, menuId)
-                }
-                menu.sideDishes.forEach { entry ->
-                    entry.value.forEach { sideDish ->
-                        MenuService.saveSideDish(sideDish, entry.key, menuId)
-                    }
-                }
-            }
-        }
-    }
 
 }
