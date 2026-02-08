@@ -18,9 +18,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Commute
+import androidx.compose.material.icons.filled.DirectionsBus
+import androidx.compose.material.icons.filled.DirectionsRailway
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Train
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.rounded.DirectionsBus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +47,7 @@ import campusapp.composeapp.generated.resources.show_more
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.model.Vehicle
 import org.jetbrains.compose.resources.stringResource
 
 enum class DepartureEntryState {
@@ -59,6 +64,15 @@ class SelectedDepartureEntry(
         } else {
             DepartureEntryState.COLLAPSED_JOURNEY
         }
+    }
+}
+
+fun getIconForVehicle(vehicle: Vehicle): ImageVector {
+    return when(vehicle) {
+        Vehicle.BUS -> Icons.Filled.DirectionsBus
+        Vehicle.S_BAHN -> Icons.Filled.Train
+        Vehicle.REGIONAL_TRAIN -> Icons.Filled.DirectionsRailway
+        Vehicle.UNKNOWN -> Icons.Filled.Commute // fallback
     }
 }
 
@@ -115,7 +129,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop, selectedDepartureEnt
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.DirectionsBus,
+                        imageVector = getIconForVehicle(departure.vehicle),
                         contentDescription = "Course Type Icon",
                         modifier = Modifier.size(24.dp),
                         tint = textColor

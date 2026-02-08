@@ -9,6 +9,7 @@ import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
+import hsrm.mi.campusapp.domain.service.MenuService
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +46,12 @@ class SettingsScreenModel: ScreenModel {
 
     fun updateCampus(campus: Campus?) {
         AppState.updateCampus(campus, screenModelScope)
+    }
+
+    fun clearDatabase() {
+        screenModelScope.launch {
+            MenuService.deleteAllMenus()
+        }
     }
 
 }

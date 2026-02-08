@@ -52,19 +52,33 @@ object MenuService {
         return menuDao.getMenusWithDishesAsFlow().map { it.map { menuWithDishes -> menuWithDishes.toDomain() } }
     }
 
+    suspend fun saveMenus(menus: List<Menu>) {
+        menus.forEach { saveMenu(it) }
+    }
     suspend fun saveMenu(menu: Menu): Long {
 
         val entity = menu.toEntity()
+        val menuId = menuDao.insertMenu(entity)
 
-        return menuDao.insertMenu(entity)
+        saveDishes(menu.dishes, menuId)
+
+        saveSideDishes(menu.sideDishes, menuId)
+
+        return menuId
     }
 
-    suspend fun saveMenus(menus: List<Menu>) {
-        menus.forEach { saveMenu(it) }
+    suspend fun saveDishes(dishes: List<Dish>, menuId: Long) {
+        dishes.forEach { saveDish(it, menuId) }
     }
 
     suspend fun saveDish(dish: Dish, menuId: Long): Long {
         return dishDao.insert(dish.toEntity(menuId))
+    }
+
+    suspend fun saveSideDishes(map: Map<SideDishType, List<String>>, menuId: Long) {
+        map.forEach { (sideDishType, names) ->
+            names.forEach { name -> saveSideDish(name, sideDishType, menuId) }
+        }
     }
 
     suspend fun saveSideDish(name: String, type: SideDishType, menuId: Long): Long {

@@ -2,6 +2,7 @@ package hsrm.mi.campusapp.data.api.rmv
 
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Journey
+import hsrm.mi.campusapp.domain.model.Vehicle
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,9 +14,25 @@ data class JourneyDetailRef(
 )
 
 @Serializable
+data class ProductAtStop(
+    val catOut: String
+)
+
+fun ProductAtStop.toDomain(): Vehicle {
+    return when(catOut) {
+        "Bus" -> Vehicle.BUS
+        "S" -> Vehicle.S_BAHN
+        "RB" -> Vehicle.REGIONAL_TRAIN
+        else -> Vehicle.UNKNOWN
+    }
+}
+
+@Serializable
 data class DepartureDTO(
     @SerialName("JourneyDetailRef")
     val journeyDetailRef: JourneyDetailRef,
+    @SerialName("ProductAtStop")
+    val prodcutAtStop: ProductAtStop,
     val name: String,
     @Serializable(with = LocalTimeSerializer::class)
     val time: LocalTime,
@@ -25,11 +42,10 @@ data class DepartureDTO(
     var journey: Journey? = null
 )
 
-
-
 fun DepartureDTO.toDomain(): Departure {
     return Departure(
         journeyDetailRef = journeyDetailRef.ref,
+        vehicle = prodcutAtStop.toDomain(),
         name = name,
         time = time,
         direction = direction,

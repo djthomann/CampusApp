@@ -7,7 +7,7 @@ import androidx.compose.runtime.snapshotFlow
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.kizitonwose.calendar.core.now
-import hsrm.mi.campusapp.data.api.canteen.CanteenAPI
+import hsrm.mi.campusapp.data.api.canteenapi.CanteenAPI
 import hsrm.mi.campusapp.data.api.canteenapi.toDomain
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Menu
@@ -45,6 +45,9 @@ class CanteenScreenModel: ScreenModel {
                     screenModelScope.launch {
                         try {
                             val apiData = CanteenAPI.getMenusForWeek(canteen, LocalDate.now())
+
+                            println("FROM API: $apiData")
+
                             MenuService.saveMenus(apiData.map { it.toDomain() })
                         } catch (e: Exception) { /* Log error */ }
                     }

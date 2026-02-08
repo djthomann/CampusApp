@@ -1,8 +1,5 @@
-package hsrm.mi.campusapp.data.api.canteen
+package hsrm.mi.campusapp.data.api.canteenapi
 
-import hsrm.mi.campusapp.data.api.canteenapi.DishDTO
-import hsrm.mi.campusapp.data.api.canteenapi.MenuDTO
-import hsrm.mi.campusapp.data.api.canteenapi.SideDishMapper
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.SideDishType
 import io.ktor.client.HttpClient

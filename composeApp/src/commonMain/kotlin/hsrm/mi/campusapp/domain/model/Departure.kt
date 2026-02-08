@@ -7,5 +7,6 @@ data class Departure(
     val name: String,
     val time: LocalTime,
     val direction: String,
+    val vehicle: Vehicle,
     var journey: Journey? = null
 )
