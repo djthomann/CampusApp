@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import hsrm.mi.campusapp.presentation.tabs.DepartureTab
-import hsrm.mi.campusapp.presentation.tabs.FoodTab
-import hsrm.mi.campusapp.presentation.tabs.HomeTab
-import hsrm.mi.campusapp.presentation.tabs.MapTab
-import hsrm.mi.campusapp.presentation.tabs.ScheduleTab
-import hsrm.mi.campusapp.presentation.tabs.SettingsTab
+import hsrm.mi.campusapp.presentation.tabs.canteen.CanteenTab
+import hsrm.mi.campusapp.presentation.tabs.departure.DepartureTab
+import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
+import hsrm.mi.campusapp.presentation.tabs.map.MapTab
+import hsrm.mi.campusapp.presentation.tabs.schedule.ScheduleTab
+import hsrm.mi.campusapp.presentation.tabs.settings.SettingsTab
 
 @Composable
 actual fun MainScaffold(navigator: TabNavigator) {
@@ -32,7 +32,7 @@ actual fun MainScaffold(navigator: TabNavigator) {
                 NavItem(HomeTab)
                 NavItem(DepartureTab)
                 NavItem(ScheduleTab)
-                NavItem(FoodTab)
+                NavItem(CanteenTab)
                 NavItem(MapTab)
 
                 Spacer(Modifier.weight(1f))

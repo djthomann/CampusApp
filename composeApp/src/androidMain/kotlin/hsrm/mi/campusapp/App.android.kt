@@ -26,12 +26,12 @@ import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
-import hsrm.mi.campusapp.presentation.tabs.DepartureTab
-import hsrm.mi.campusapp.presentation.tabs.FoodTab
-import hsrm.mi.campusapp.presentation.tabs.HomeTab
-import hsrm.mi.campusapp.presentation.tabs.MapTab
-import hsrm.mi.campusapp.presentation.tabs.ScheduleTab
-import hsrm.mi.campusapp.presentation.tabs.SettingsTab
+import hsrm.mi.campusapp.presentation.tabs.canteen.CanteenTab
+import hsrm.mi.campusapp.presentation.tabs.departure.DepartureTab
+import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
+import hsrm.mi.campusapp.presentation.tabs.map.MapTab
+import hsrm.mi.campusapp.presentation.tabs.schedule.ScheduleTab
+import hsrm.mi.campusapp.presentation.tabs.settings.SettingsTab
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +73,7 @@ actual fun MainScaffold(navigator: TabNavigator) {
         bottomBar = {
             if(selectedCampus != null) {
                 NavigationBar() {
-                    NavItem(FoodTab)
+                    NavItem(CanteenTab)
                     NavItem(ScheduleTab)
                     NavItem(HomeTab)
                     NavItem(DepartureTab)

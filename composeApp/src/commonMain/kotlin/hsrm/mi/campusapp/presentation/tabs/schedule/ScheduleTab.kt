@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.tabs
+package hsrm.mi.campusapp.presentation.tabs.schedule
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,9 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
@@ -58,46 +56,20 @@ import campusapp.composeapp.generated.resources.wednesday_single_letter
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
-import com.kizitonwose.calendar.core.now
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
-import hsrm.mi.campusapp.domain.service.CourseService
+import hsrm.mi.campusapp.presentation.tabs.CampusTab
+import hsrm.mi.campusapp.presentation.tabs.map.MapTab
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-import kotlin.time.ExperimentalTime
-
-class ScheduleScreenModel: ScreenModel {
-
-    @OptIn(ExperimentalTime::class)
-    val currentDate: LocalDate = LocalDate.now()
-    var selectedDay = MutableStateFlow(currentDate)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val todaysCourses: StateFlow<List<Course>> = selectedDay
-        .flatMapLatest { date ->
-            CourseService.getCoursesForDayOfWeek(date.dayOfWeek)
-        }
-        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun setDay(day: LocalDate) {
-        selectedDay.value = day
-    }
-
-}
 
 object ScheduleTab: CampusTab {
     private fun readResolve(): Any = ScheduleTab

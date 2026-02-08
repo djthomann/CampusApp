@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.tabs
+package hsrm.mi.campusapp.presentation.tabs.map
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween

@@ -11,7 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import hsrm.mi.campusapp.presentation.state.AppState
-import hsrm.mi.campusapp.presentation.tabs.HomeTab
+import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
 import hsrm.mi.campusapp.presentation.theme.AppTypography
 import hsrm.mi.campusapp.presentation.theme.darkScheme
 import hsrm.mi.campusapp.presentation.theme.lightScheme

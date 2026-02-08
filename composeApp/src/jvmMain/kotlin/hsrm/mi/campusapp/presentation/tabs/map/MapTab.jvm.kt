@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.tabs
+package hsrm.mi.campusapp.presentation.tabs.map
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text

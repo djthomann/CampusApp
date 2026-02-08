@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.presentation.tabs
+package hsrm.mi.campusapp.presentation.tabs.departure
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -51,9 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.departures_tab_title
@@ -65,45 +63,19 @@ import campusapp.composeapp.generated.resources.show_less
 import campusapp.composeapp.generated.resources.show_more
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.RmvAPI.normalizeRmvId
-import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Departure
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
+import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-
-class DepartureScreenModel: ScreenModel {
-
-    var isLoadingDepartures by mutableStateOf<Boolean>(false)
-    val currentStop = mutableStateOf<Stop?>(null)
-
-    val departures = mutableStateOf<List<Departure>>(emptyList())
-
-    fun loadDepartures(stop: Stop) {
-        departures.value = emptyList()
-        isLoadingDepartures = true
-        currentStop.value = stop
-        screenModelScope.launch {
-
-            departures.value = RmvAPI.getNextDepartures(stop).map { it.toDomain() }
-
-            departures.value.forEach { departure ->
-                launch {
-                    departure.journey = RmvAPI.getJourneyDetails(departure.journeyDetailRef).toDomain()
-                }
-            }
-            isLoadingDepartures = false
-        }
-    }
-}
 
 object DepartureTab: CampusTab {
     private fun readResolve(): Any = DepartureTab
