@@ -85,24 +85,12 @@ object CanteenTab: CampusTab {
                     CampusButton(
                         text = canteen.name,
                         onClick = {
-                            screenModel.loadMenu(canteen)
+                            screenModel.loadMenus(canteen)
                         },
                         isActive = canteen == selectedCanteen
                     )
                 }
             }
-            /*Row(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                CampusButton(
-                    text = "Clear All",
-                    onClick = {
-                        screenModel.clearMenus()
-                        screenModel.clearDishes()
-                    }
-                )
-            }*/
             Spacer(
                 modifier = Modifier.padding(5.dp)
             )

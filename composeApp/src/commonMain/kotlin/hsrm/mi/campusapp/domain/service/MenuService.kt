@@ -5,8 +5,8 @@ import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.SideDishType
 import hsrm.mi.campusapp.domain.model.toEntity
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.SideDishEntity
-import hsrm.mi.campusapp.domain.persistence.toDomain
+import hsrm.mi.campusapp.domain.persistence.menu.SideDishEntity
+import hsrm.mi.campusapp.domain.persistence.menu.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

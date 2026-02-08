@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.MenuEntity
+import hsrm.mi.campusapp.domain.persistence.menu.MenuEntity
 import kotlinx.datetime.LocalDate
 
 data class Menu (

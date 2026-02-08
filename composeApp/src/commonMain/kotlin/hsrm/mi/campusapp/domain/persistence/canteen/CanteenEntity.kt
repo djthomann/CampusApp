@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence
+package hsrm.mi.campusapp.domain.persistence.canteen
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

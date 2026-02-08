@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence
+package hsrm.mi.campusapp.domain.persistence.menu
 
 import androidx.room.Embedded
 import androidx.room.Relation

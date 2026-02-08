@@ -58,7 +58,7 @@ class CanteenScreenModel: ScreenModel {
         println("SAVING MENUS")
 
         screenModelScope.launch(Dispatchers.IO) {
-            // Move this logic to MenuService
+            // TODO() Move this logic to Service layer in the future
             menus.forEach { menu ->
                 println("INSERTING MENU $menu")
                 val menuId = MenuService.saveMenu(menu)
@@ -74,15 +74,12 @@ class CanteenScreenModel: ScreenModel {
         }
     }
 
-    // TODO() Faulty logic probably
-    fun loadMenu(canteen: Canteen) {
+    fun loadMenus(canteen: Canteen) {
 
         println("LOADING MENUS FOR $canteen")
         selectedCanteen = canteen
 
         screenModelScope.launch {
-            // Wir warten kurz, bis der DB-Flow oben (menus) den ersten Wert geliefert hat
-            // Falls die DB für diese Mensa leer ist -> API Call
             if (menus.value.isEmpty()) {
                 println("Try API for loading menus for ${canteen.name}")
                 try {
@@ -96,4 +93,4 @@ class CanteenScreenModel: ScreenModel {
         }
     }
 
-}     // TODO() CLEAN THIS UP!!!!
+}
