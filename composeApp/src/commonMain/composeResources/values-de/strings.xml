@@ -25,6 +25,7 @@
     <string name="arrive_on_time">Pünktliche Verbindung</string>
     <string name="next_course">Nächste Veranstaltung</string>
     <string name="menu_to_be_implemented">Speiseplan wird noch umgesetzt</string>
+    <string name="menu_for_canteen">Speiseplan für %1$s</string>
     <string name="course_type_lecture">Vorlesung</string>
     <string name="course_type_practical">Praktikum</string>
     <string name="course_type_extra">Extra</string>

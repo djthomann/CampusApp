@@ -4,11 +4,11 @@
     "url": "mensa-accent"
   },
   {
-    "name": "Mensa Rüsselsheim",
-    "url": "mensa-ruesselsheim"
-  },
-  {
     "name": "Mensa POINT",
     "url": "mensa-point"
+  },
+  {
+    "name": "Mensa Rüsselsheim",
+    "url": "mensa-ruesselsheim"
   }
 ]

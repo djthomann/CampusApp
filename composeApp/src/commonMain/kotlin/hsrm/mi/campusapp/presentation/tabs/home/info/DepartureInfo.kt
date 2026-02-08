@@ -2,10 +2,9 @@ package hsrm.mi.campusapp.presentation.tabs.home.info
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Icon
@@ -39,15 +38,15 @@ fun DepartureInfo(stops: List<Stop>, tabNavigator: TabNavigator) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            LazyRow(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(stops) { stop ->
+                stops.forEach {
                     CampusButton(
-                        text = stop.name,
+                        text = it.name,
                         onClick = {
-                            DepartureTab.selectStop(stop)
+                            DepartureTab.selectStop(it)
                             tabNavigator.current = DepartureTab
                         },
                         isActive = true

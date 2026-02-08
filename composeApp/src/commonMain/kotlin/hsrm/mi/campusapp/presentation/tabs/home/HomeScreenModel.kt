@@ -10,17 +10,18 @@ import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Course
-import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.domain.model.Weather
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.service.CourseService
+import hsrm.mi.campusapp.domain.service.MenuService
 import hsrm.mi.campusapp.presentation.state.AppState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -32,10 +33,28 @@ import kotlin.time.ExperimentalTime
 class HomeScreenModel: ScreenModel {
 
     val currentWeather = mutableStateOf<Weather?>(null)
-    val todaysMeal = mutableStateOf<Menu?>(null)
+
 
     val isLoadingArrivalTrip = mutableStateOf(false)
     val arrivalTrip = mutableStateOf<Trip?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+    val todaysMeal: StateFlow<Menu?> = AppState.selectedCanteen
+        .flatMapLatest { canteen ->
+            println("FlatMapLatest triggered für Canteen: ${canteen?.name}")
+
+            if (canteen == null) {
+                flowOf(null)
+            } else {
+                val today = LocalDate.now()
+                MenuService.getMenuForDayAndCanteen(today, canteen)
+            }
+        }
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     @OptIn(ExperimentalTime::class)
     val todaysCourses: StateFlow<List<Course>> = CourseService.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
@@ -60,31 +79,6 @@ class HomeScreenModel: ScreenModel {
             currentWeather.value = result?.toDomain(campus)*/
 
             currentWeather.value = OpenMeteoAPI.getCurrentWeather(campus)?.toDomain(campus)
-        }
-    }
-
-    // TODO() Fix the logic
-    @OptIn(ExperimentalTime::class)
-    fun loadTodaysMenu() {
-        screenModelScope.launch {
-            val menuEntity = DatabaseHolder.db.getMenuDao().getMenuForDay(LocalDate.now().toString()).first()
-            menuEntity?.let {
-                todaysMeal.value = Menu(
-                    canteen = menuEntity.menu.canteen,
-                    date = LocalDate.parse(menuEntity.menu.date),
-                    dateString = menuEntity.menu.dateString,
-                    dishes = menuEntity.dishes.map { dishEntity ->
-                        Dish(
-                            name = dishEntity.name,
-                            description = dishEntity.description,
-                            price = dishEntity.price,
-                            dishAllergens = dishEntity.dishAllergens
-                        )
-                    },
-                    sideDishes = menuEntity.sideDishes.groupBy { it.type }.mapValues { (_, entities) -> entities.map { it.name } }
-                )
-            }
-
         }
     }
 

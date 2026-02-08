@@ -1,5 +1,6 @@
 package hsrm.mi.campusapp.domain.service
 
+import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.SideDishType
@@ -7,14 +8,48 @@ import hsrm.mi.campusapp.domain.model.toEntity
 import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
 import hsrm.mi.campusapp.domain.persistence.menu.SideDishEntity
 import hsrm.mi.campusapp.domain.persistence.menu.toDomain
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.LocalDate
 
 object MenuService {
 
     private val sideDishDao = DatabaseHolder.db.getSideDishDao()
     private val dishDao = DatabaseHolder.db.getDishDao()
     private val menuDao = DatabaseHolder.db.getMenuDao()
+
+    private val allMenusFlow = menuDao.getMenusWithDishesAsFlow()
+        .map { entities -> entities.map { it.toDomain() }}
+        .stateIn(
+            scope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun getMenusForCanteenAsFlow(canteen: Canteen?): Flow<List<Menu>> {
+        return allMenusFlow.map { menus ->
+            menus.filter { menu ->
+                menu.canteen == canteen?.name
+            }
+        }
+
+    }
+
+    fun getMenuForDayAndCanteen(date: LocalDate, canteen: Canteen?): Flow<Menu?> {
+
+
+
+        return getMenusForCanteenAsFlow(canteen).map { menus ->
+            menus.find { menu ->
+                menu.date.toString() == "2026-02-09"
+            }
+        }
+    }
 
     fun getMenusWithDishesAsFlow(): Flow<List<Menu>> {
         return menuDao.getMenusWithDishesAsFlow().map { it.map { menuWithDishes -> menuWithDishes.toDomain() } }

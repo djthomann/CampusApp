@@ -104,5 +104,15 @@
     "courseType": "PRACTICAL",
     "longitude": 8.425203705070214,
     "latitude": 49.98527172708337
+  },
+  {
+    "name": "Elektrotechnik",
+    "dayOfWeek": "SUNDAY",
+    "start": "10:00",
+    "durationInMinutes": "90",
+    "room": "F201",
+    "courseType": "PRACTICAL",
+    "longitude": 8.425203705070214,
+    "latitude": 49.98527172708337
   }
 ]

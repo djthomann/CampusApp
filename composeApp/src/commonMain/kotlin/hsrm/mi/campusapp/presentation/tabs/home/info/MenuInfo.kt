@@ -10,14 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import campusapp.composeapp.generated.resources.Res
+import campusapp.composeapp.generated.resources.menu_for_canteen
 import campusapp.composeapp.generated.resources.no_menu_today
+import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.presentation.tabs.canteen.CanteenTab
 import org.jetbrains.compose.resources.stringResource
 
 
 @Composable
-fun MenuInfo(menu: Menu?) {
+fun MenuInfo(canteen: Canteen?, menu: Menu?) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -26,7 +28,7 @@ fun MenuInfo(menu: Menu?) {
                 imageVector =  CanteenTab.activeIcon,
                 contentDescription = CanteenTab.topAppBarTitle
             )
-            Text(CanteenTab.topAppBarTitle)
+            Text(if(canteen != null) stringResource(Res.string.menu_for_canteen, canteen.name) else CanteenTab.topAppBarTitle)
         }
         Row(
             verticalAlignment = Alignment.CenterVertically

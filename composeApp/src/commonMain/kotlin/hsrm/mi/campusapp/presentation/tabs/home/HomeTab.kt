@@ -87,12 +87,12 @@ object HomeTab: CampusTab {
         val tabNavigator = LocalTabNavigator.current
 
         val currentCampus by AppState.selectedCampus.collectAsState()
+        val currentCanteen by AppState.selectedCanteen.collectAsState()
 
         LaunchedEffect(currentCampus) {
             val campus = currentCampus
             if (campus != null) {
                 screenModel.loadWeather(campus)
-                screenModel.loadTodaysMenu()
             }
         }
 
@@ -100,6 +100,7 @@ object HomeTab: CampusTab {
         val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
         val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
         val nextCourse by screenModel.earliestCourse.collectAsStateWithLifecycle()
+        val todaysMenu by screenModel.todaysMeal.collectAsStateWithLifecycle()
 
         LaunchedEffect(nextCourse, AppState.homeStopId) {
             nextCourse?.let { it1 ->
@@ -177,7 +178,7 @@ object HomeTab: CampusTab {
                     ArrivalInfo(screenModel.arrivalTrip.value, screenModel.isLoadingArrivalTrip.value)
                 }
                 Spacer(modifier = Modifier.height(20.dp))
-                MenuInfo(screenModel.todaysMeal.value)
+                MenuInfo(currentCanteen, todaysMenu)
             }
 
             Box(modifier = Modifier.padding(12.dp)) {

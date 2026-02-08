@@ -1,14 +1,13 @@
 package hsrm.mi.campusapp.presentation.tabs.departure
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DepartureBoard
@@ -21,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.style.TextAlign
@@ -32,17 +30,12 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.departures_tab_title
 import campusapp.composeapp.generated.resources.loading_departures
-import campusapp.composeapp.generated.resources.no_departure_in_x_minutes
-import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
-import io.github.alexzhirkevich.compottie.LottieCompositionSpec
-import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
-import io.github.alexzhirkevich.compottie.rememberLottieComposition
-import io.github.alexzhirkevich.compottie.rememberLottiePainter
+import hsrm.mi.campusapp.presentation.tabs.schedule.EmptyIndicator
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -105,18 +98,17 @@ object DepartureTab: CampusTab {
             } else {
                 Text("No campus selected")
             } */
-            LazyRow(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(stops) { stop ->
-
+                stops.forEach {
                     CampusButton(
-                        text = stop.name,
+                        text = it.name,
                         onClick = {
-                            screenModel.loadDepartures(stop)
+                            screenModel.loadDepartures(it)
                         },
-                        isActive = screenModel.currentStop.value == stop
+                        isActive = screenModel.currentStop.value == it
                     )
                 }
             }
@@ -164,32 +156,4 @@ object DepartureTab: CampusTab {
     }
 
 
-}
-
-@Composable
-private fun EmptyIndicator() {
-
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/lottie/no-transport.json").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(composition)
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Image(
-            painter = rememberLottiePainter(
-                composition = composition,
-                progress = { progress },
-            ),
-            contentDescription = "Lottie animation"
-        )
-
-        Text(textAlign = TextAlign.Center, text = stringResource(Res.string.no_departure_in_x_minutes, RmvAPI.SEARCH_TIMEFRAME_MINUTES))
-    }
 }

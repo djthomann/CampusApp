@@ -2,12 +2,12 @@ package hsrm.mi.campusapp.presentation.tabs.canteen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dining
@@ -76,18 +76,17 @@ object CanteenTab: CampusTab {
         Column(
             modifier = Modifier.fillMaxSize().padding(10.dp),
         ) {
-            LazyRow(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(canteens) { canteen ->
-
+                canteens.forEach {
                     CampusButton(
-                        text = canteen.name,
+                        text = it.name,
                         onClick = {
-                            screenModel.loadMenus(canteen)
+                            screenModel.loadMenus(it)
                         },
-                        isActive = canteen == selectedCanteen
+                        isActive = it == selectedCanteen
                     )
                 }
             }
