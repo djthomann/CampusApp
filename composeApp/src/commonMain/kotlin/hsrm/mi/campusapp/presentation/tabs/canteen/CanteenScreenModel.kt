@@ -34,12 +34,22 @@ class CanteenScreenModel: ScreenModel {
         initialValue = emptyList()
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
     val menus: StateFlow<List<Menu>> = snapshotFlow { selectedCanteen }
         .flatMapLatest { canteen ->
-            if (canteen == null) flowOf(emptyList())
-            else MenuService.getMenusWithDishesAsFlow().map { list ->
-                list.filter { it.canteen == canteen.name }
+            if (canteen == null) return@flatMapLatest flowOf(emptyList())
+            MenuService.getMenusForCanteenAsFlow(canteen).map { list ->
+
+
+                if (list.isEmpty()) {
+                    screenModelScope.launch {
+                        try {
+                            val apiData = CanteenAPI.getMenusForWeek(canteen, LocalDate.now())
+                            MenuService.saveMenus(apiData.map { it.toDomain() })
+                        } catch (e: Exception) { /* Log error */ }
+                    }
+                }
+                list
             }
         }
         .stateIn(
@@ -69,25 +79,6 @@ class CanteenScreenModel: ScreenModel {
                     entry.value.forEach { sideDish ->
                         MenuService.saveSideDish(sideDish, entry.key, menuId)
                     }
-                }
-            }
-        }
-    }
-
-    fun loadMenus(canteen: Canteen) {
-
-        println("LOADING MENUS FOR $canteen")
-        selectedCanteen = canteen
-
-        screenModelScope.launch {
-            if (menus.value.isEmpty()) {
-                println("Try API for loading menus for ${canteen.name}")
-                try {
-                    val loadedMenus = loadMenuFromAPI(canteen)
-                    println("LOADED MENUS: $loadedMenus")
-                    saveMenus(loadedMenus)
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
             }
         }

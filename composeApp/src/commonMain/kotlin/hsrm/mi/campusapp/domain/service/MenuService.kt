@@ -41,9 +41,6 @@ object MenuService {
     }
 
     fun getMenuForDayAndCanteen(date: LocalDate, canteen: Canteen?): Flow<Menu?> {
-
-
-
         return getMenusForCanteenAsFlow(canteen).map { menus ->
             menus.find { menu ->
                 menu.date.toString() == "2026-02-09"
@@ -62,6 +59,10 @@ object MenuService {
         return menuDao.insertMenu(entity)
     }
 
+    suspend fun saveMenus(menus: List<Menu>) {
+        menus.forEach { saveMenu(it) }
+    }
+
     suspend fun saveDish(dish: Dish, menuId: Long): Long {
         return dishDao.insert(dish.toEntity(menuId))
     }
@@ -72,6 +73,18 @@ object MenuService {
             type = type,
             name = name
         ))
+    }
+
+    suspend fun deleteAllMenus() {
+        menuDao.deleteAllMenus()
+    }
+
+    suspend fun deleteAllDishes() {
+        dishDao.deleteAllDishes()
+    }
+
+    suspend fun deleteAllSideDishes() {
+        sideDishDao.deleteAllSideDishes()
     }
 
 }

@@ -80,11 +80,12 @@ object CanteenTab: CampusTab {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 canteens.forEach {
                     CampusButton(
                         text = it.name,
                         onClick = {
-                            screenModel.loadMenus(it)
+                            screenModel.selectedCanteen = it
                         },
                         isActive = it == selectedCanteen
                     )
