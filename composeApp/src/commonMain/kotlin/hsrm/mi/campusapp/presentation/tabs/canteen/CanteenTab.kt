@@ -1,30 +1,17 @@
 package hsrm.mi.campusapp.presentation.tabs.canteen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dining
 import androidx.compose.material.icons.outlined.Dining
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,11 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,9 +29,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.food_tab_title
 import campusapp.composeapp.generated.resources.no_menu_available
-import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
-import hsrm.mi.campusapp.domain.model.SideDishType
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
@@ -153,166 +135,5 @@ object CanteenTab: CampusTab {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun MenuEntry(menu: Menu, expanded: Boolean, onClick: () -> Unit) {
-
-    val backgroundColor by animateColorAsState(
-        targetValue = if (expanded)
-            MaterialTheme.colorScheme.secondary
-        else
-            MaterialTheme.colorScheme.surfaceContainerHigh,
-        label = "backgroundColor"
-    )
-
-    val textColor = if (expanded)
-        MaterialTheme.colorScheme.onSecondary
-    else
-        MaterialTheme.colorScheme.onSurface
-
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .fillMaxWidth()
-            .background(backgroundColor)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }
-                .padding(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = if (expanded) 6.dp else 0.dp),
-            ) {
-                Text(menu.dateString, color = textColor)
-            }
-            AnimatedVisibility(
-                visible = expanded
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text("Gerichte", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                    menu.dishes.sortedBy { dish -> dish.price }.forEachIndexed { index, dish ->
-                        DishEntry(dish, index % 2 == 0)
-                        HorizontalDivider(thickness = 1.dp)
-                    }
-                    BoxWithConstraints(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        val isWide = maxWidth > 600.dp
-
-                        if (isWide) {
-                            SideDishesRow(menu.sideDishes)
-                        } else {
-                            SideDishesColumn(menu.sideDishes)
-                        }
-                    }
-
-                }
-            }
-        }
-        Box(
-            modifier = Modifier.fillMaxWidth().background(if(!expanded) textColor else Color.Transparent).height(4.dp)
-        )
-    }
-}
-
-@Composable
-fun SideDishesColumn(sideDishes: Map<SideDishType, List<String>>) {
-
-    val textColor = MaterialTheme.colorScheme.onSecondary
-
-    Column(
-        modifier = Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Column {
-            Text("Beilagen", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-            sideDishes[SideDishType.GARNISH]?.forEach {
-                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-            }
-        }
-        Column {
-            Text("Salate", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-            sideDishes[SideDishType.SALAD]?.forEach {
-                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-            }
-        }
-        Column {
-            Text("Dessert", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-            sideDishes[SideDishType.DESSERT]?.forEach {
-                Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-            }
-        }
-    }
-
-}
-
-@Composable
-fun SideDishesRow(sideDishes: Map<SideDishType, List<String>>) {
-
-    val textColor = MaterialTheme.colorScheme.onSecondary
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        ) {
-            Column {
-                Text("Beilagen", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                sideDishes[SideDishType.GARNISH]?.forEach {
-                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-                }
-            }
-        }
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        ) {
-            Column {
-                Text("Salate", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                sideDishes[SideDishType.SALAD]?.forEach {
-                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-                }
-            }
-        }
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        ) {
-            Column {
-                Text("Dessert", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
-                sideDishes[SideDishType.DESSERT]?.forEach {
-                    Text("• $it", style = MaterialTheme.typography.bodyMedium, color = textColor)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DishEntry(dish: Dish, isEven: Boolean) {
-
-    val textColor = MaterialTheme.colorScheme.onSecondary
-
-    val backgroundColor = if(isEven) Color.Transparent else Color.DarkGray // TODO() Get rid of this
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(modifier = Modifier.weight(1f), text = dish.name, style = MaterialTheme.typography.bodyMedium, color = textColor)
-        Text(modifier = Modifier.wrapContentWidth(), text = dish.price, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = textColor)
     }
 }

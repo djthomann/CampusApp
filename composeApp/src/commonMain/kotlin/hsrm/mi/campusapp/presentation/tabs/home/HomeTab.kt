@@ -1,35 +1,22 @@
 package hsrm.mi.campusapp.presentation.tabs.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.ModeOfTravel
-import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,51 +28,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.Shader
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
-import campusapp.composeapp.generated.resources.arrive_on_time
 import campusapp.composeapp.generated.resources.choose_your_campus
 import campusapp.composeapp.generated.resources.home
-import campusapp.composeapp.generated.resources.next_course
-import campusapp.composeapp.generated.resources.no_courses_today
-import campusapp.composeapp.generated.resources.no_menu_today
-import campusapp.composeapp.generated.resources.no_weather_data
-import campusapp.composeapp.generated.resources.stops
-import campusapp.composeapp.generated.resources.welcome_campus
 import hsrm.mi.campusapp.domain.model.Campus
-import hsrm.mi.campusapp.domain.model.Course
-import hsrm.mi.campusapp.domain.model.Menu
-import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.model.Trip
-import hsrm.mi.campusapp.domain.model.Weather
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
-import hsrm.mi.campusapp.presentation.components.WeatherWidget
-import hsrm.mi.campusapp.presentation.components.getWeatherIcon
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
-import hsrm.mi.campusapp.presentation.tabs.canteen.CanteenTab
-import hsrm.mi.campusapp.presentation.tabs.departure.DepartureTab
-import hsrm.mi.campusapp.presentation.tabs.schedule.ScheduleTab
+import hsrm.mi.campusapp.presentation.tabs.home.info.ArrivalInfo
+import hsrm.mi.campusapp.presentation.tabs.home.info.DepartureInfo
+import hsrm.mi.campusapp.presentation.tabs.home.info.MenuInfo
+import hsrm.mi.campusapp.presentation.tabs.home.info.ScheduleInfo
+import hsrm.mi.campusapp.presentation.tabs.home.info.WeatherInfo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -224,159 +188,6 @@ object HomeTab: CampusTab {
 }
 
 @Composable
-fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.ModeOfTravel,
-            contentDescription = "arrive on time"
-        )
-        Text(stringResource(Res.string.arrive_on_time))
-        Spacer(modifier = Modifier.width(12.dp))
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // TODO() Make string resources
-        if(AppState.homeStopId != null) {
-            if(trip != null) {
-                Column {
-                    Text(style = MaterialTheme.typography.bodyMedium, text = "Von ${trip.startTime} Bis ${trip.arrivalTime}")
-                    trip.legs.filter { leg -> leg.name != "Fußweg" }.forEach { leg ->
-                        Text(style = MaterialTheme.typography.bodyMedium, text = "• ${leg.name}: ${leg.origin} → ${leg.destination} ")
-                    }
-                }
-            } else {
-                if(isLoading) {
-                    Text(text = "Lade Verbindungen...", style = MaterialTheme.typography.bodyMedium)
-                } else {
-                    Text(text = "Keine Verbindung gefunden...", style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-        } else {
-            Text(text = "No home stop selected...", style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-}
-
-@Composable
-fun WeatherInfo(currentWeather: Weather?) {
-
-    if(currentWeather == null) {
-        Text(stringResource(Res.string.no_weather_data), style = MaterialTheme.typography.bodyMedium)
-    } else {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = getWeatherIcon(currentWeather),
-                contentDescription = "current weather"
-            )
-            WeatherWidget(weather = currentWeather, modifier = Modifier.wrapContentWidth())
-        }
-    }
-
-}
-
-@Composable
-fun DepartureInfo(stops: List<Stop>, tabNavigator: TabNavigator) {
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.LocationOn,
-                contentDescription = DepartureTab.topAppBarTitle
-            )
-            Text(stringResource(Res.string.stops))
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(stops) { stop ->
-                    CampusButton(
-                        text = stop.name,
-                        onClick = {
-                            DepartureTab.selectStop(stop)
-                            tabNavigator.current = DepartureTab
-                        },
-                        isActive = true
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ScheduleInfo(nextCourse: Course?, tabNavigator: TabNavigator) {
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Schedule,
-                contentDescription = "Next course"
-            )
-            Text(stringResource(Res.string.next_course))
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            if(nextCourse == null) {
-                Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.bodyMedium)
-            } else {
-                CampusButton(
-                    text = nextCourse.name,
-                    onClick = {
-                        tabNavigator.current = ScheduleTab
-                    },
-                    isActive = true
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun MenuInfo(menu: Menu?) {
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector =  CanteenTab.activeIcon,
-                contentDescription = CanteenTab.topAppBarTitle
-            )
-            Text(CanteenTab.topAppBarTitle)
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column (
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if(menu == null) {
-                    Text(stringResource(Res.string.no_menu_today), style = MaterialTheme.typography.bodyMedium)
-                } else {
-                    menu.dishes.sortedBy { it.price }.forEach { dish -> Text("• ${dish.name}", style = MaterialTheme.typography.bodyMedium) }
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
 fun CampusName(campus: Campus, modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
@@ -393,59 +204,6 @@ fun ChooseText() {
         modifier = Modifier.padding(4.dp),
         text = stringResource(Res.string.choose_your_campus),
         style = MaterialTheme.typography.headlineLarge
-    )
-}
-
-@Composable
-fun WelcomeText(campus: Campus) {
-
-    Text(
-        modifier = Modifier.padding(4.dp),
-        text = stringResource(Res.string.welcome_campus),
-        color = MaterialTheme.colorScheme.onBackground,
-        style = MaterialTheme.typography.titleLarge
-    )
-}
-
-/* https://medium.com/androiddevelopers/animating-brush-text-coloring-in-compose-%EF%B8%8F-26ae99d9b402 */
-@Composable
-fun AnimatedBrushText(text: String) {
-    val infiniteTransition = rememberInfiniteTransition()
-
-    val offset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2000, easing = LinearEasing),
-        )
-    )
-
-    val brush = remember(offset) {
-        object : ShaderBrush() {
-            override fun createShader(size: Size): Shader {
-                val widthOffset = size.width * offset
-                val heightOffset = size.height * offset
-                return LinearGradientShader(
-                    colors = listOf(
-                        Color(0xff28d400),
-                        Color(0xff126100),
-                        Color(0xff47b32e)
-                    ),
-                    from = Offset(widthOffset, heightOffset),
-                    to = Offset(widthOffset + size.width, heightOffset + size.height),
-                    tileMode = TileMode.Mirror
-                )
-            }
-        }
-    }
-
-    Text(
-        text = text,
-        style = TextStyle(
-            fontSize = 60.sp,
-            fontWeight = FontWeight.ExtraBold,
-            brush = brush
-        )
     )
 }
 

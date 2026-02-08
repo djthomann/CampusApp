@@ -16,7 +16,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.map_tab_title
-import hsrm.mi.campusapp.presentation.state.MapState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
@@ -69,5 +68,3 @@ object MapTab: CampusTab {
     }
 }
 
-@Composable
-expect fun MapView(state: MapState)

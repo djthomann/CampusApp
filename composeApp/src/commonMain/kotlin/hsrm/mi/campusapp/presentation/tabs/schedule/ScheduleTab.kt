@@ -1,6 +1,5 @@
 package hsrm.mi.campusapp.presentation.tabs.schedule
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,8 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,10 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.rounded.Schedule
-import androidx.compose.material.icons.rounded.Start
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,12 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.friday_single_letter
 import campusapp.composeapp.generated.resources.monday_single_letter
-import campusapp.composeapp.generated.resources.no_courses_today
 import campusapp.composeapp.generated.resources.saturday_single_letter
 import campusapp.composeapp.generated.resources.schedule_tab_title
 import campusapp.composeapp.generated.resources.sunday_single_letter
@@ -59,11 +50,6 @@ import com.kizitonwose.calendar.core.minusDays
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
-import hsrm.mi.campusapp.presentation.tabs.map.MapTab
-import io.github.alexzhirkevich.compottie.LottieCompositionSpec
-import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
-import io.github.alexzhirkevich.compottie.rememberLottieComposition
-import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -116,7 +102,7 @@ object ScheduleTab: CampusTab {
                 modifier = Modifier.width(600.dp),
                 state = state,
                 contentPadding = PaddingValues(10.dp),
-                weekHeader = { week ->
+                weekHeader = { _ ->
                     Row {
                         DayOfWeek.entries.forEach { dayOfWeek ->
                             Box(
@@ -188,27 +174,7 @@ private fun Schedule(courses: List<Course>) {
 
 }
 
-@Composable
-private fun EmptyIndicator() {
 
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/lottie/no-courses.json").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(composition)
-
-    Image(
-        painter = rememberLottiePainter(
-            composition = composition,
-            progress = { progress },
-        ),
-        contentDescription = "Lottie animation"
-    )
-
-    Text(stringResource(Res.string.no_courses_today), style = MaterialTheme.typography.headlineMedium)
-
-}
 
 @Composable
 private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Unit) {
@@ -248,89 +214,5 @@ private fun Day(date: LocalDate, isSelected: Boolean, onClick: (LocalDate) -> Un
                     .align(Alignment.BottomCenter),
             )
         } */
-    }
-}
-@Composable
-private fun CourseEntry(course: Course) {
-
-    val tabNavigator = LocalTabNavigator.current
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .width(900.dp)
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                .clickable {
-                    MapTab.moveToPosition(course.building)
-                    tabNavigator.current = MapTab
-                }
-        ) {
-            Box(
-                modifier = Modifier.fillMaxWidth().background(color = course.courseType.color).height(8.dp)
-            )
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
-                Text(text = course.name, style = MaterialTheme.typography.bodyLarge)
-                if(course.lecturer != null) Text(text = course.lecturer, style = MaterialTheme.typography.bodyMedium)
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = course.courseType.icon,
-                            contentDescription = "Course Type Icon"
-                        )
-                        Text(stringResource(course.courseType.nameResource), style = MaterialTheme.typography.bodyMedium)
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Text(course.room, style = MaterialTheme.typography.bodyMedium)
-                        Icon(
-                            imageVector = Icons.Outlined.LocationOn,
-                            contentDescription = "Location Icon"
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Start,
-                            contentDescription = "Course starts at"
-                        )
-                        Text(course.start.toString(), style = MaterialTheme.typography.bodyMedium)
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Text("${course.durationInMinutes} min", style = MaterialTheme.typography.bodyMedium)
-                        Icon(
-                            imageVector = Icons.Rounded.Schedule,
-                            contentDescription = "Duration Icon"
-                        )
-                    }
-                }
-            }
-        }
-
     }
 }
