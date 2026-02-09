@@ -1,10 +1,10 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.campus.CampusEntity
-import hsrm.mi.campusapp.domain.persistence.canteen.CanteenEntity
-import hsrm.mi.campusapp.domain.persistence.course.CourseEntity
-import hsrm.mi.campusapp.domain.persistence.menu.MenuEntity
-import hsrm.mi.campusapp.domain.persistence.stop.StopEntity
+import hsrm.mi.campusapp.data.persistence.campus.CampusEntity
+import hsrm.mi.campusapp.data.persistence.canteen.CanteenEntity
+import hsrm.mi.campusapp.data.persistence.course.CourseEntity
+import hsrm.mi.campusapp.data.persistence.menu.MenuEntity
+import hsrm.mi.campusapp.data.persistence.stop.StopEntity
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime

@@ -1,11 +1,10 @@
 package hsrm.mi.campusapp.data.persistence
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import hsrm.mi.campusapp.data.persistence.canteen.CanteenDao
+import hsrm.mi.campusapp.data.persistence.canteen.toDomain
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.toEntity
-import hsrm.mi.campusapp.domain.persistence.AppDatabase
-import hsrm.mi.campusapp.domain.persistence.canteen.CanteenDao
-import hsrm.mi.campusapp.domain.persistence.canteen.toDomain
 import kotlinx.coroutines.test.runTest
 import org.maplibre.spatialk.geojson.Position
 import kotlin.test.AfterTest
