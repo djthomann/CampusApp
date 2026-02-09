@@ -9,11 +9,14 @@ import kotlinx.serialization.json.Json
 
 object OpenMeteoAPI {
 
+    lateinit var client: HttpClient
+
+    fun init(c : HttpClient) {
+        client = c
+    }
     private val json = Json {
         ignoreUnknownKeys = true
     }
-
-    val client = HttpClient()
 
     const val BASE_URL = "https://api.open-meteo.com/v1"
 

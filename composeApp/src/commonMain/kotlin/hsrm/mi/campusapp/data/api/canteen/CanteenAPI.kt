@@ -3,7 +3,6 @@ package hsrm.mi.campusapp.data.api.canteen
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.SideDishType
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.UserAgent
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
@@ -19,13 +18,14 @@ import kotlin.time.ExperimentalTime
 
 object CanteenAPI {
 
+    lateinit var client: HttpClient
+
+    fun init(c : HttpClient) {
+        client = c
+    }
+
     const val BASE_URL: String = "https://www.swffm.de/essen-trinken/speiseplaene"
 
-    val client = HttpClient() {
-        install(UserAgent) {
-            agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-    }
     @OptIn(ExperimentalTime::class)
     private suspend fun scrapeCanteenData(canteen: Canteen): List<MenuDTO> {
         val html = client.get("$BASE_URL/${canteen.url}") {

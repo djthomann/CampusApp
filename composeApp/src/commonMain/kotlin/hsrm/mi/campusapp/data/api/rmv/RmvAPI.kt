@@ -11,6 +11,12 @@ import kotlinx.serialization.json.Json
 
 object RmvAPI {
 
+    lateinit var client: HttpClient
+
+    fun init(c : HttpClient) {
+        client = c
+    }
+
     /* TODO() Work with result types instead to mirror images when fetching */
 
     const val SEARCH_TIMEFRAME_MINUTES = 180
@@ -25,8 +31,6 @@ object RmvAPI {
     private val json = Json {
         ignoreUnknownKeys = true
     }
-
-    val client = HttpClient()
 
     const val BASE_URL = "https://www.rmv.de/hapi"
     val rmvApiKey = ApiKeys.RMV
@@ -132,10 +136,14 @@ object RmvAPI {
             parameter("withMastNames", 1)
         }.bodyAsText()
 
-        // println("RAW Response: $jsonResponse")
+        println("RAW Response: $jsonResponse")
 
         return try {
             val locationResponse = json.decodeFromString<LocationResponse>(jsonResponse)
+
+            println("RESPONSE DECODE: $locationResponse")
+
+
             locationResponse.stopsWrapper.map { it.stopLocation }
         } catch (e: Exception) {
             println("Error deserializing Location Response: ${e.message}")

@@ -18,7 +18,7 @@ data class StopLocationWrapper(
 )
 
 @Serializable
-class StopLocationDTO(
+data class StopLocationDTO(
     val id: String,
     val name: String,
     val lon: Double,

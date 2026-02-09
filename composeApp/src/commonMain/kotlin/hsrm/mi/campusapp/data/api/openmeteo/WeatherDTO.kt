@@ -16,7 +16,6 @@ data class WeatherDTO(
     val cloudCover: Int,
     @SerialName("is_day")
     val isDayNum: Int
-
 )
 
 fun WeatherDTO.toDomain(campus: Campus): Weather {
