@@ -5,11 +5,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -123,52 +121,39 @@ object HomeTab: CampusTab {
 
         val scrollState = rememberScrollState()
 
-        Column(
-            modifier = Modifier.fillMaxSize().padding(12.dp).verticalScroll(scrollState)
-        ) {
-            AnimatedVisibility(
-                visible = currentCampus == null,
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(200.dp))
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        ChooseText()
-                        AnimatedBrushText("Campus")
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
+        if(currentCampus == null) {
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                item {
+                    ChooseText()
+                    AnimatedBrushText("Campus")
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+                itemsIndexed(campuses) { index, campus ->
+                    AnimatedVisibility(
+                        visible = index < visibleCount,
+                        enter = slideInVertically(
+                            initialOffsetY = { -it },
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeIn(animationSpec = tween(300))
                     ) {
-                        itemsIndexed(campuses) { index, campus ->
-                            AnimatedVisibility(
-                                visible = index < visibleCount,
-                                enter = slideInVertically(
-                                    initialOffsetY = { -it },
-                                    animationSpec = tween(durationMillis = 300)
-                                ) + fadeIn(animationSpec = tween(300))
-                            ) {
-                                CampusButton(
-                                    text = campus.name,
-                                    onClick = { screenModel.updateCampus(campus) },
-                                    isActive = true
-                                )
-                            }
-                        }
+                        CampusButton(
+                            text = campus.name,
+                            onClick = { screenModel.updateCampus(campus) },
+                            isActive = true
+                        )
                     }
                 }
             }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(12.dp).verticalScroll(scrollState)
+            ) {
 
-
-            if(currentCampus != null) {
                 Spacer(modifier = Modifier.height(20.dp))
                 CampusName(currentCampus!!)
                 Spacer(modifier = Modifier.height(20.dp))
@@ -183,10 +168,7 @@ object HomeTab: CampusTab {
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 MenuInfo(currentCanteen, todaysMenu)
-            }
 
-            Box(modifier = Modifier.padding(12.dp)) {
-                /* Should display MapScreen --> Idea scraped? */
             }
         }
     }

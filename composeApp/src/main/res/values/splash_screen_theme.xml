@@ -2,10 +2,10 @@
 <resources>
     <style name="Theme.App.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">
-            #697091
+            #5a825a
         </item>
         <item name="windowSplashScreenAnimatedIcon">
-            @mipmap/ic_launcher
+            @mipmap/ic_launcher_foreground
         </item>
         <item name="android:windowNoTitle">true</item>
         <item name="postSplashScreenTheme">
