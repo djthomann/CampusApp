@@ -46,6 +46,7 @@ class HomeScreenModel: ScreenModel {
             if (canteen == null) {
                 flowOf(null)
             } else {
+                println("FlatMapLatest triggered to load for Canteen: ${canteen.name}")
                 val today = LocalDate.now()
                 MenuService.getMenuForDayAndCanteen(today, canteen)
             }

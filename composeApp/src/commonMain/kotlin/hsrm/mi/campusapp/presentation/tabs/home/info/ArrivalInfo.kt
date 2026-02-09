@@ -11,6 +11,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,6 +25,9 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
+
+    val homeStop by AppState.homeStop.collectAsState()
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -38,7 +43,7 @@ fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // TODO() Make string resources
-        if(AppState.homeStopId != null) {
+        if(homeStop != null) {
             if(trip != null) {
                 Column {
                     Text(style = MaterialTheme.typography.bodyMedium, text = "Von ${trip.startTime} Bis ${trip.arrivalTime}")

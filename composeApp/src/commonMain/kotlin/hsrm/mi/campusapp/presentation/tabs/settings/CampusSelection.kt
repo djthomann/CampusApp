@@ -22,7 +22,6 @@ import hsrm.mi.campusapp.presentation.state.AppState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CampusSelection(campuses: List<Campus>, modifier: Modifier = Modifier, updateCampus: (Campus) -> Unit) {
-    val options = campuses
     val selectedOption by AppState.selectedCampus.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
@@ -45,7 +44,7 @@ fun CampusSelection(campuses: List<Campus>, modifier: Modifier = Modifier, updat
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            options.forEach { option ->
+            campuses.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option.name) },
                     onClick = {

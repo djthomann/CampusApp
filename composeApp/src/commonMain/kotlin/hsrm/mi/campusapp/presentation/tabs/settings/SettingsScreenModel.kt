@@ -7,6 +7,7 @@ import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
+import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.domain.service.MenuService
@@ -40,7 +41,7 @@ class SettingsScreenModel: ScreenModel {
 
     }
 
-    fun updateCanteen(canteen: Canteen) {
+    fun updateCanteen(canteen: Canteen?) {
         AppState.updateCanteen(canteen, screenModelScope)
     }
 
@@ -48,8 +49,13 @@ class SettingsScreenModel: ScreenModel {
         AppState.updateCampus(campus, screenModelScope)
     }
 
+    fun updateHomeStop(stop: Stop?) {
+        AppState.selectHomeStop(stop, screenModelScope)
+    }
+
     fun clearDatabase() {
         screenModelScope.launch {
+            // TODO() Actually clear all Database tables
             MenuService.deleteAllMenus()
         }
     }

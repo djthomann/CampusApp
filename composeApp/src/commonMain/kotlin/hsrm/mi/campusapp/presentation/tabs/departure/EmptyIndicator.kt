@@ -20,7 +20,7 @@ import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-private fun EmptyIndicator() {
+fun EmptyIndicator() {
 
     val composition by rememberLottieComposition {
         LottieCompositionSpec.JsonString(

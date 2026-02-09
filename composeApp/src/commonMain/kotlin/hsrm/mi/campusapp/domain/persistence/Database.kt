@@ -125,7 +125,7 @@ suspend fun seedCanteensFromResource(dao: CanteenDao) {
     StopEntity::class,
     CanteenEntity::class,
     CourseEntity::class
-                     ], version = 30)
+                     ], version = 32)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(
     SideDishTypeConverter::class
@@ -137,7 +137,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getStopDao(): StopDao
     abstract fun getCanteenDao(): CanteenDao
     abstract fun getCampusDao(): CampusDao
-
     abstract fun getCourseDao(): CourseDao
 }
 

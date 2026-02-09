@@ -35,7 +35,6 @@ import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
-import hsrm.mi.campusapp.presentation.tabs.schedule.EmptyIndicator
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource

@@ -1,7 +1,9 @@
 package hsrm.mi.campusapp.data.api.rmv
 
+import hsrm.mi.campusapp.domain.model.Stop
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.maplibre.spatialk.geojson.Position
 
 @Serializable
 data class LocationResponse(
@@ -22,3 +24,12 @@ class StopLocationDTO(
     val lon: Double,
     val lat: Double
 )
+
+fun StopLocationDTO.toDomain(): Stop {
+    return Stop(
+        id = id,
+        name = name,
+        campus = "",
+        position = Position(lon, lat)
+    )
+}

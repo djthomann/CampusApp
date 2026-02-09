@@ -26,8 +26,6 @@ object CanteenAPI {
             agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
     }
-
-    /* TODO() Make this more beautiful */
     @OptIn(ExperimentalTime::class)
     private suspend fun scrapeCanteenData(canteen: Canteen): List<MenuDTO> {
         val html = client.get("$BASE_URL/${canteen.url}") {
@@ -52,8 +50,6 @@ object CanteenAPI {
             }
         }
 
-        println(menus)
-
         return menus
     }
 
@@ -74,7 +70,6 @@ fun parseMenu(canteen: Canteen, div: Element): MenuDTO {
 
 
     dishRows.forEach { dish ->
-
         run {
             dishes.add(parseDish(dish))
         }

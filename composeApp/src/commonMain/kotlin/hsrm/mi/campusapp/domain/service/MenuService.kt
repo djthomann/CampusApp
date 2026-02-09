@@ -43,7 +43,7 @@ object MenuService {
     fun getMenuForDayAndCanteen(date: LocalDate, canteen: Canteen?): Flow<Menu?> {
         return getMenusForCanteenAsFlow(canteen).map { menus ->
             menus.find { menu ->
-                menu.date.toString() == "2026-02-09"
+                menu.date == date
             }
         }
     }

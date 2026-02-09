@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
@@ -46,7 +48,6 @@ import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import hsrm.mi.campusapp.presentation.tabs.home.info.ArrivalInfo
-import hsrm.mi.campusapp.presentation.tabs.home.info.DepartureInfo
 import hsrm.mi.campusapp.presentation.tabs.home.info.MenuInfo
 import hsrm.mi.campusapp.presentation.tabs.home.info.ScheduleInfo
 import hsrm.mi.campusapp.presentation.tabs.home.info.WeatherInfo
@@ -101,11 +102,12 @@ object HomeTab: CampusTab {
         val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
         val nextCourse by screenModel.earliestCourse.collectAsStateWithLifecycle()
         val todaysMenu by screenModel.todaysMeal.collectAsStateWithLifecycle()
+        val homeStop by AppState.homeStop.collectAsState()
 
-        LaunchedEffect(nextCourse, AppState.homeStopId) {
-            nextCourse?.let { it1 ->
-                AppState.homeStopId?.let {
-                    screenModel.loadArrivalTrip(it, nextCourse!!)
+        LaunchedEffect(nextCourse, homeStop) {
+            nextCourse?.let { course ->
+                homeStop.let { stop ->
+                    screenModel.loadArrivalTrip(stop!!.id, course)
                 }
             }
         }
@@ -119,8 +121,10 @@ object HomeTab: CampusTab {
             }
         }
 
+        val scrollState = rememberScrollState()
+
         Column(
-            modifier = Modifier.fillMaxSize().padding(12.dp)
+            modifier = Modifier.fillMaxSize().padding(12.dp).verticalScroll(scrollState)
         ) {
             AnimatedVisibility(
                 visible = currentCampus == null,
@@ -169,8 +173,8 @@ object HomeTab: CampusTab {
                 CampusName(currentCampus!!)
                 Spacer(modifier = Modifier.height(20.dp))
                 WeatherInfo(screenModel.currentWeather.value)
-                Spacer(modifier = Modifier.height(20.dp))
-                DepartureInfo(stops, tabNavigator)
+                // Spacer(modifier = Modifier.height(20.dp))
+                // DepartureInfo(stops, tabNavigator)
                 Spacer(modifier = Modifier.height(20.dp))
                 ScheduleInfo(nextCourse, tabNavigator) // TODO() Probably migrate to ScreenModel
                 nextCourse?.let {

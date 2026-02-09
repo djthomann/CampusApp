@@ -3,8 +3,11 @@ package hsrm.mi.campusapp.presentation.state
 import androidx.compose.runtime.mutableStateOf
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
+import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.persistence.stop.toDomain
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
+import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.settings.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,14 @@ object AppState {
                 val canteen = CanteenService.getCanteenByName(canteenName)
                 _selectedCanteen.value = canteen
             }
+
+            val homeStopId = settings.homeStopId
+            if (homeStopId.isNotBlank()) {
+
+                val stop = StopService.dao.getById(homeStopId)
+
+                _homeStop.value = stop?.toDomain()
+            }
         }
     }
 
@@ -41,15 +52,11 @@ object AppState {
     private val _selectedCanteen = MutableStateFlow<Canteen?>(null)
     val selectedCanteen = _selectedCanteen.asStateFlow()
 
-    private var _homeStopId = mutableStateOf<String>(settings.homeStopId)
-
-    /* TODO() Save real Stop object later and retrieve it here */
-    var homeStopId: String? = null
-        get() = _homeStopId.value.ifEmpty { null }
-        private set
+    private var _homeStop = MutableStateFlow<Stop?>(null)
+    val homeStop = _homeStop.asStateFlow()
 
 
-    var isDarkMode = mutableStateOf<Boolean>(settings.isDarkMode)
+    var isDarkMode = mutableStateOf(settings.isDarkMode)
         private set
 
     fun toggleDarkMode() {
@@ -72,10 +79,14 @@ object AppState {
         }
     }
 
-    fun selectHomeStop(stopId: String?) {
-        _homeStopId.value = stopId?: ""
-        homeStopId = stopId
-        settings.homeStopId = stopId?: ""
+    fun selectHomeStop(stop: Stop?, scope: CoroutineScope) {
+        scope.launch {
+            if(stop != null) {
+                StopService.saveStop(stop)
+            }
+            settings.homeStopId = stop?.id ?: ""
+            _homeStop.value = stop
+        }
     }
 
 }

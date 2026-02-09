@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,11 +34,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
+import hsrm.mi.campusapp.data.api.rmv.toDomain
+import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.presentation.state.AppState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeStopSearchBar(results: List<StopLocationDTO>, onSearch: (String) -> Unit) {
+fun HomeStopSearchBar(results: List<StopLocationDTO>, onSearch: (String) -> Unit, selectHomeStop: (Stop) -> Unit) {
     // Common parameters
     val placeholder = "Search"
 
@@ -46,6 +49,8 @@ fun HomeStopSearchBar(results: List<StopLocationDTO>, onSearch: (String) -> Unit
 
     // State management
     var expanded by remember { mutableStateOf(false) }
+
+    val selectedStop by AppState.homeStop.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -113,7 +118,7 @@ fun HomeStopSearchBar(results: List<StopLocationDTO>, onSearch: (String) -> Unit
                         items(results) { result ->
                             ListItem(
                                 modifier = Modifier.clickable {
-                                    AppState.selectHomeStop(result.id)
+                                    selectHomeStop(result.toDomain())
                                 },
                                 colors = ListItemDefaults.colors(
                                     containerColor = Color.Transparent

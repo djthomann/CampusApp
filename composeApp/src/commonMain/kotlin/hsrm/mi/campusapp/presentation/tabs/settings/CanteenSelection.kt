@@ -21,7 +21,6 @@ import hsrm.mi.campusapp.presentation.state.AppState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CanteenSelection(canteens: List<Canteen>, modifier: Modifier = Modifier, updateCanteen: (Canteen) -> Unit) {
-    val options = canteens
     val selectedOption = AppState.selectedCanteen
     var expanded by remember { mutableStateOf(false) }
 
@@ -44,7 +43,7 @@ fun CanteenSelection(canteens: List<Canteen>, modifier: Modifier = Modifier, upd
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            options.forEach { option ->
+            canteens.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option.name) },
                     onClick = {

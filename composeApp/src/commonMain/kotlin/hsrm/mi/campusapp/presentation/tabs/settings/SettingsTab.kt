@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.MoreVert
@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -71,6 +72,8 @@ object SettingsTab: CampusTab {
         val canteens by screenModel.canteens.collectAsStateWithLifecycle()
         val campuses by screenModel.campuses.collectAsStateWithLifecycle()
 
+        val selectedStop by AppState.homeStop.collectAsState()
+
         Column(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -92,6 +95,7 @@ object SettingsTab: CampusTab {
                     }
                     Text(text = stringResource(Res.string.settings))
                 }
+                /* Only for testing purposes
                 IconButton(
                     onClick = {
                         screenModel.clearDatabase()
@@ -101,7 +105,7 @@ object SettingsTab: CampusTab {
                         imageVector = Icons.Filled.ClearAll,
                         contentDescription = "Clear Database"
                     )
-                }
+                } */
                 Switch(
                     checked = AppState.isDarkMode.value,
                     onCheckedChange = { _ -> AppState.toggleDarkMode() },
@@ -137,7 +141,7 @@ object SettingsTab: CampusTab {
                     modifier = Modifier.weight(1f),
                     updateCanteen = screenModel::updateCanteen
                     )
-                IconButton(onClick = {}) {
+                IconButton(onClick = { screenModel.updateCanteen(null) }) {
                     Icon(
                         imageVector = Icons.Filled.Clear,
                         contentDescription = "Clear Canteen"
@@ -145,29 +149,32 @@ object SettingsTab: CampusTab {
                 }
             }
 
-            if(AppState.homeStopId != null) {
+            if(selectedStop != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Home Stop:")
-                    IconButton(onClick = { AppState.selectHomeStop("") }) {
+                    Icon(
+                        imageVector = Icons.Filled.Flag,
+                        contentDescription = "Home Stop Icon"
+                    )
+                    Text(style = MaterialTheme.typography.bodyMedium, text = selectedStop!!.name)
+                    IconButton(onClick = { screenModel.updateHomeStop(null) }) {
                         Icon(
                             imageVector = Icons.Filled.Clear,
                             contentDescription = "Clear Home Stop"
                         )
                     }
                 }
-                Text(style = MaterialTheme.typography.bodyMedium, text = AppState.homeStopId!!) // TODO() Improve later with real Stop Object
+
             } else {
                 HomeStopSearchBar(
                     results = screenModel.homeStopResults.value,
-                    onSearch = screenModel::searchHomeStopByName
+                    onSearch = screenModel::searchHomeStopByName,
+                    selectHomeStop = screenModel::updateHomeStop
                 )
             }
-
-
 
             /* TODO() Implement later */
             /*var value by remember { mutableStateOf("") }
