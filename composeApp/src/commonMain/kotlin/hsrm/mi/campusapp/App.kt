@@ -15,7 +15,23 @@ import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
 import hsrm.mi.campusapp.presentation.theme.AppTypography
 import hsrm.mi.campusapp.presentation.theme.darkScheme
 import hsrm.mi.campusapp.presentation.theme.lightScheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.KoinApplication
+import org.koin.core.KoinApplication
+import org.koin.core.module.Module
+import org.koin.dsl.module
+
+
+expect fun platformModule(): Module
+
+val commonModule = module {
+
+    single { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UnusedMaterial3ScaffoldPaddingParameter")
@@ -30,7 +46,7 @@ fun App() {
         typography = AppTypography,
     ) {
         TabNavigator(HomeTab) {
-            navigator ->
+                navigator ->
             MainScaffold(navigator)
         }
     }

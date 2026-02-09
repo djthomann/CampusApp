@@ -11,15 +11,21 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.room.RoomDatabase
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import hsrm.mi.campusapp.data.persistence.AppDatabase
+import hsrm.mi.campusapp.data.persistence.getDatabaseBuilder
+import hsrm.mi.campusapp.data.persistence.getRoomDatabase
 import hsrm.mi.campusapp.presentation.tabs.canteen.CanteenTab
 import hsrm.mi.campusapp.presentation.tabs.departure.DepartureTab
 import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
 import hsrm.mi.campusapp.presentation.tabs.map.MapTab
 import hsrm.mi.campusapp.presentation.tabs.schedule.ScheduleTab
 import hsrm.mi.campusapp.presentation.tabs.settings.SettingsTab
+import kotlinx.coroutines.CoroutineScope
+import org.koin.dsl.module
 
 @Composable
 actual fun MainScaffold(navigator: TabNavigator) {
@@ -55,4 +61,16 @@ fun NavItem(tab: Tab) {
         },
         icon = { tab.options.icon?.let { Icon(painter = it, contentDescription = tab.options.title) } }
     )
+}
+
+actual fun platformModule() = module {
+    single<AppDatabase> {
+        val scope: CoroutineScope = get()
+
+        val builder: RoomDatabase.Builder<AppDatabase> = getDatabaseBuilder()
+
+        val db = getRoomDatabase(builder, scope)
+
+        db
+    }
 }

@@ -8,31 +8,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import hsrm.mi.campusapp.data.api.ApiModule
+import hsrm.mi.campusapp.data.persistence.AppDatabase
 import hsrm.mi.campusapp.data.persistence.DatabaseHolder
-import hsrm.mi.campusapp.data.persistence.getDatabaseBuilder
-import hsrm.mi.campusapp.data.persistence.getRoomDatabase
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import org.koin.android.ext.koin.androidContext
+import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
+import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        // TODO() Implement a DI Framework, i.e. Koin
-
-        ApiModule.init(HttpClient())
-
-        val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-        val db = getRoomDatabase(getDatabaseBuilder(applicationContext), scope = applicationScope)
-        DatabaseHolder.init(db)
-
         installSplashScreen()
         setContent {
-            App()
+            KoinApplication(application = {
+                androidContext(applicationContext)
+                modules(
+                    commonModule,
+                    platformModule()
+                )
+            }) {
+                ApiModule.init(HttpClient())
+
+                DatabaseHolder.init(koinInject<AppDatabase>())
+
+                App()
+            }
+
         }
     }
 }

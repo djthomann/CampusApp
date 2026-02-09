@@ -6,7 +6,7 @@ import hsrm.mi.campusapp.domain.model.Canteen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-object CanteenService {
+object CanteenService: ICanteenService {
 
     val dao = DatabaseHolder.db.getCanteenDao()
 
