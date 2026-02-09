@@ -43,7 +43,9 @@ fun LegDTO.toDomain(): Leg {
     return Leg(
         name = name,
         origin = origin.name,
-        destination = destination.name
+        startTime = origin.time,
+        destination = destination.name,
+        endTime = destination.time
     )
 }
 

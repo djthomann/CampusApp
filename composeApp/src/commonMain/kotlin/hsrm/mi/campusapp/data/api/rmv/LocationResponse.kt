@@ -29,7 +29,7 @@ fun StopLocationDTO.toDomain(): Stop {
     return Stop(
         id = id,
         name = name,
-        campus = "",
+        campus = null,
         position = Position(lon, lat)
     )
 }

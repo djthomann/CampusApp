@@ -11,5 +11,7 @@ data class Trip(
 data class Leg(
     val name: String,
     val origin: String,
+    val startTime: LocalTime,
     val destination: String,
+    val endTime: LocalTime
 )

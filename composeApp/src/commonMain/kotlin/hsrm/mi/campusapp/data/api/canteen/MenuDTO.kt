@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.data.api.canteenapi
+package hsrm.mi.campusapp.data.api.canteen
 
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.SideDishType
@@ -55,6 +55,7 @@ fun dateStringToLocalDate(input: String, year: Int): LocalDate {
 
         LocalDate(year, month, day)
     } catch (e: Exception) {
+        val s = e.toString()
         LocalDate(2000, Month.JANUARY, 1) // Fallback
     }
 }

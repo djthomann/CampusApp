@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.data.api.canteenapi
+package hsrm.mi.campusapp.data.api.canteen
 
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.SideDishType
