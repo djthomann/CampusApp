@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence.campus
+package hsrm.mi.campusapp.data.persistence.campus
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.menu.DishEntity
+import hsrm.mi.campusapp.data.persistence.menu.DishEntity
 
 data class Dish(
     val name: String,

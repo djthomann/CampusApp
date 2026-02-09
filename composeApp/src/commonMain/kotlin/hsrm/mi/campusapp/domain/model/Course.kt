@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.course.CourseEntity
+import hsrm.mi.campusapp.data.persistence.course.CourseEntity
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 import org.maplibre.spatialk.geojson.Position

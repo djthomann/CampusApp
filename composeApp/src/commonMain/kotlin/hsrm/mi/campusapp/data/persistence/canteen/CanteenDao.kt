@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence.canteen
+package hsrm.mi.campusapp.data.persistence.canteen
 
 import androidx.room.Dao
 import androidx.room.Delete

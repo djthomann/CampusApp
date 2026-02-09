@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.stop.StopEntity
+import hsrm.mi.campusapp.data.persistence.stop.StopEntity
 import org.maplibre.spatialk.geojson.Position
 
 data class Stop(

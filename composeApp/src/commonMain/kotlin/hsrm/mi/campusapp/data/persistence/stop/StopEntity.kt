@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence.stop
+package hsrm.mi.campusapp.data.persistence.stop
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

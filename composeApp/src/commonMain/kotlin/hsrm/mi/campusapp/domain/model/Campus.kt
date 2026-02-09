@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.campus.CampusEntity
+import hsrm.mi.campusapp.data.persistence.campus.CampusEntity
 import org.maplibre.spatialk.geojson.Position
 
 data class Campus(

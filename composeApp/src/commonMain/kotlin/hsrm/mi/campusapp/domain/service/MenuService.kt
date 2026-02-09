@@ -1,13 +1,13 @@
 package hsrm.mi.campusapp.domain.service
 
+import hsrm.mi.campusapp.data.persistence.DatabaseHolder
+import hsrm.mi.campusapp.data.persistence.menu.SideDishEntity
+import hsrm.mi.campusapp.data.persistence.menu.toDomain
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.SideDishType
 import hsrm.mi.campusapp.domain.model.toEntity
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.menu.SideDishEntity
-import hsrm.mi.campusapp.domain.persistence.menu.toDomain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

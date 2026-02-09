@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence.course
+package hsrm.mi.campusapp.data.persistence.course
 
 import androidx.room.Dao
 import androidx.room.Delete

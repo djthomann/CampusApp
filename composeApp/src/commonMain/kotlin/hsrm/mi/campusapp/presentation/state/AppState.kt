@@ -1,10 +1,10 @@
 package hsrm.mi.campusapp.presentation.state
 
 import androidx.compose.runtime.mutableStateOf
+import hsrm.mi.campusapp.data.persistence.stop.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.persistence.stop.toDomain
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.domain.service.StopService

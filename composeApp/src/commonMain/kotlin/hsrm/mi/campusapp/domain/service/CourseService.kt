@@ -1,8 +1,8 @@
 package hsrm.mi.campusapp.domain.service
 
+import hsrm.mi.campusapp.data.persistence.DatabaseHolder
+import hsrm.mi.campusapp.data.persistence.course.toDomain
 import hsrm.mi.campusapp.domain.model.Course
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.course.toDomain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

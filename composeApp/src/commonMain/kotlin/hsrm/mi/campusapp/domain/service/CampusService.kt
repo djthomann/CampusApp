@@ -1,8 +1,8 @@
 package hsrm.mi.campusapp.domain.service
 
+import hsrm.mi.campusapp.data.persistence.DatabaseHolder
+import hsrm.mi.campusapp.data.persistence.campus.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.campus.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence.menu
+package hsrm.mi.campusapp.data.persistence.menu
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

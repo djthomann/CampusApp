@@ -8,9 +8,11 @@ import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.app_name
 import campusapp.composeapp.generated.resources.logo
 import dev.datlag.kcef.KCEF
-import hsrm.mi.campusapp.domain.persistence.DatabaseHolder
-import hsrm.mi.campusapp.domain.persistence.getDatabaseBuilder
-import hsrm.mi.campusapp.domain.persistence.getRoomDatabase
+import hsrm.mi.campusapp.data.api.ApiModule
+import hsrm.mi.campusapp.data.persistence.DatabaseHolder
+import hsrm.mi.campusapp.data.persistence.getDatabaseBuilder
+import hsrm.mi.campusapp.data.persistence.getRoomDatabase
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,6 +23,8 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun main() = application {
+
+    ApiModule.init(HttpClient())
 
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

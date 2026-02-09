@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence.menu
+package hsrm.mi.campusapp.data.persistence.menu
 
 import androidx.room.TypeConverter
 import hsrm.mi.campusapp.domain.model.SideDishType

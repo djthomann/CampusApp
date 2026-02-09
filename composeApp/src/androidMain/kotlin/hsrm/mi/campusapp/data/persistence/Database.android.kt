@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.domain.persistence
+package hsrm.mi.campusapp.data.persistence
 
 import android.content.Context
 import androidx.room.Room

@@ -1,6 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
-import hsrm.mi.campusapp.domain.persistence.canteen.CanteenEntity
+import hsrm.mi.campusapp.data.persistence.canteen.CanteenEntity
 import org.maplibre.spatialk.geojson.Position
 
 data class Canteen(
