@@ -13,7 +13,7 @@ interface StopDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: StopEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<StopEntity>)
 
     @Query("SELECT * FROM StopEntity WHERE id = :id")
