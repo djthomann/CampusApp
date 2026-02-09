@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(
     indices = [Index(value = ["canteen", "date"], unique = true)],
 )
-class MenuEntity(
+data class MenuEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val canteen: String, // TODO() Change later

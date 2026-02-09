@@ -11,7 +11,7 @@ import org.maplibre.spatialk.geojson.Position
 
 @Entity
 @Serializable
-class CourseEntity(
+data class CourseEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,

@@ -8,16 +8,19 @@ import org.maplibre.spatialk.geojson.Position
 
 @Entity
 @Serializable
-class CanteenEntity(
+data class CanteenEntity(
     @PrimaryKey val name: String,
-    val url: String
+    val campus: String = "",
+    val longitude: Double = 0.0,
+    val latitude: Double = 0.0,
+    val url: String,
 )
 
 fun CanteenEntity.toDomain(): Canteen {
     return Canteen(
         name = name,
-        campus = "",
-        position = Position(0.0, 0.0),
+        campus = campus,
+        position = Position(longitude, latitude),
         url = url,
     )
 }

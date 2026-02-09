@@ -8,7 +8,7 @@ import org.maplibre.spatialk.geojson.Position
 
 @Entity
 @Serializable
-class StopEntity (
+data class StopEntity (
     @PrimaryKey val id: String,
     val name: String,
     val campus: String,

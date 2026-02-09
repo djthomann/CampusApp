@@ -107,7 +107,7 @@ object HomeTab: CampusTab {
         LaunchedEffect(nextCourse, homeStop) {
             nextCourse?.let { course ->
                 homeStop.let { stop ->
-                    screenModel.loadArrivalTrip(stop!!.id, course)
+                    screenModel.loadArrivalTrip(stop?.id ?: "", course)
                 }
             }
         }

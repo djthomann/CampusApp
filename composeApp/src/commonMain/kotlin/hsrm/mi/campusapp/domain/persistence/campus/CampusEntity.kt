@@ -8,7 +8,7 @@ import org.maplibre.spatialk.geojson.Position
 
 @Entity
 @Serializable
-class CampusEntity (
+data class CampusEntity (
     @PrimaryKey val name: String,
     val longitude: Double,
     val latitude: Double,

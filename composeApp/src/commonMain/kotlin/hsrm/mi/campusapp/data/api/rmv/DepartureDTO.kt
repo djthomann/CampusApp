@@ -14,11 +14,11 @@ data class JourneyDetailRef(
 )
 
 @Serializable
-data class ProductAtStop(
+data class VehicleDTO(
     val catOut: String
 )
 
-fun ProductAtStop.toDomain(): Vehicle {
+fun VehicleDTO.toDomain(): Vehicle {
     return when(catOut) {
         "Bus" -> Vehicle.BUS
         "S" -> Vehicle.S_BAHN
@@ -32,7 +32,7 @@ data class DepartureDTO(
     @SerialName("JourneyDetailRef")
     val journeyDetailRef: JourneyDetailRef,
     @SerialName("ProductAtStop")
-    val prodcutAtStop: ProductAtStop,
+    val prodcutAtStop: VehicleDTO,
     val name: String,
     @Serializable(with = LocalTimeSerializer::class)
     val time: LocalTime,
