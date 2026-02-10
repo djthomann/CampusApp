@@ -28,8 +28,6 @@ expect fun platformModule(): Module
 
 val commonModule = module {
     includes(appModules)
-    single { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

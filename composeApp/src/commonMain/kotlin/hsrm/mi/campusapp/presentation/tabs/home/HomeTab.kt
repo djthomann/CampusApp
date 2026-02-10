@@ -5,9 +5,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -103,8 +105,8 @@ object HomeTab: CampusTab {
         }
 
         val campuses by koinInject<ICampusService>().getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
-        val stops by stopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
-        val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
+        // val stops by stopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
+        // val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
         val nextCourse by screenModel.earliestCourse.collectAsStateWithLifecycle()
         val todaysMenu by screenModel.todaysMeal.collectAsStateWithLifecycle()
         val homeStop by appState.homeStop.collectAsState()
@@ -133,12 +135,21 @@ object HomeTab: CampusTab {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
             ) {
                 item {
-                    ChooseText()
-                    AnimatedBrushText("Campus")
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillParentMaxHeight(0.5f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            ChooseText()
+                            AnimatedBrushText("Campus")
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
+                    }
                 }
                 itemsIndexed(campuses) { index, campus ->
                     AnimatedVisibility(

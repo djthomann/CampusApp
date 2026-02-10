@@ -41,7 +41,7 @@ class SettingsScreenModel(
     fun searchHomeStopByName(input: String) {
 
         screenModelScope.launch {
-            homeStopResults.value = RmvAPI.searchStopByName(input)
+            homeStopResults.value = RmvAPI.searchStopByName(input) // TODO() Service Layer!
         }
 
     }

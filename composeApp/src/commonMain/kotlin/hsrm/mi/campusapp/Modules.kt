@@ -14,10 +14,14 @@ import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.settings.AppSettings
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.dsl.module
 
 val networkModule = module {
     single { HttpClient() }
+    single { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
 }
 
 val appStateModule = module {
