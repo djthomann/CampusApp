@@ -14,8 +14,8 @@ import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.domain.model.Weather
-import hsrm.mi.campusapp.domain.service.CourseService
-import hsrm.mi.campusapp.domain.service.MenuService
+import hsrm.mi.campusapp.domain.service.ICourseService
+import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +30,11 @@ import kotlinx.datetime.LocalDateTime
 import org.maplibre.spatialk.geojson.Position
 import kotlin.time.ExperimentalTime
 
-class HomeScreenModel: ScreenModel {
+class HomeScreenModel(
+    private val appState: AppState,
+    private val menuService: IMenuService,
+    private val courseService: ICourseService
+): ScreenModel {
 
     val currentWeather = mutableStateOf<Weather?>(null)
 
@@ -39,7 +43,7 @@ class HomeScreenModel: ScreenModel {
     val arrivalTrip = mutableStateOf<Trip?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-    val todaysMeal: StateFlow<Menu?> = AppState.selectedCanteen
+    val todaysMeal: StateFlow<Menu?> = appState.selectedCanteen
         .flatMapLatest { canteen ->
             println("FlatMapLatest triggered für Canteen: ${canteen?.name}")
 
@@ -48,7 +52,7 @@ class HomeScreenModel: ScreenModel {
             } else {
                 println("FlatMapLatest triggered to load for Canteen: ${canteen.name}")
                 val today = LocalDate.now()
-                MenuService.getMenuForDayAndCanteen(today, canteen)
+                menuService.getMenuForDayAndCanteen(today, canteen)
             }
         }
         .stateIn(
@@ -58,7 +62,7 @@ class HomeScreenModel: ScreenModel {
         )
 
     @OptIn(ExperimentalTime::class)
-    val todaysCourses: StateFlow<List<Course>> = CourseService.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
+    val todaysCourses: StateFlow<List<Course>> = courseService.getCoursesForDayOfWeek(LocalDate.now().dayOfWeek)
         .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val earliestCourse: StateFlow<Course?> = todaysCourses
@@ -68,7 +72,7 @@ class HomeScreenModel: ScreenModel {
         .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun updateCampus(campus: Campus?) {
-        AppState.updateCampus(campus, screenModelScope)
+        appState.updateCampus(campus, screenModelScope)
     }
 
     fun loadWeather(campus: Campus) {

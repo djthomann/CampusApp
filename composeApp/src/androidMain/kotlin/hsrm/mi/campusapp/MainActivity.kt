@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
             KoinApplication(application = {
                 androidContext(applicationContext)
                 modules(
+
                     commonModule,
                     platformModule()
                 )

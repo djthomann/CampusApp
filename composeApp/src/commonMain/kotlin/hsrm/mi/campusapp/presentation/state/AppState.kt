@@ -1,13 +1,12 @@
 package hsrm.mi.campusapp.presentation.state
 
 import androidx.compose.runtime.mutableStateOf
-import hsrm.mi.campusapp.data.persistence.stop.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.service.CampusService
-import hsrm.mi.campusapp.domain.service.CanteenService
-import hsrm.mi.campusapp.domain.service.StopService
+import hsrm.mi.campusapp.domain.service.ICampusService
+import hsrm.mi.campusapp.domain.service.ICanteenService
+import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.settings.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,36 +14,37 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-object AppState {
+class AppState(
+    private val settings: AppSettings,
+    private val campusService: ICampusService,
+    private val canteenService: ICanteenService,
+    private val stopService: IStopService,
+    private val appScope: CoroutineScope
+) {
 
     init {
-
-        // Load from settings
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val campusName = settings.campus
-            if(campusName.isNotBlank()) {
-                val campus = CampusService.getCampusByName(campusName)
-                _selectedCampus.value = campus
-            }
-
-            val canteenName = settings.canteen
-            if (canteenName.isNotBlank()) {
-                val canteen = CanteenService.getCanteenByName(canteenName)
-                _selectedCanteen.value = canteen
-            }
-
-            val homeStopId = settings.homeStopId
-            if (homeStopId.isNotBlank()) {
-
-                val stop = StopService.dao.getById(homeStopId)
-
-                _homeStop.value = stop?.toDomain()
-            }
+        appScope.launch(Dispatchers.IO) {
+            loadInitialData()
         }
+
     }
 
-    private val settings: AppSettings = AppSettings()
+    private suspend fun loadInitialData() {
+        val campusName = settings.campus
+        if (campusName.isNotBlank()) {
+            _selectedCampus.value = campusService.getCampusByName(campusName)
+        }
+
+        val canteenName = settings.canteen
+        if (canteenName.isNotBlank()) {
+            _selectedCanteen.value = canteenService.getCanteenByName(canteenName)
+        }
+
+        val homeStopId = settings.homeStopId
+        if (homeStopId.isNotBlank()) {
+            _homeStop.value = stopService.getStopById(homeStopId)
+        }
+    }
 
     private var _selectedCampus = MutableStateFlow<Campus?>(null)
     val selectedCampus = _selectedCampus.asStateFlow()
@@ -82,7 +82,7 @@ object AppState {
     fun selectHomeStop(stop: Stop?, scope: CoroutineScope) {
         scope.launch {
             if(stop != null) {
-                StopService.saveStop(stop)
+                stopService.saveStop(stop)
             }
             settings.homeStopId = stop?.id ?: ""
             _homeStop.value = stop

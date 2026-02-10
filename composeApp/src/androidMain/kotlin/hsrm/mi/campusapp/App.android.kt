@@ -38,13 +38,14 @@ import hsrm.mi.campusapp.presentation.tabs.map.MapTab
 import hsrm.mi.campusapp.presentation.tabs.schedule.ScheduleTab
 import hsrm.mi.campusapp.presentation.tabs.settings.SettingsTab
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.dsl.module
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 actual fun MainScaffold(navigator: TabNavigator) {
 
-    val selectedCampus by AppState.selectedCampus.collectAsState()
+    val selectedCampus by koinInject<AppState>().selectedCampus.collectAsState()
 
     Scaffold(
         topBar = {

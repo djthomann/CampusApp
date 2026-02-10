@@ -16,9 +16,11 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.map_tab_title
+import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
+import org.koin.compose.koinInject
 import org.maplibre.spatialk.geojson.Position
 
 object MapTab: CampusTab {
@@ -51,7 +53,8 @@ object MapTab: CampusTab {
 
     @Composable
     override fun Content() {
-        val screenModel = rememberScreenModel { MapScreenModel() }
+        val appState = koinInject<AppState>()
+        val screenModel = rememberScreenModel { MapScreenModel(appState) }
 
         LaunchedEffect(pendingPosition.value) {
             pendingPosition.value?.let { position ->

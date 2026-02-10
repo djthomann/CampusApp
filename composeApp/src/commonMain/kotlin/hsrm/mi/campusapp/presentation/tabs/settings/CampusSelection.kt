@@ -18,11 +18,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.presentation.state.AppState
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CampusSelection(campuses: List<Campus>, modifier: Modifier = Modifier, updateCampus: (Campus) -> Unit) {
-    val selectedOption by AppState.selectedCampus.collectAsState()
+    val selectedOption by koinInject<AppState>().selectedCampus.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(

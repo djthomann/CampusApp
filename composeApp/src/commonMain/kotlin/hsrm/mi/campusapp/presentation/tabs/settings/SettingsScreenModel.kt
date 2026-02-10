@@ -8,24 +8,29 @@ import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.service.CampusService
-import hsrm.mi.campusapp.domain.service.CanteenService
-import hsrm.mi.campusapp.domain.service.MenuService
+import hsrm.mi.campusapp.domain.service.ICampusService
+import hsrm.mi.campusapp.domain.service.ICanteenService
+import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SettingsScreenModel: ScreenModel {
+class SettingsScreenModel(
+    private val appState: AppState,
+    private val canteenService: ICanteenService,
+    private val campusService: ICampusService,
+    private val menuService: IMenuService
+): ScreenModel {
 
-    val canteens: StateFlow<List<Canteen>> = CanteenService.getAllCanteens().stateIn(
+    val canteens: StateFlow<List<Canteen>> = canteenService.getAllCanteens().stateIn(
         scope = screenModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
-    val campuses: StateFlow<List<Campus>> = CampusService.getAllCampuses().stateIn(
+    val campuses: StateFlow<List<Campus>> = campusService.getAllCampuses().stateIn(
         scope = screenModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
@@ -42,21 +47,21 @@ class SettingsScreenModel: ScreenModel {
     }
 
     fun updateCanteen(canteen: Canteen?) {
-        AppState.updateCanteen(canteen, screenModelScope)
+        appState.updateCanteen(canteen, screenModelScope)
     }
 
     fun updateCampus(campus: Campus?) {
-        AppState.updateCampus(campus, screenModelScope)
+        appState.updateCampus(campus, screenModelScope)
     }
 
     fun updateHomeStop(stop: Stop?) {
-        AppState.selectHomeStop(stop, screenModelScope)
+        appState.selectHomeStop(stop, screenModelScope)
     }
 
     fun clearDatabase() {
         screenModelScope.launch {
             // TODO() Actually clear all Database tables
-            MenuService.deleteAllMenus()
+            menuService.deleteAllMenus()
         }
     }
 

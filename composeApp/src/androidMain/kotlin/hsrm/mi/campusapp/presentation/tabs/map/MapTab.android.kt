@@ -36,12 +36,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.pin_green
 import hsrm.mi.campusapp.domain.model.Campus
-import hsrm.mi.campusapp.domain.service.CampusService
+import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.state.MapState
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.format
@@ -74,7 +75,7 @@ actual fun MapView(state: MapState) {
     val cameraState = rememberCameraState(state.cameraPosition)
 
     var jsonString by remember { mutableStateOf<String?>(null) }
-    val isDarkMode by AppState.isDarkMode
+    val isDarkMode by koinInject<AppState>().isDarkMode
     val variant = if (isDarkMode) "dark" else "light"
 
     val locationProvider = rememberAndroidLocationProvider(
@@ -89,7 +90,7 @@ actual fun MapView(state: MapState) {
         mutableStateOf<Feature<Geometry, JsonObject?>?>(null)
     }
 
-    val campuses by CampusService.getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
+    val campuses by koinInject<ICampusService>().getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
 
     LaunchedEffect(variant) {
         jsonString = Res

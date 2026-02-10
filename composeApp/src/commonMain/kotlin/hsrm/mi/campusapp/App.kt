@@ -19,8 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinApplication
-import org.koin.core.KoinApplication
+import org.koin.compose.koinInject
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -28,7 +27,7 @@ import org.koin.dsl.module
 expect fun platformModule(): Module
 
 val commonModule = module {
-
+    includes(appModules)
     single { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
 
 }
@@ -39,7 +38,7 @@ val commonModule = module {
 @Preview
 fun App() {
 
-    val isDark = AppState.isDarkMode
+    val isDark = koinInject<AppState>().isDarkMode
 
     MaterialTheme(
         colorScheme = if(isDark.value) darkScheme else lightScheme,

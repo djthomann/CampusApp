@@ -11,8 +11,8 @@ import hsrm.mi.campusapp.data.api.canteen.CanteenAPI
 import hsrm.mi.campusapp.data.api.canteen.toDomain
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Menu
-import hsrm.mi.campusapp.domain.service.CanteenService
-import hsrm.mi.campusapp.domain.service.MenuService
+import hsrm.mi.campusapp.domain.service.ICanteenService
+import hsrm.mi.campusapp.domain.service.IMenuService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,10 +24,13 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlin.time.ExperimentalTime
 
-class CanteenScreenModel: ScreenModel {
+class CanteenScreenModel(
+    private val canteenService: ICanteenService,
+    private val menuService: IMenuService
+): ScreenModel {
 
     var selectedCanteen by mutableStateOf<Canteen?>(null)
-    val canteens: StateFlow<List<Canteen>> = CanteenService.getAllCanteens().stateIn(
+    val canteens: StateFlow<List<Canteen>> = canteenService.getAllCanteens().stateIn(
         scope = screenModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
@@ -37,14 +40,14 @@ class CanteenScreenModel: ScreenModel {
     val menus: StateFlow<List<Menu>> = snapshotFlow { selectedCanteen }
         .flatMapLatest { canteen ->
             if (canteen == null) return@flatMapLatest flowOf(emptyList())
-            MenuService.getMenusForCanteenAsFlow(canteen).map { list ->
+            menuService.getMenusForCanteenAsFlow(canteen).map { list ->
 
 
                 if (list.isEmpty()) {
                     screenModelScope.launch {
                         try {
                             val apiData = CanteenAPI.getMenusForWeek(canteen, LocalDate.now())
-                            MenuService.saveMenus(apiData.map { it.toDomain() })
+                            menuService.saveMenus(apiData.map { it.toDomain() })
                         } catch (e: Exception) { /* Log error */ }
                     }
                 }

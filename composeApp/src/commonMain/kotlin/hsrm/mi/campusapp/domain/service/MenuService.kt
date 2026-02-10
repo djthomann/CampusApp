@@ -1,6 +1,8 @@
 package hsrm.mi.campusapp.domain.service
 
-import hsrm.mi.campusapp.data.persistence.DatabaseHolder
+import hsrm.mi.campusapp.data.persistence.menu.DishDao
+import hsrm.mi.campusapp.data.persistence.menu.MenuDao
+import hsrm.mi.campusapp.data.persistence.menu.SideDishDao
 import hsrm.mi.campusapp.data.persistence.menu.SideDishEntity
 import hsrm.mi.campusapp.data.persistence.menu.toDomain
 import hsrm.mi.campusapp.domain.model.Canteen
@@ -17,11 +19,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
 
-object MenuService {
-
-    private val sideDishDao = DatabaseHolder.db.getSideDishDao()
-    private val dishDao = DatabaseHolder.db.getDishDao()
-    private val menuDao = DatabaseHolder.db.getMenuDao()
+class MenuService(
+    private val menuDao: MenuDao,
+    private val dishDao: DishDao,
+    private val sideDishDao: SideDishDao
+): IMenuService {
 
     private val allMenusFlow = menuDao.getMenusWithDishesAsFlow()
         .map { entities -> entities.map { it.toDomain() }}
@@ -31,7 +33,7 @@ object MenuService {
             initialValue = emptyList()
         )
 
-    fun getMenusForCanteenAsFlow(canteen: Canteen?): Flow<List<Menu>> {
+    override fun getMenusForCanteenAsFlow(canteen: Canteen?): Flow<List<Menu>> {
         return allMenusFlow.map { menus ->
             menus.filter { menu ->
                 menu.canteen == canteen?.name
@@ -40,7 +42,7 @@ object MenuService {
 
     }
 
-    fun getMenuForDayAndCanteen(date: LocalDate, canteen: Canteen?): Flow<Menu?> {
+    override fun getMenuForDayAndCanteen(date: LocalDate, canteen: Canteen?): Flow<Menu?> {
         return getMenusForCanteenAsFlow(canteen).map { menus ->
             menus.find { menu ->
                 menu.date == date
@@ -48,14 +50,14 @@ object MenuService {
         }
     }
 
-    fun getMenusWithDishesAsFlow(): Flow<List<Menu>> {
+    override fun getMenusWithDishesAsFlow(): Flow<List<Menu>> {
         return menuDao.getMenusWithDishesAsFlow().map { it.map { menuWithDishes -> menuWithDishes.toDomain() } }
     }
 
-    suspend fun saveMenus(menus: List<Menu>) {
+    override suspend fun saveMenus(menus: List<Menu>) {
         menus.forEach { saveMenu(it) }
     }
-    suspend fun saveMenu(menu: Menu): Long {
+    override suspend fun saveMenu(menu: Menu): Long {
 
         val entity = menu.toEntity()
         val menuId = menuDao.insertMenu(entity)
@@ -67,21 +69,21 @@ object MenuService {
         return menuId
     }
 
-    suspend fun saveDishes(dishes: List<Dish>, menuId: Long) {
+    override suspend fun saveDishes(dishes: List<Dish>, menuId: Long) {
         dishes.forEach { saveDish(it, menuId) }
     }
 
-    suspend fun saveDish(dish: Dish, menuId: Long): Long {
+    override suspend fun saveDish(dish: Dish, menuId: Long): Long {
         return dishDao.insert(dish.toEntity(menuId))
     }
 
-    suspend fun saveSideDishes(map: Map<SideDishType, List<String>>, menuId: Long) {
+    override suspend fun saveSideDishes(map: Map<SideDishType, List<String>>, menuId: Long) {
         map.forEach { (sideDishType, names) ->
             names.forEach { name -> saveSideDish(name, sideDishType, menuId) }
         }
     }
 
-    suspend fun saveSideDish(name: String, type: SideDishType, menuId: Long): Long {
+    override suspend fun saveSideDish(name: String, type: SideDishType, menuId: Long): Long {
         return sideDishDao.insert(SideDishEntity(
             menuId = menuId,
             type = type,
@@ -89,15 +91,15 @@ object MenuService {
         ))
     }
 
-    suspend fun deleteAllMenus() {
+    override suspend fun deleteAllMenus() {
         menuDao.deleteAllMenus()
     }
 
-    suspend fun deleteAllDishes() {
+    override suspend fun deleteAllDishes() {
         dishDao.deleteAllDishes()
     }
 
-    suspend fun deleteAllSideDishes() {
+    override suspend fun deleteAllSideDishes() {
         sideDishDao.deleteAllSideDishes()
     }
 

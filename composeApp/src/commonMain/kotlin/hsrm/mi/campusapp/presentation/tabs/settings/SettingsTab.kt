@@ -34,11 +34,15 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.settings
+import hsrm.mi.campusapp.domain.service.ICampusService
+import hsrm.mi.campusapp.domain.service.ICanteenService
+import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
 import hsrm.mi.campusapp.presentation.tabs.schedule.ScheduleTab
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 object SettingsTab: CampusTab {
     private fun readResolve(): Any = ScheduleTab
@@ -66,13 +70,18 @@ object SettingsTab: CampusTab {
     @Composable
     override fun Content() {
 
-        val screenModel = rememberScreenModel { SettingsScreenModel() }
+        // Put in Koin Module!
+        val appState = koinInject<AppState>()
+        val canteenService = koinInject<ICanteenService>()
+        val campusService = koinInject<ICampusService>()
+        val menuService = koinInject<IMenuService>()
+        val screenModel = rememberScreenModel { SettingsScreenModel(appState, canteenService, campusService, menuService) }
         val tabNavigator = LocalTabNavigator.current
 
         val canteens by screenModel.canteens.collectAsStateWithLifecycle()
         val campuses by screenModel.campuses.collectAsStateWithLifecycle()
 
-        val selectedStop by AppState.homeStop.collectAsState()
+        val selectedStop by appState.homeStop.collectAsState()
 
         Column(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -107,10 +116,10 @@ object SettingsTab: CampusTab {
                     )
                 } */
                 Switch(
-                    checked = AppState.isDarkMode.value,
-                    onCheckedChange = { _ -> AppState.toggleDarkMode() },
+                    checked = appState.isDarkMode.value,
+                    onCheckedChange = { _ -> appState.toggleDarkMode() },
                     thumbContent = {
-                        if(AppState.isDarkMode.value)
+                        if(appState.isDarkMode.value)
                             Icon(imageVector =  Icons.Filled.DarkMode, contentDescription = "")
                         else
                             Icon(imageVector =  Icons.Filled.LightMode, contentDescription = "")

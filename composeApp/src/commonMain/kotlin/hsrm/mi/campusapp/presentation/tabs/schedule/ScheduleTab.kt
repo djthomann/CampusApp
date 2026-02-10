@@ -49,6 +49,7 @@ import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
+import hsrm.mi.campusapp.domain.service.ICourseService
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
@@ -56,6 +57,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.Padding
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 object ScheduleTab: CampusTab {
     private fun readResolve(): Any = ScheduleTab
@@ -81,7 +83,8 @@ object ScheduleTab: CampusTab {
 
     @Composable
     override fun Content() {
-        val screenModel = rememberScreenModel { ScheduleScreenModel() }
+        val courseService = koinInject<ICourseService>()
+        val screenModel = rememberScreenModel { ScheduleScreenModel(courseService) }
 
         val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
         val selectedDay by screenModel.selectedDay.collectAsStateWithLifecycle()

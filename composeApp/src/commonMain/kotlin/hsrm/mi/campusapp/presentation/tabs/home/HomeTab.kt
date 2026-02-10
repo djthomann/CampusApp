@@ -40,8 +40,10 @@ import campusapp.composeapp.generated.resources.app_name
 import campusapp.composeapp.generated.resources.choose_your_campus
 import campusapp.composeapp.generated.resources.home
 import hsrm.mi.campusapp.domain.model.Campus
-import hsrm.mi.campusapp.domain.service.CampusService
-import hsrm.mi.campusapp.domain.service.StopService
+import hsrm.mi.campusapp.domain.service.ICampusService
+import hsrm.mi.campusapp.domain.service.ICourseService
+import hsrm.mi.campusapp.domain.service.IMenuService
+import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
@@ -53,6 +55,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
 
 object HomeTab: CampusTab {
@@ -81,12 +84,16 @@ object HomeTab: CampusTab {
     @OptIn(ExperimentalTime::class)
     @Composable
     override fun Content() {
-        val screenModel = rememberScreenModel { HomeScreenModel() }
+        val appState = koinInject<AppState>()
+        val menuService = koinInject<IMenuService>()
+        val courseService = koinInject<ICourseService>()
+        val stopService = koinInject<IStopService>()
+        val screenModel = rememberScreenModel { HomeScreenModel(appState, menuService, courseService) }
 
         val tabNavigator = LocalTabNavigator.current
 
-        val currentCampus by AppState.selectedCampus.collectAsState()
-        val currentCanteen by AppState.selectedCanteen.collectAsState()
+        val currentCampus by appState.selectedCampus.collectAsState()
+        val currentCanteen by appState.selectedCanteen.collectAsState()
 
         LaunchedEffect(currentCampus) {
             val campus = currentCampus
@@ -95,12 +102,12 @@ object HomeTab: CampusTab {
             }
         }
 
-        val campuses by CampusService.getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
-        val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
+        val campuses by koinInject<ICampusService>().getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
+        val stops by stopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
         val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
         val nextCourse by screenModel.earliestCourse.collectAsStateWithLifecycle()
         val todaysMenu by screenModel.todaysMeal.collectAsStateWithLifecycle()
-        val homeStop by AppState.homeStop.collectAsState()
+        val homeStop by appState.homeStop.collectAsState()
 
         LaunchedEffect(nextCourse, homeStop) {
             nextCourse?.let { course ->

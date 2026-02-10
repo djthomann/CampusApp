@@ -1,20 +1,20 @@
 package hsrm.mi.campusapp.domain.service
 
-import hsrm.mi.campusapp.data.persistence.DatabaseHolder
+import hsrm.mi.campusapp.data.persistence.campus.CampusDao
 import hsrm.mi.campusapp.data.persistence.campus.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-object CampusService {
+class CampusService (
+    private val dao: CampusDao
+): ICampusService {
 
-    val dao = DatabaseHolder.db.getCampusDao()
-
-    fun getAllCampuses(): Flow<List<Campus>> {
+    override fun getAllCampuses(): Flow<List<Campus>> {
         return dao.getAllAsFlow().map { entities -> entities.map { it.toDomain() } }
     }
 
-    suspend fun getCampusByName(name: String): Campus? {
+    override suspend fun getCampusByName(name: String): Campus? {
         return dao.getByName(name)?.toDomain()
     }
 

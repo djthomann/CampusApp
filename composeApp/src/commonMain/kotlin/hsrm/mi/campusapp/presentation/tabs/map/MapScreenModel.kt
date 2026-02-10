@@ -12,11 +12,13 @@ import kotlinx.coroutines.launch
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.spatialk.geojson.Position
 
-class MapScreenModel: ScreenModel {
+class MapScreenModel(
+    private val appState: AppState
+): ScreenModel {
 
     val defaultCenter = Position(0.0, 0.0)
 
-    val selectedCampus = AppState.selectedCampus
+    val selectedCampus = appState.selectedCampus
 
     var uiState by mutableStateOf(
         MapState(
@@ -32,7 +34,7 @@ class MapScreenModel: ScreenModel {
 
     init {
         screenModelScope.launch {
-            snapshotFlow { AppState.selectedCampus }
+            snapshotFlow { appState.selectedCampus }
                 .collect { campus ->
                     campus.let {
                         uiState = uiState.copy(

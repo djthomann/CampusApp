@@ -17,11 +17,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.presentation.state.AppState
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CanteenSelection(canteens: List<Canteen>, modifier: Modifier = Modifier, updateCanteen: (Canteen) -> Unit) {
-    val selectedOption = AppState.selectedCanteen
+    val appState = koinInject<AppState>()
+    val selectedOption = koinInject<AppState>().selectedCanteen
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(

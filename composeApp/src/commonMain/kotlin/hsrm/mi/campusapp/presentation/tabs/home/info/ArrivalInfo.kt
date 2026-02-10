@@ -21,12 +21,13 @@ import campusapp.composeapp.generated.resources.arrive_on_time
 import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.presentation.state.AppState
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 
 @Composable
 fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
 
-    val homeStop by AppState.homeStop.collectAsState()
+    val homeStop by koinInject<AppState>().homeStop.collectAsState()
 
     Row(
         modifier = Modifier.fillMaxWidth(),

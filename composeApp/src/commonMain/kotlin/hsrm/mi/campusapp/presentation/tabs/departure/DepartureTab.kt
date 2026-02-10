@@ -31,13 +31,14 @@ import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.departures_tab_title
 import campusapp.composeapp.generated.resources.loading_departures
 import hsrm.mi.campusapp.domain.model.Stop
-import hsrm.mi.campusapp.domain.service.StopService
+import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 object DepartureTab: CampusTab {
     private fun readResolve(): Any = DepartureTab
@@ -70,8 +71,11 @@ object DepartureTab: CampusTab {
     override fun Content() {
         val screenModel = rememberScreenModel { DepartureScreenModel() }
 
-        val currentCampus by AppState.selectedCampus.collectAsState()
-        val stops by StopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
+        val appState = koinInject<AppState>()
+        val stopService = koinInject<IStopService>()
+
+        val currentCampus by appState.selectedCampus.collectAsState()
+        val stops by stopService.getStopsForCampusName(currentCampus?.name ?: "").collectAsStateWithLifecycle(initialValue = emptyList())
 
         var selectedEntry by remember { mutableStateOf<SelectedDepartureEntry?>(null) }
 

@@ -30,11 +30,14 @@ import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.food_tab_title
 import campusapp.composeapp.generated.resources.no_menu_available
 import hsrm.mi.campusapp.domain.model.Menu
+import hsrm.mi.campusapp.domain.service.ICanteenService
+import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import kotlin.time.ExperimentalTime
 
 
@@ -65,7 +68,9 @@ object CanteenTab: CampusTab {
     @Composable
     override fun Content() {
 
-        val screenModel = rememberScreenModel { CanteenScreenModel() }
+        val canteenService = koinInject<ICanteenService>()
+        val menuService = koinInject<IMenuService>()
+        val screenModel = rememberScreenModel { CanteenScreenModel(canteenService, menuService) }
 
         val menus by screenModel.menus.collectAsStateWithLifecycle()
         val expandedMenu = remember { mutableStateOf<Menu?>(null) }

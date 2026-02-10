@@ -37,6 +37,7 @@ import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
 import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.presentation.state.AppState
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +51,7 @@ fun HomeStopSearchBar(results: List<StopLocationDTO>, onSearch: (String) -> Unit
     // State management
     var expanded by remember { mutableStateOf(false) }
 
-    val selectedStop by AppState.homeStop.collectAsState()
+    val selectedStop by koinInject<AppState>().homeStop.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
