@@ -2,8 +2,9 @@ package hsrm.mi.campusapp.settings
 
 import com.russhwolf.settings.Settings
 
-class AppSettings {
+class AppSettings(
     private val settings: Settings = Settings()
+) {
 
     enum class SettingsKey() {
         SELECTED_CAMPUS,

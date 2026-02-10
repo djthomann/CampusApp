@@ -21,6 +21,8 @@ room = "2.8.4"
 sqlite = "2.6.2"
 ksp = "2.3.3"
 compottie="2.0.2"
+coreKtx = "1.7.0"
+robolectric = "4.12"
 
 [libraries]
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
@@ -41,7 +43,9 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime"}
 
-
+androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "composeMultiplatform" }
+androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "composeMultiplatform" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version = "0.12.1" }
 
@@ -70,6 +74,7 @@ compottie-lite = { module = "io.github.alexzhirkevich:compottie-lite", version.r
 compottie-dot = { module = "io.github.alexzhirkevich:compottie-dot", version.ref = "compottie" }
 compottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "compottie" }
 compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
+core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

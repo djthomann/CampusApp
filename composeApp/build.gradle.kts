@@ -33,6 +33,12 @@ kotlin {
             implementation("androidx.core:core-splashscreen:1.0.1")
             implementation(libs.androidx.room.sqlite.wrapper)
         }
+        androidUnitTest.dependencies {
+            implementation(libs.androidx.ui.test.junit4)
+            implementation(libs.androidx.ui.test.manifest)
+            implementation(libs.robolectric)
+            implementation(libs.core.ktx)
+        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -125,10 +131,19 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
+
 }
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     listOf(
         "kspAndroid",
