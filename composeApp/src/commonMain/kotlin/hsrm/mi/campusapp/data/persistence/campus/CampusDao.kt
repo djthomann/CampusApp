@@ -21,7 +21,7 @@ interface CampusDao {
     fun getAllAsFlow(): Flow<List<CampusEntity>>
 
     @Delete
-    suspend fun delete(dish: CampusEntity)
+    suspend fun delete(campus: CampusEntity)
 
     @Query("DELETE FROM CampusEntity")
     suspend fun deleteAll()

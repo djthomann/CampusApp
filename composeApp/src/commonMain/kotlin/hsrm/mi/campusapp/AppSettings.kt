@@ -1,4 +1,4 @@
-package hsrm.mi.campusapp.settings
+package hsrm.mi.campusapp
 
 import com.russhwolf.settings.Settings
 

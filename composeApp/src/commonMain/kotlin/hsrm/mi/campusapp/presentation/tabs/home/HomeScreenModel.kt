@@ -37,8 +37,6 @@ class HomeScreenModel(
 ): ScreenModel {
 
     val currentWeather = mutableStateOf<Weather?>(null)
-
-
     val isLoadingArrivalTrip = mutableStateOf(false)
     val arrivalTrip = mutableStateOf<Trip?>(null)
 

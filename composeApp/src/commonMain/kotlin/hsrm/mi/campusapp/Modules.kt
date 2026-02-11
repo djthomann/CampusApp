@@ -12,7 +12,6 @@ import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.domain.service.MenuService
 import hsrm.mi.campusapp.domain.service.StopService
 import hsrm.mi.campusapp.presentation.state.AppState
-import hsrm.mi.campusapp.settings.AppSettings
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.LightMode
@@ -105,7 +106,6 @@ object SettingsTab: CampusTab {
                     }
                     Text(text = stringResource(Res.string.settings))
                 }
-                /* Only for testing purposes
                 IconButton(
                     onClick = {
                         screenModel.clearDatabase()
@@ -115,7 +115,7 @@ object SettingsTab: CampusTab {
                         imageVector = Icons.Filled.ClearAll,
                         contentDescription = "Clear Database"
                     )
-                } */
+                }
                 Switch(
                     modifier = Modifier.testTag("darkModeSwitch"),
                     checked = appState.isDarkMode.value,

@@ -15,13 +15,13 @@ import androidx.test.core.app.ApplicationProvider
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.russhwolf.settings.SharedPreferencesSettings
+import hsrm.mi.campusapp.AppSettings
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.settings.SettingsTab
-import hsrm.mi.campusapp.settings.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

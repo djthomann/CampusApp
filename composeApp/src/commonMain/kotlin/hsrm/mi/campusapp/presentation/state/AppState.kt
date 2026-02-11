@@ -1,13 +1,13 @@
 package hsrm.mi.campusapp.presentation.state
 
 import androidx.compose.runtime.mutableStateOf
+import hsrm.mi.campusapp.AppSettings
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.IStopService
-import hsrm.mi.campusapp.settings.AppSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

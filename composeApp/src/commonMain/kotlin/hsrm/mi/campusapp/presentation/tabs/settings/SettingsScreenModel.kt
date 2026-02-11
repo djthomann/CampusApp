@@ -62,6 +62,7 @@ class SettingsScreenModel(
         screenModelScope.launch {
             // TODO() Actually clear all Database tables
             menuService.deleteAllMenus()
+            campusService.deleteAll()
         }
     }
 

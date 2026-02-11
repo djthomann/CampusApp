@@ -1,22 +1,22 @@
 [
   {
     "name": "Unter den Eichen",
-    "latitude": 50.0964,
-    "longitude": 8.217,
+    "latitude": 50.09686962453529,
+    "longitude": 8.216254849184642,
     "tilt": 0.0,
     "jsonPath": "ude.geojson"
   },
   {
     "name": "Kurt-Schumacher-Ring",
-    "latitude": 50.08,
-    "longitude": 8.217,
+    "latitude": 50.080547192529274,
+    "longitude": 8.216663274809344,
     "tilt": 0.0,
     "jsonPath": "ksr.geojson"
   },
   {
     "name": "Rüsselsheim",
-    "latitude": 49.985,
-    "longitude": 8.424,
+    "latitude": 49.98490515929359,
+    "longitude": 8.424576241668294,
     "tilt": 0.0,
     "jsonPath": "ruesselsheim.geojson"
   }

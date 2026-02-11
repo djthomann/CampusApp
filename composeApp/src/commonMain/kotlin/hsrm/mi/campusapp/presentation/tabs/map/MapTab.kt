@@ -32,7 +32,7 @@ object MapTab: CampusTab {
 
     private val pendingPosition = mutableStateOf<Position?>(null)
 
-    public fun moveToPosition(position: Position) {
+    fun moveToPosition(position: Position) {
         pendingPosition.value = position
     }
 
@@ -66,7 +66,7 @@ object MapTab: CampusTab {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            MapView(screenModel.uiState)
+            MapView(screenModel)
         }
     }
 }

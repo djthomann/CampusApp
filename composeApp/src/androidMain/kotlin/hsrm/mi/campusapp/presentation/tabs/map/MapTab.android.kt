@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,11 +39,11 @@ import campusapp.composeapp.generated.resources.pin_green
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.presentation.state.AppState
-import hsrm.mi.campusapp.presentation.state.MapState
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.format
@@ -71,8 +72,13 @@ import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
-actual fun MapView(state: MapState) {
-    val cameraState = rememberCameraState(state.cameraPosition)
+actual fun MapView(mapScreenModel: MapScreenModel) {
+    val cameraState = rememberCameraState(CameraPosition(
+        target = mapScreenModel.defaultCenter,
+        zoom = 16.0,
+        tilt = 45.0,
+        bearing = 0.0
+    ))
 
     var jsonString by remember { mutableStateOf<String?>(null) }
     val isDarkMode by koinInject<AppState>().isDarkMode
@@ -91,6 +97,32 @@ actual fun MapView(state: MapState) {
     }
 
     val campuses by koinInject<ICampusService>().getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
+    val currentCampus by koinInject<AppState>().selectedCampus.collectAsState()
+
+    LaunchedEffect(currentCampus) {
+        val campus = currentCampus
+        if (campus != null) {
+            cameraState.animateTo(CameraPosition(
+                target = campus.center,
+                zoom = 16.0,
+                tilt = 45.0,
+                bearing = 0.0
+            )
+            )
+        }
+    }
+
+    LaunchedEffect(mapScreenModel.target) {
+        mapScreenModel.target.value?.let { target ->
+            cameraState.animateTo(CameraPosition(
+                target = target,
+                zoom = 18.0,
+                tilt = 45.0,
+                bearing = 0.0
+            ))
+            mapScreenModel.clearTarget()
+        }
+    }
 
     LaunchedEffect(variant) {
         jsonString = Res
@@ -99,14 +131,16 @@ actual fun MapView(state: MapState) {
         print(variant)
     }
 
-    LaunchedEffect(state.cameraPosition) {
-        cameraState.animateTo(state.cameraPosition)
-    }
-
     LaunchedEffect(selectedFeature) {
         selectedFeature?.let {
             val point = it.geometry as Point
-            cameraState.animateTo(state.cameraPosition.copy(target = Position(point.longitude, point.latitude), zoom = 18.0))
+            cameraState.animateTo(CameraPosition(
+                target = Position(point.longitude, point.latitude),
+                zoom = 18.0,
+                tilt = 45.0,
+                bearing = 0.0
+                )
+            )
         }
     }
 

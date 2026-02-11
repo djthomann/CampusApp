@@ -10,14 +10,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.russhwolf.settings.Settings
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.home.HomeTab
 import hsrm.mi.campusapp.presentation.theme.AppTypography
 import hsrm.mi.campusapp.presentation.theme.darkScheme
 import hsrm.mi.campusapp.presentation.theme.lightScheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.core.module.Module
