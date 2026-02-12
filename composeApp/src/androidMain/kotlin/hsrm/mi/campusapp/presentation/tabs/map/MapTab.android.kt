@@ -30,36 +30,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import campusapp.composeapp.generated.resources.Res
-import campusapp.composeapp.generated.resources.pin_green
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
-import org.maplibre.compose.expressions.ast.StringLiteral
-import org.maplibre.compose.expressions.dsl.Feature.get
 import org.maplibre.compose.expressions.dsl.Feature.id
 import org.maplibre.compose.expressions.dsl.condition
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.eq
-import org.maplibre.compose.expressions.dsl.get
-import org.maplibre.compose.expressions.dsl.format
-import org.maplibre.compose.expressions.dsl.image
-import org.maplibre.compose.expressions.dsl.nil
-import org.maplibre.compose.expressions.dsl.offset
 import org.maplibre.compose.expressions.dsl.switch
 import org.maplibre.compose.expressions.value.StringValue
 import org.maplibre.compose.layers.FillExtrusionLayer
-import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.location.DesiredAccuracy
 import org.maplibre.compose.location.LocationPuck
 import org.maplibre.compose.location.rememberAndroidLocationProvider
@@ -109,27 +98,17 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
     val campuses by koinInject<ICampusService>().getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
     val currentCampus by koinInject<AppState>().selectedCampus.collectAsState()
 
+
     LaunchedEffect(currentCampus) {
         val campus = currentCampus
         if (campus != null) {
-            cameraState.animateTo(CameraPosition(
-                target = campus.center,
-                zoom = 16.0,
-                tilt = 45.0,
-                bearing = 0.0
-            )
-            )
+            animateCameraStateToTarget(cameraState, campus.center)
         }
     }
 
     LaunchedEffect(mapScreenModel.target) {
         mapScreenModel.target.value?.let { target ->
-            cameraState.animateTo(CameraPosition(
-                target = target,
-                zoom = 18.0,
-                tilt = 45.0,
-                bearing = 0.0
-            ))
+            animateCameraStateToTarget(cameraState, target)
             mapScreenModel.clearTarget()
         }
     }
@@ -159,14 +138,7 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
             }
 
             targetPosition?.let { pos ->
-                cameraState.animateTo(
-                    CameraPosition(
-                        target = pos,
-                        zoom = 18.0,
-                        tilt = 45.0,
-                        bearing = 0.0
-                    )
-                )
+                animateCameraStateToTarget(cameraState, pos)
             }
         }
     }
@@ -191,6 +163,15 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
                 modifier = Modifier.fillMaxSize(),
                 cameraState = cameraState,
                 options = mapOptions,
+                onMapClick = { pos, offset ->
+                    val features = cameraState.projection?.queryRenderedFeatures(offset)
+                    if (features.isNullOrEmpty()) {
+                        selectedFeature = null
+                        ClickResult.Consume
+                    } else {
+                        ClickResult.Pass
+                    }
+                },
                 baseStyle = BaseStyle.Json(it)
             ) {
                 locationState?.let { state ->
@@ -202,10 +183,12 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
                 }
 
                 campuses.forEach { campus ->
-                    CampusLayers(campus, selectedFeature, onClick = {
-                            features ->
-                            selectedFeature = features.firstOrNull()
-                            ClickResult.Consume
+                    CampusLayers(campus, selectedFeature,
+                        onFeatureClick = { feature ->
+                            selectedFeature = feature
+                        },
+                        clearFeature = {
+                            selectedFeature = null
                         }
                     )
                 }
@@ -235,8 +218,14 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
 
 }
 
+private suspend fun animateCameraStateToTarget(cameraState: CameraState, target: Position) {
+    cameraState.animateTo(cameraState.position.copy(
+        target = target
+    ))
+}
+
 @Composable
-fun FeatureCard(onDismiss: () -> Unit, feature: Feature<Geometry, JsonObject?>) {
+fun FeatureCard(feature: Feature<Geometry, JsonObject?>, onDismiss: () -> Unit) {
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -265,7 +254,12 @@ fun FeatureCard(onDismiss: () -> Unit, feature: Feature<Geometry, JsonObject?>) 
 }
 
 @Composable
-fun CampusLayers(campus: Campus, selectedFeature: Feature<Geometry, JsonObject?>?, onClick: (List<Feature<Geometry, JsonObject?>>) -> Unit) {
+fun CampusLayers(
+    campus: Campus,
+    selectedFeature: Feature<Geometry, JsonObject?>?,
+    onFeatureClick: (Feature<Geometry, JsonObject?>) -> Unit,
+    clearFeature: () -> Unit
+) {
 
     val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/campus-geodata/${campus.jsonPath}")))
     val selectedFeatureId = selectedFeature?.properties?.get("@id")?.jsonPrimitive?.content
@@ -274,8 +268,15 @@ fun CampusLayers(campus: Campus, selectedFeature: Feature<Geometry, JsonObject?>
         id = "buildings-3d-${campus.name}",
         source = campusBuildings,
         onClick = { features ->
-            onClick(features)
-            ClickResult.Consume
+            val hit = features.firstOrNull()
+            if (hit != null) {
+                onFeatureClick(hit)
+                ClickResult.Consume
+            } else {
+                // Probably never gets called
+                clearFeature()
+                ClickResult.Consume
+            }
         },
         height = const(10.0f),
         color = switch(
