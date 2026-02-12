@@ -14,7 +14,7 @@
         "addr:street": "Unter den Eichen",
         "building": "university",
         "designation": "Gebäude C - Angewandte Informatik, Allgemeine Informatik, Master Informatik",
-        "name": "Hochschule RheinMain",
+        "name": "C-Gebäude",
         "source": "Student there;www.hs-rm.de;http://www.hs-rm.de/dcsm/studiengaenge/angewandte-informatik-bsc",
         "type": "multipolygon",
         "wheelchair": "yes",
@@ -163,6 +163,7 @@
         "addr:housenumber": "5e",
         "addr:street": "Unter den Eichen",
         "building": "college",
+        "name": "F-Gebäude",
         "type": "multipolygon"
       },
       "geometry": {
@@ -566,7 +567,7 @@
         "amenity": "university",
         "building": "yes",
         "check_date": "2024-10-26",
-        "name": "Hochschule RheinMain",
+        "name": "D-Gebäude",
         "ref": "D",
         "source": "Gebäude D - Medieninformatik"
       },
@@ -637,6 +638,7 @@
         "@id": "way/71859476",
         "addr:housenumber": "5k",
         "addr:street": "Unter den Eichen",
+        "name": "Restaurant Camera",
         "building": "retail"
       },
       "geometry": {
@@ -730,6 +732,7 @@
         "building": "college",
         "building:levels": "2",
         "ref": "B1",
+        "name": "B1-Gebäude",
         "roof:levels": "1"
       },
       "geometry": {
@@ -788,114 +791,10 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "way/182285602",
-        "addr:housenumber": "5k",
-        "addr:street": "Unter den Eichen",
-        "building": "office"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.2168033,
-              50.0977404
-            ],
-            [
-              8.216761,
-              50.0977384
-            ],
-            [
-              8.2167091,
-              50.0977492
-            ],
-            [
-              8.2166769,
-              50.0977666
-            ],
-            [
-              8.2166523,
-              50.0977919
-            ],
-            [
-              8.2166435,
-              50.0978226
-            ],
-            [
-              8.2166493,
-              50.0978559
-            ],
-            [
-              8.2166729,
-              50.0978771
-            ],
-            [
-              8.2166369,
-              50.0979155
-            ],
-            [
-              8.2166047,
-              50.0979497
-            ],
-            [
-              8.2165366,
-              50.0979232
-            ],
-            [
-              8.2165174,
-              50.0979435
-            ],
-            [
-              8.2167773,
-              50.0980446
-            ],
-            [
-              8.2166911,
-              50.0981365
-            ],
-            [
-              8.2165946,
-              50.0980998
-            ],
-            [
-              8.2162791,
-              50.0979765
-            ],
-            [
-              8.2166736,
-              50.0975571
-            ],
-            [
-              8.216824,
-              50.0976157
-            ],
-            [
-              8.2167748,
-              50.097668
-            ],
-            [
-              8.2168455,
-              50.0976955
-            ],
-            [
-              8.2168225,
-              50.09772
-            ],
-            [
-              8.2168033,
-              50.0977404
-            ]
-          ]
-        ]
-      },
-      "id": "way/182285602"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "way/182285605",
         "addr:housenumber": "5f",
         "addr:street": "Unter den Eichen",
+        "name": "FIII-Gebäude",
         "building": "college"
       },
       "geometry": {
@@ -1025,6 +924,7 @@
         "@id": "way/182285606",
         "addr:housenumber": "5f",
         "addr:street": "Unter den Eichen",
+        "name": "FII-Gebäude",
         "building": "college"
       },
       "geometry": {
@@ -1161,6 +1061,7 @@
         "addr:street": "Unter den Eichen",
         "building": "college",
         "building:levels": "2",
+        "name": "B1-Gebäude",
         "roof:levels": "0"
       },
       "geometry": {
@@ -1202,6 +1103,7 @@
         "building": "college",
         "building:levels": "3",
         "ref": "B2",
+        "name": "B2-Gebäude",
         "roof:levels": "0"
       },
       "geometry": {
@@ -1250,6 +1152,7 @@
         "addr:street": "Unter den Eichen",
         "building": "college",
         "building:levels": "2",
+        "name": "B1-Gebäude",
         "roof:levels": "0"
       },
       "geometry": {

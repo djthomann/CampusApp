@@ -11,6 +11,7 @@
         "building": "university",
         "building:levels": "2",
         "ref": "B",
+        "name": "B-Gebäude",
         "type": "multipolygon"
       },
       "geometry": {
@@ -108,7 +109,8 @@
       "type": "Feature",
       "properties": {
         "@id": "way/24523108",
-        "building": "university"
+        "building": "university",
+        "name": "A-Gebäude"
       },
       "geometry": {
         "type": "Polygon",
@@ -336,7 +338,7 @@
         "building": "university",
         "diet:vegetarian": "yes",
         "fast_food": "cafeteria",
-        "name": "Mensa",
+        "name": "F-Gebäude + Mensa",
         "opening_hours": "Mo-Fr 08:00-15:00; Sa 12:00-14:00; Su,PH off",
         "operator": "Studierendenwerk Frankfurt am Main",
         "ref": "F",
@@ -426,6 +428,7 @@
         "@id": "way/155817750",
         "building": "university",
         "ref": "E",
+        "name": "E-Gebäude",
         "wheelchair": "yes"
       },
       "geometry": {
@@ -604,48 +607,6 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "way/249113992",
-        "addr:city": "Rüsselsheim am Main",
-        "addr:country": "DE",
-        "addr:housenumber": "58",
-        "addr:postcode": "65428",
-        "addr:street": "August-Bebel-Straße",
-        "building": "dormitory",
-        "description": "Studentenwohnheim",
-        "name": "Loverix-Hostel"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4237899,
-              49.9841862
-            ],
-            [
-              8.4239171,
-              49.9838486
-            ],
-            [
-              8.4241313,
-              49.983882
-            ],
-            [
-              8.424004,
-              49.9842196
-            ],
-            [
-              8.4237899,
-              49.9841862
-            ]
-          ]
-        ]
-      },
-      "id": "way/249113992"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "way/249113993",
         "addr:city": "Rüsselsheim am Main",
         "addr:country": "DE",
@@ -653,6 +614,7 @@
         "addr:postcode": "65428",
         "addr:street": "August-Bebel-Straße",
         "building": "university",
+        "name": "C-Gebäude",
         "ref": "C"
       },
       "geometry": {
@@ -695,84 +657,10 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "way/369219132",
-        "building": "university"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4246075,
-              49.9844593
-            ],
-            [
-              8.4246151,
-              49.9844373
-            ],
-            [
-              8.4246982,
-              49.9844492
-            ],
-            [
-              8.4246906,
-              49.9844712
-            ],
-            [
-              8.4246075,
-              49.9844593
-            ]
-          ]
-        ]
-      },
-      "id": "way/369219132"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "way/369219133",
-        "building": "roof",
-        "layer": "1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4239554,
-              49.9847541
-            ],
-            [
-              8.4239907,
-              49.9846608
-            ],
-            [
-              8.4240382,
-              49.9846682
-            ],
-            [
-              8.4240028,
-              49.9847615
-            ],
-            [
-              8.423979,
-              49.9847578
-            ],
-            [
-              8.4239554,
-              49.9847541
-            ]
-          ]
-        ]
-      },
-      "id": "way/369219133"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "way/388252665",
         "building": "university",
         "building:levels": "1",
+        "name": "D-Gebäude",
         "ref": "D"
       },
       "geometry": {
@@ -834,6 +722,7 @@
         "@id": "way/397176780",
         "building": "university",
         "building:levels": "3",
+        "name": "G-Gebäude",
         "ref": "G"
       },
       "geometry": {
@@ -876,222 +765,6 @@
         ]
       },
       "id": "way/397176780"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "way/400229650",
-        "building": "roof",
-        "layer": "1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4232914,
-              49.9855684
-            ],
-            [
-              8.4232309,
-              49.9855592
-            ],
-            [
-              8.4231671,
-              49.9855494
-            ],
-            [
-              8.4231802,
-              49.9855147
-            ],
-            [
-              8.4231881,
-              49.9854935
-            ],
-            [
-              8.4233118,
-              49.9855144
-            ],
-            [
-              8.423304,
-              49.9855352
-            ],
-            [
-              8.4232914,
-              49.9855684
-            ]
-          ]
-        ]
-      },
-      "id": "way/400229650"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "way/400229653",
-        "building": "roof",
-        "layer": "1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4237214,
-              49.9847174
-            ],
-            [
-              8.4237528,
-              49.9846346
-            ],
-            [
-              8.4237733,
-              49.9846378
-            ],
-            [
-              8.4237959,
-              49.9846413
-            ],
-            [
-              8.4237645,
-              49.9847242
-            ],
-            [
-              8.4237416,
-              49.9847206
-            ],
-            [
-              8.4237214,
-              49.9847174
-            ]
-          ]
-        ]
-      },
-      "id": "way/400229653"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "way/1376689128",
-        "building": "service",
-        "building:levels": "1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4260289,
-              49.9844948
-            ],
-            [
-              8.4260509,
-              49.9844383
-            ],
-            [
-              8.4260563,
-              49.9844242
-            ],
-            [
-              8.4260874,
-              49.9844291
-            ],
-            [
-              8.4261966,
-              49.9844464
-            ],
-            [
-              8.4261571,
-              49.9845495
-            ],
-            [
-              8.4260165,
-              49.9845273
-            ],
-            [
-              8.4260289,
-              49.9844948
-            ]
-          ]
-        ]
-      },
-      "id": "way/1376689128"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "way/1377779427",
-        "building": "roof",
-        "layer": "1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4245374,
-              49.9853006
-            ],
-            [
-              8.4245591,
-              49.9852443
-            ],
-            [
-              8.4245817,
-              49.9852478
-            ],
-            [
-              8.4246034,
-              49.9852512
-            ],
-            [
-              8.4245824,
-              49.9853078
-            ],
-            [
-              8.4245374,
-              49.9853006
-            ]
-          ]
-        ]
-      },
-      "id": "way/1377779427"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "way/1377779428",
-        "building": "roof",
-        "layer": "1"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              8.4244435,
-              49.9855496
-            ],
-            [
-              8.4244677,
-              49.9854866
-            ],
-            [
-              8.4245113,
-              49.9854935
-            ],
-            [
-              8.4244869,
-              49.9855564
-            ],
-            [
-              8.4244435,
-              49.9855496
-            ]
-          ]
-        ]
-      },
-      "id": "way/1377779428"
     }
   ]
 }

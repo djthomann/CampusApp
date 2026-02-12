@@ -45,10 +45,19 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
+import org.maplibre.compose.expressions.ast.StringLiteral
+import org.maplibre.compose.expressions.dsl.Feature.get
+import org.maplibre.compose.expressions.dsl.Feature.id
+import org.maplibre.compose.expressions.dsl.condition
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.expressions.dsl.eq
+import org.maplibre.compose.expressions.dsl.get
 import org.maplibre.compose.expressions.dsl.format
 import org.maplibre.compose.expressions.dsl.image
+import org.maplibre.compose.expressions.dsl.nil
 import org.maplibre.compose.expressions.dsl.offset
+import org.maplibre.compose.expressions.dsl.switch
+import org.maplibre.compose.expressions.value.StringValue
 import org.maplibre.compose.layers.FillExtrusionLayer
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.location.DesiredAccuracy
@@ -67,6 +76,7 @@ import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.Geometry
 import org.maplibre.spatialk.geojson.Point
+import org.maplibre.spatialk.geojson.Polygon
 import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.seconds
 
@@ -126,27 +136,44 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
 
     LaunchedEffect(variant) {
         jsonString = Res
-            .readBytes("files/liberty-$variant.json")
+            .readBytes("files/map-themes/liberty-$variant.json")
             .decodeToString()
-        print(variant)
+        // print(variant)
     }
 
     LaunchedEffect(selectedFeature) {
-        selectedFeature?.let {
-            val point = it.geometry as Point
-            cameraState.animateTo(CameraPosition(
-                target = Position(point.longitude, point.latitude),
-                zoom = 18.0,
-                tilt = 45.0,
-                bearing = 0.0
+        selectedFeature?.let { feature ->
+            val targetPosition = when (val geometry = feature.geometry) {
+                is Point -> {
+                    Position(geometry.longitude, geometry.latitude)
+                }
+                is Polygon -> {
+                    val points = geometry.coordinates.firstOrNull() ?: emptyList()
+                    if (points.isNotEmpty()) {
+                        val avgLat = points.map { it.latitude }.average()
+                        val avgLon = points.map { it.longitude }.average()
+                        Position(avgLon, avgLat)
+                    } else null
+                }
+                else -> null
+            }
+
+            targetPosition?.let { pos ->
+                cameraState.animateTo(
+                    CameraPosition(
+                        target = pos,
+                        zoom = 18.0,
+                        tilt = 45.0,
+                        bearing = 0.0
+                    )
                 )
-            )
+            }
         }
     }
 
     val mapOptions = MapOptions(
         renderOptions = RenderOptions.Standard,
-        gestureOptions = if(selectedFeature != null) GestureOptions.AllDisabled else GestureOptions.Standard,
+        gestureOptions = GestureOptions.Standard,
         ornamentOptions = OrnamentOptions(
             isCompassEnabled = true,
             isLogoEnabled = true,
@@ -174,27 +201,14 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
                     )
                 }
 
-                val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/campus-buildings.geojson")))
-                val marker = painterResource(Res.drawable.pin_green)
-
-                campuses.forEach { campus -> CampusLayers(campus) }
-
-                /* Include for other campuses aswell */
-                SymbolLayer(
-                    id = "building-points",
-                    source = campusBuildings,
-                    onClick = { features ->
-                        selectedFeature = features.firstOrNull()
-                        ClickResult.Consume
-                    },
-                    iconImage = image(marker, size = DpSize(20.dp, 30.dp)),
-                    textField = format(),
-                    textColor = const(MaterialTheme.colorScheme.onBackground),
-                    textOffset = offset(0.em, 0.6.em),
-                )
-
-
-
+                campuses.forEach { campus ->
+                    CampusLayers(campus, selectedFeature, onClick = {
+                            features ->
+                            selectedFeature = features.firstOrNull()
+                            ClickResult.Consume
+                        }
+                    )
+                }
             }
         }
 
@@ -251,15 +265,28 @@ fun FeatureCard(onDismiss: () -> Unit, feature: Feature<Geometry, JsonObject?>) 
 }
 
 @Composable
-fun CampusLayers(campus: Campus) {
+fun CampusLayers(campus: Campus, selectedFeature: Feature<Geometry, JsonObject?>?, onClick: (List<Feature<Geometry, JsonObject?>>) -> Unit) {
 
-    val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/${campus.jsonPath}")))
+    val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/campus-geodata/${campus.jsonPath}")))
+    val selectedFeatureId = selectedFeature?.properties?.get("@id")?.jsonPrimitive?.content
 
     FillExtrusionLayer(
         id = "buildings-3d-${campus.name}",
         source = campusBuildings,
+        onClick = { features ->
+            onClick(features)
+            ClickResult.Consume
+        },
         height = const(10.0f),
-        color = const(MaterialTheme.colorScheme.secondary),
+        color = switch(
+            condition(
+                test = id<StringValue>().cast<StringValue>() eq const(selectedFeatureId ?: "").cast<StringValue>(),
+                output = const(Color.Green)
+            ),
+            fallback = const(MaterialTheme.colorScheme.secondary)
+        ),
         opacity = const(0.5f)
     )
+
+
 }
