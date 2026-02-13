@@ -4,6 +4,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import hsrm.mi.campusapp.data.persistence.building.BuildingEntity
+import hsrm.mi.campusapp.domain.model.Course
+import hsrm.mi.campusapp.domain.model.CourseType
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 
 @Entity(
@@ -16,6 +20,7 @@ import kotlinx.serialization.Serializable
         )
     ]
 )
+
 @Serializable
 data class CourseEntity(
     @PrimaryKey(autoGenerate = true)

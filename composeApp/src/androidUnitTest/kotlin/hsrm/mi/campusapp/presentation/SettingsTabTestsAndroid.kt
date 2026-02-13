@@ -20,6 +20,10 @@ import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.domain.service.IStopService
+import hsrm.mi.campusapp.domain.service.TestCampusService
+import hsrm.mi.campusapp.domain.service.TestCanteenService
+import hsrm.mi.campusapp.domain.service.TestMenuService
+import hsrm.mi.campusapp.domain.service.TestStopService
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.settings.SettingsTab
 import kotlinx.coroutines.CoroutineScope

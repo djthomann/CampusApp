@@ -1,10 +1,9 @@
-package hsrm.mi.campusapp.presentation
+package hsrm.mi.campusapp.domain.service
 
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Dish
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.SideDishType
-import hsrm.mi.campusapp.domain.service.IMenuService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 

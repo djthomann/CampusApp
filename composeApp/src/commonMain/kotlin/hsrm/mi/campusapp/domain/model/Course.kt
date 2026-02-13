@@ -1,6 +1,9 @@
 package hsrm.mi.campusapp.domain.model
 
+import hsrm.mi.campusapp.data.persistence.building.BuildingEntity
 import hsrm.mi.campusapp.data.persistence.course.CourseEntity
+import hsrm.mi.campusapp.data.persistence.course.CourseWithBuilding
+import hsrm.mi.campusapp.presentation.tabs.schedule.CourseEntry
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
@@ -25,6 +28,13 @@ fun Course.toEntity(): CourseEntity {
         room = room,
         courseType = courseType.name,
         buildingId = building.id
+    )
+}
+
+fun Course.toEntityWithRelation(): CourseWithBuilding {
+    return CourseWithBuilding(
+        course = toEntity(),
+        building = building.toEntity()
     )
 }
 

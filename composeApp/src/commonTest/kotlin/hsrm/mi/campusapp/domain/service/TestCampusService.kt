@@ -1,8 +1,7 @@
-package hsrm.mi.campusapp.presentation
+package hsrm.mi.campusapp.domain.service
 
 import hsrm.mi.campusapp.data.persistence.campus.CampusEntity
 import hsrm.mi.campusapp.domain.model.Campus
-import hsrm.mi.campusapp.domain.service.ICampusService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.maplibre.spatialk.geojson.Position

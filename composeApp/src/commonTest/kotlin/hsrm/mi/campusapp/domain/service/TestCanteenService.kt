@@ -1,7 +1,6 @@
-package hsrm.mi.campusapp.presentation
+package hsrm.mi.campusapp.domain.service
 
 import hsrm.mi.campusapp.domain.model.Canteen
-import hsrm.mi.campusapp.domain.service.ICanteenService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.maplibre.spatialk.geojson.Position
