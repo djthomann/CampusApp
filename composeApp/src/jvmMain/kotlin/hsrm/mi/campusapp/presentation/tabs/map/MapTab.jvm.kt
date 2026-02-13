@@ -14,16 +14,15 @@ import campusapp.composeapp.generated.resources.Res
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import dev.datlag.kcef.KCEF
-import hsrm.mi.campusapp.presentation.state.MapState
 import java.io.File
 
 
 @Composable
-actual fun MapView(state: MapState) {
+actual fun MapView(mapScreenModel: MapScreenModel) {
     var initialized by remember { mutableStateOf(true) }
 
     if (initialized) {
-        MainView(state) // WebView erst nach Init
+        MainView(mapScreenModel) // WebView erst nach Init
     } else {
         Text("Initializing WebView...", modifier = Modifier.fillMaxSize())
     }
@@ -34,7 +33,7 @@ actual fun MapView(state: MapState) {
 }
 
 @Composable
-fun MainView(state: MapState) {
+fun MainView(mapScreenModel: MapScreenModel) {
     var bytes by remember {
         mutableStateOf(ByteArray(0))
     }

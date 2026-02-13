@@ -54,5 +54,11 @@ fun WeatherWidget(
         Spacer(modifier = Modifier.width(12.dp))
         Text(style = MaterialTheme.typography.bodyMedium, text = "${weather.windSpeed} km/h")
         Icon(modifier = Modifier.size(16.dp), imageVector = Icons.Outlined.Air, contentDescription = "Wind Icon")
+        Spacer(modifier = Modifier.width(12.dp))
+        Icon(
+            imageVector = getWeatherIcon(weather),
+            contentDescription = "current weather",
+            modifier = Modifier.size(20.dp)
+        )
     }
 }

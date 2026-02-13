@@ -1,5 +1,6 @@
 package hsrm.mi.campusapp.presentation
 
+import hsrm.mi.campusapp.data.persistence.campus.CampusEntity
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.service.ICampusService
 import kotlinx.coroutines.flow.Flow
@@ -23,5 +24,13 @@ class TestCampusService(): ICampusService {
 
     override suspend fun getCampusByName(name: String): Campus? {
         return mockCampuses.find { it.name == name }
+    }
+
+    override suspend fun delete(entity: CampusEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteAll() {
+        TODO("Not yet implemented")
     }
 }

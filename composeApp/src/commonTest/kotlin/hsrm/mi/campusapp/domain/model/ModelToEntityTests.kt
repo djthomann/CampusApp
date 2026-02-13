@@ -1,5 +1,6 @@
 package hsrm.mi.campusapp.domain.model
 
+import hsrm.mi.campusapp.data.persistence.building.BuildingEntity
 import hsrm.mi.campusapp.data.persistence.campus.CampusEntity
 import hsrm.mi.campusapp.data.persistence.canteen.CanteenEntity
 import hsrm.mi.campusapp.data.persistence.course.CourseEntity
@@ -87,6 +88,29 @@ class ModelToEntityTests {
     }
 
     @Test
+    fun testBuildingToEntity() {
+
+        val expected = BuildingEntity(
+            id = "Test ID",
+            name = "Test Building",
+            longitude = 1.5,
+            latitude = 3.0
+        )
+
+        val model = Building(
+            id = "Test ID",
+            name = "Test Building",
+            longitude = 1.5,
+            latitude = 3.0
+        )
+
+        val actual = model.toEntity()
+
+        assertEquals(expected, actual)
+
+    }
+
+    @Test
     fun testCourseToEntity() {
 
         val expected = CourseEntity(
@@ -97,8 +121,7 @@ class ModelToEntityTests {
             lecturer = "Test Lecturer",
             room = "Room 101",
             courseType = "PRACTICAL",
-            longitude = 12.0,
-            latitude = 14.0
+            buildingId = "Test ID"
         )
 
         val model = Course(
@@ -109,7 +132,7 @@ class ModelToEntityTests {
             lecturer = "Test Lecturer",
             room = "Room 101",
             courseType = CourseType.PRACTICAL,
-            building = Position(12.0, 14.0)
+            building = Building("Test ID", "Building 1", 12.0, 14.0)
         )
 
         val actual = model.toEntity()
