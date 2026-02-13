@@ -7,8 +7,7 @@
     "lecturer": "Prof. Dr. Marion Koelle",
     "room": "D14",
     "courseType": "LECTURE",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/65045771"
   },
   {
     "name": "Human Computer Interaction",
@@ -18,8 +17,7 @@
     "lecturer": "Prof. Dr. Marion Koelle",
     "room": "D15",
     "courseType": "PRACTICAL",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/65045771"
   },
   {
     "name": "Algorithmen und Datenstrukturen",
@@ -29,19 +27,7 @@
     "lecturer": "Prof. Dr. Dirk Krechel",
     "room": "D12",
     "courseType": "LECTURE",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
-  },
-  {
-    "name": "Algorithmen und Datenstrukturen",
-    "dayOfWeek": "SATURDAY",
-    "start": "14:15",
-    "durationInMinutes": "90",
-    "lecturer": "Prof. Dr. Dirk Krechel",
-    "room": "D12",
-    "courseType": "EXTRA_CURRICULAR",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/65045771"
   },
   {
     "name": "Algorithmen und Datenstrukturen",
@@ -51,8 +37,7 @@
     "lecturer": "Prof. Dr. Dirk Krechel",
     "room": "D12",
     "courseType": "PRACTICAL",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/65045771"
   },
   {
     "name": "Angewandte Mathematik",
@@ -60,10 +45,9 @@
     "start": "10:00",
     "durationInMinutes": "90",
     "lecturer": "Prof. Dr. Schwanecke",
-    "room": "D11",
+    "room": "B101",
     "courseType": "LECTURE",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/182285616"
   },
   {
     "name": "Senatssitzung",
@@ -72,8 +56,7 @@
     "durationInMinutes": "60",
     "room": "A113",
     "courseType": "EXTRA_CURRICULAR",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/111340991"
   },
   {
     "name": "Fachschaftssitzung",
@@ -82,8 +65,7 @@
     "durationInMinutes": "60",
     "room": "A115",
     "courseType": "EXTRA_CURRICULAR",
-    "longitude": 8.21618070647615,
-    "latitude": 50.097631477365795
+    "buildingId": "way/111340991"
   },
   {
     "name": "Elektrotechnik",
@@ -92,8 +74,7 @@
     "durationInMinutes": "90",
     "room": "F2",
     "courseType": "LECTURE",
-    "longitude": 8.425203705070214,
-    "latitude": 49.98527172708337
+    "buildingId": "way/155817748"
   },
   {
     "name": "Elektrotechnik",
@@ -102,17 +83,6 @@
     "durationInMinutes": "90",
     "room": "F201",
     "courseType": "PRACTICAL",
-    "longitude": 8.425203705070214,
-    "latitude": 49.98527172708337
-  },
-  {
-    "name": "Elektrotechnik",
-    "dayOfWeek": "SUNDAY",
-    "start": "10:00",
-    "durationInMinutes": "90",
-    "room": "F201",
-    "courseType": "PRACTICAL",
-    "longitude": 8.425203705070214,
-    "latitude": 49.98527172708337
+    "buildingId": "way/155817748"
   }
 ]

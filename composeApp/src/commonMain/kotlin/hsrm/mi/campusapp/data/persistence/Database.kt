@@ -7,6 +7,8 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import campusapp.composeapp.generated.resources.Res
+import hsrm.mi.campusapp.data.persistence.building.BuildingDao
+import hsrm.mi.campusapp.data.persistence.building.BuildingEntity
 import hsrm.mi.campusapp.data.persistence.campus.CampusDao
 import hsrm.mi.campusapp.data.persistence.campus.CampusEntity
 import hsrm.mi.campusapp.data.persistence.canteen.CanteenDao
@@ -39,6 +41,7 @@ fun getRoomDatabase(
 
     // Seed Database
     scope.launch {
+        seedBuildingsFromResource(db.getBuildingDao())
         seedCampusFromResource(db.getCampusDao())
         seedStopsFromResource(db.getStopDao())
         seedCanteensFromResource(db.getCanteenDao())
@@ -117,6 +120,23 @@ suspend fun seedCanteensFromResource(dao: CanteenDao) {
     println("LOADED CANTEENS: ${dao.count()}")
 }
 
+suspend fun seedBuildingsFromResource(dao: BuildingDao) {
+
+    if (dao.count() == 0) {
+        println("SEEDING DB WITH BUILDINGS...")
+        try {
+            val jsonString = Res.readBytes("files/model/buildings.json").decodeToString()
+            val items = Json.decodeFromString<List<BuildingEntity>>(jsonString)
+            dao.insertAll(items)
+            println("SEEDING BUILDINGS FINISHED")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    println("LOADED BUILDINGS: ${dao.count()}")
+}
+
 @Database(entities = [
     CampusEntity::class,
     DishEntity::class,
@@ -124,8 +144,9 @@ suspend fun seedCanteensFromResource(dao: CanteenDao) {
     SideDishEntity::class,
     StopEntity::class,
     CanteenEntity::class,
-    CourseEntity::class
-                     ], version = 34)
+    CourseEntity::class,
+    BuildingEntity::class
+                     ], version = 35)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(
     SideDishTypeConverter::class
@@ -138,6 +159,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getCanteenDao(): CanteenDao
     abstract fun getCampusDao(): CampusDao
     abstract fun getCourseDao(): CourseDao
+
+    abstract fun getBuildingDao(): BuildingDao
 }
 
 @Suppress("KotlinNoActualForExpect")

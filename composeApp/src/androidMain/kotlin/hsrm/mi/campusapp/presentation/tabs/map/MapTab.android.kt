@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import campusapp.composeapp.generated.resources.Res
+import hsrm.mi.campusapp.domain.model.Building
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.presentation.state.AppState
@@ -95,9 +96,12 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
         mutableStateOf<Feature<Geometry, JsonObject?>?>(null)
     }
 
+    var selectedBuilding by remember {
+        mutableStateOf<Building?>(null)
+    }
+
     val campuses by koinInject<ICampusService>().getAllCampuses().collectAsStateWithLifecycle(initialValue = emptyList())
     val currentCampus by koinInject<AppState>().selectedCampus.collectAsState()
-
 
     LaunchedEffect(currentCampus) {
         val campus = currentCampus
@@ -108,8 +112,9 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
 
     LaunchedEffect(mapScreenModel.target) {
         mapScreenModel.target.value?.let { target ->
-            animateCameraStateToTarget(cameraState, target)
+            animateCameraStateToTargetBuilding(cameraState, target)
             mapScreenModel.clearTarget()
+            selectedBuilding = target
         }
     }
 
@@ -121,12 +126,17 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
     }
 
     LaunchedEffect(selectedFeature) {
+
+        if(selectedFeature == null) {
+            selectedBuilding = null
+        }
+
         selectedFeature?.let { feature ->
             val targetPosition = when (val geometry = feature.geometry) {
                 is Point -> {
                     Position(geometry.longitude, geometry.latitude)
                 }
-                is Polygon -> {
+                is Polygon -> { // TODO() Move computation to JSON source
                     val points = geometry.coordinates.firstOrNull() ?: emptyList()
                     if (points.isNotEmpty()) {
                         val avgLat = points.map { it.latitude }.average()
@@ -138,8 +148,26 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
             }
 
             targetPosition?.let { pos ->
+
+                println("TARGET: $targetPosition")
+
+                val buildingId = feature.properties?.get("@id")?.jsonPrimitive?.content
+                val buildingName = feature.properties?.get("name")?.jsonPrimitive?.content
+
+                if(buildingName != null && buildingId != null) {
+                    selectedBuilding = Building(
+                        id = buildingId,
+                        name = buildingName,
+                        longitude = pos.longitude,
+                        latitude = pos.latitude
+                    )
+                }
+
                 animateCameraStateToTarget(cameraState, pos)
+
             }
+
+
         }
     }
 
@@ -183,7 +211,7 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
                 }
 
                 campuses.forEach { campus ->
-                    CampusLayers(campus, selectedFeature,
+                    CampusLayers(campus, selectedBuilding,
                         onFeatureClick = { feature ->
                             selectedFeature = feature
                         },
@@ -196,7 +224,7 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
         }
 
         AnimatedVisibility(
-            visible = selectedFeature != null,
+            visible = selectedBuilding != null,
             enter = slideInVertically(
                 initialOffsetY = { fullHeight -> fullHeight },
                 animationSpec = tween(durationMillis = 300)
@@ -207,10 +235,10 @@ actual fun MapView(mapScreenModel: MapScreenModel) {
             ) + fadeOut(animationSpec = tween(300)),
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-            selectedFeature?.let { feature ->
-                FeatureCard(
-                    onDismiss = { selectedFeature = null },
-                    feature = feature
+            selectedBuilding?.let { building ->
+                BuildingCard(
+                    onDismiss = { selectedBuilding = null },
+                    building = building
                 )
             }
         }
@@ -223,9 +251,12 @@ private suspend fun animateCameraStateToTarget(cameraState: CameraState, target:
         target = target
     ))
 }
+private suspend fun animateCameraStateToTargetBuilding(cameraState: CameraState, building: Building) {
+    animateCameraStateToTarget(cameraState, Position(building.longitude, building.latitude))
+}
 
 @Composable
-fun FeatureCard(feature: Feature<Geometry, JsonObject?>, onDismiss: () -> Unit) {
+fun BuildingCard(building: Building, onDismiss: () -> Unit) {
 
     Card(
         modifier = Modifier.padding(10.dp),
@@ -241,7 +272,7 @@ fun FeatureCard(feature: Feature<Geometry, JsonObject?>, onDismiss: () -> Unit) 
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            feature.properties?.get("name")?.let { Text(it.jsonPrimitive.content, color = MaterialTheme.colorScheme.onSecondary) }
+            Text(building.name, color = MaterialTheme.colorScheme.onSecondary)
             IconButton(onClick = { onDismiss() }) {
                 Icon(
                     imageVector = Icons.Filled.Clear,
@@ -256,13 +287,12 @@ fun FeatureCard(feature: Feature<Geometry, JsonObject?>, onDismiss: () -> Unit) 
 @Composable
 fun CampusLayers(
     campus: Campus,
-    selectedFeature: Feature<Geometry, JsonObject?>?,
+    selectedBuilding: Building?,
     onFeatureClick: (Feature<Geometry, JsonObject?>) -> Unit,
     clearFeature: () -> Unit
 ) {
 
     val campusBuildings = rememberGeoJsonSource(GeoJsonData.Uri(Res.getUri("files/campus-geodata/${campus.jsonPath}")))
-    val selectedFeatureId = selectedFeature?.properties?.get("@id")?.jsonPrimitive?.content
 
     FillExtrusionLayer(
         id = "buildings-3d-${campus.name}",
@@ -281,7 +311,7 @@ fun CampusLayers(
         height = const(10.0f),
         color = switch(
             condition(
-                test = id<StringValue>().cast<StringValue>() eq const(selectedFeatureId ?: "").cast<StringValue>(),
+                test = id<StringValue>().cast<StringValue>() eq const(selectedBuilding?.id ?: "").cast<StringValue>(),
                 output = const(Color.Green)
             ),
             fallback = const(MaterialTheme.colorScheme.secondary)

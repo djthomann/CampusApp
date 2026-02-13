@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.rounded.Apartment
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Start
 import androidx.compose.material3.Icon
@@ -44,7 +45,7 @@ fun CourseEntry(course: Course) {
                 .width(900.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .clickable {
-                    MapTab.moveToPosition(course.building)
+                    MapTab.focusBuilding(course.building)
                     tabNavigator.current = MapTab
                 }
         ) {
@@ -106,6 +107,21 @@ fun CourseEntry(course: Course) {
                             imageVector = Icons.Rounded.Schedule,
                             contentDescription = "Duration Icon"
                         )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(0.dp, 12.dp, 0.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Apartment,
+                            contentDescription = "Course Building"
+                        )
+                        Text(course.building.name, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

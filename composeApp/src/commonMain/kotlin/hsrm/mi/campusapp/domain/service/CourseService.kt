@@ -16,7 +16,7 @@ class CourseService(
     private val dao: CourseDao
 ): ICourseService {
 
-    private val allCourseFlow = dao.getAllAsFlow()
+    private val allCourseFlow = dao.getAllWithBuildingAsFlow()
         .map { entities -> entities.map { it.toDomain() }}
         .stateIn(
             scope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
@@ -25,7 +25,7 @@ class CourseService(
         )
 
     override fun getAllCourses(): Flow<List<Course>> {
-        return dao.getAllAsFlow().map { entities -> entities.map { it.toDomain() } }
+        return dao.getAllWithBuildingAsFlow().map { entities -> entities.map { it.toDomain() } }
     }
 
     override fun getCoursesForDayOfWeek(dayOfWeek: DayOfWeek): Flow<List<Course>> {

@@ -1,0 +1,142 @@
+[
+  {
+    "id": "way/65045771",
+    "name": "D-Gebäude",
+    "longitude": 8.2162,
+    "latitude": 50.0976
+  },
+  {
+    "id": "way/182285618",
+    "name": "B1-Gebäude",
+    "longitude": 8.2159,
+    "latitude": 50.0962
+  },
+  {
+    "id": "way/182285616",
+    "name": "B2-Gebäude",
+    "longitude": 8.2159,
+    "latitude": 50.0957
+  },
+  {
+    "id": "relation/6972346",
+    "name": "C-Gebäude",
+    "longitude": 8.2170,
+    "latitude": 50.0968
+  },
+  {
+    "id": "way/71859476",
+    "name": "Restaurant Camera",
+    "longitude": 8.2167,
+    "latitude": 50.0978
+  },
+  {
+    "id": "way/182285606",
+    "name": "FII-Gebäude",
+    "longitude": 8.2162,
+    "latitude": 50.0982
+  },
+  {
+    "id": "relation/6972347",
+    "name": "F-Gebäude",
+    "longitude": 8.2158,
+    "latitude": 50.0981
+  },
+  {
+    "id": "way/182285605",
+    "name": "FIII-Gebäude",
+    "longitude": 8.2160,
+    "latitude": 50.0985
+  },
+  {
+    "id": "way/65045730",
+    "name": "Bibliothek",
+    "longitude": 8.2159,
+    "latitude": 50.0982
+  },
+
+  {
+    "id": "way/111340981",
+    "name": "E-Gebäude",
+    "longitude": 8.2156,
+    "latitude": 50.0802
+  },
+  {
+    "id": "way/111340989",
+    "name": "B-Gebäude",
+    "longitude": 8.2175,
+    "latitude": 50.0806
+  },
+  {
+    "id": "way/111340991",
+    "name": "A-Gebäude",
+    "longitude": 8.2170,
+    "latitude": 50.0810
+  },
+  {
+    "id": "way/392374626",
+    "name": "G-Gebäude",
+    "longitude": 8.2180,
+    "latitude": 50.0810
+  },
+  {
+    "id": "way/983605549",
+    "name": "L-Gebäude",
+    "longitude": 8.2169,
+    "latitude": 50.0795
+  },
+  {
+    "id": "way/1434538113",
+    "name": "C-Gebäude",
+    "longitude": 8.2159,
+    "latitude": 50.0806
+  },
+  {
+    "id": "way/1434538115",
+    "name": "D-Gebäude",
+    "longitude": 8.2165,
+    "latitude": 50.0801
+  },
+
+  {
+    "id": "relation/1875933",
+    "name": "B-Gebäude",
+    "longitude": 8.4256,
+    "latitude": 49.9848
+  },
+  {
+    "id": "way/24523108",
+    "name": "A-Gebäude",
+    "longitude": 8.4240,
+    "latitude": 49.9853
+  },
+  {
+    "id": "way/155817748",
+    "name": "F-Gebäude + Mensa",
+    "longitude": 8.4251,
+    "latitude": 49.9852
+  },
+  {
+    "id": "way/155817750",
+    "name": "E-Gebäude",
+    "longitude": 8.4242,
+    "latitude": 49.9845
+  },
+  {
+    "id": "way/249113993",
+    "name": "C-Gebäude",
+    "longitude": 8.4243,
+    "latitude": 49.9842
+  },
+  {
+    "id": "way/397176780",
+    "name": "G-Gebäude",
+    "longitude": 8.4241,
+    "latitude": 49.9859
+  },
+  {
+    "id": "way/388252665",
+    "name": "D-Gebäude",
+    "longitude": 8.4246,
+    "latitude": 49.9854
+  }
+]

@@ -16,12 +16,12 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.map_tab_title
+import hsrm.mi.campusapp.domain.model.Building
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
-import org.maplibre.spatialk.geojson.Position
 
 object MapTab: CampusTab {
     private fun readResolve(): Any = MapTab
@@ -30,10 +30,10 @@ object MapTab: CampusTab {
     override val activeIcon: ImageVector = Icons.Filled.Map
     override val inactiveIcon: ImageVector = Icons.Outlined.Map
 
-    private val pendingPosition = mutableStateOf<Position?>(null)
+    private val pendingBuilding = mutableStateOf<Building?>(null)
 
-    fun moveToPosition(position: Position) {
-        pendingPosition.value = position
+    fun focusBuilding(building: Building) {
+        pendingBuilding.value = building
     }
 
     override val options: TabOptions
@@ -56,10 +56,10 @@ object MapTab: CampusTab {
         val appState = koinInject<AppState>()
         val screenModel = rememberScreenModel { MapScreenModel(appState) }
 
-        LaunchedEffect(pendingPosition.value) {
-            pendingPosition.value?.let { position ->
+        LaunchedEffect(pendingBuilding.value) {
+            pendingBuilding.value?.let { position ->
                 screenModel.updateTarget(position)
-                pendingPosition.value = null // Zurücksetzen, nachdem geladen wurde
+                pendingBuilding.value = null // Zurücksetzen, nachdem geladen wurde
             }
         }
 

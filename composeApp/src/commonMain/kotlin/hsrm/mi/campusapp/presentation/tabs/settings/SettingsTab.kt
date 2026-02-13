@@ -36,6 +36,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import campusapp.composeapp.generated.resources.Res
 import campusapp.composeapp.generated.resources.settings
+import hsrm.mi.campusapp.domain.service.IBuildingService
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.IMenuService
@@ -77,7 +78,8 @@ object SettingsTab: CampusTab {
         val canteenService = koinInject<ICanteenService>()
         val campusService = koinInject<ICampusService>()
         val menuService = koinInject<IMenuService>()
-        val screenModel = rememberScreenModel { SettingsScreenModel(appState, canteenService, campusService, menuService) }
+        val buildingService = koinInject<IBuildingService>()
+        val screenModel = rememberScreenModel { SettingsScreenModel(appState, canteenService, campusService, menuService, buildingService) }
         val tabNavigator = LocalTabNavigator.current
 
         val canteens by screenModel.canteens.collectAsStateWithLifecycle()

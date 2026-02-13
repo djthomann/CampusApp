@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,8 +19,16 @@ interface CourseDao {
     @Query("SELECT * FROM CourseEntity WHERE name = :name")
     suspend fun getByName(name: String): CourseEntity?
 
+    @Transaction
+    @Query("SELECT * FROM CourseEntity WHERE name = :name")
+    suspend fun getCourseWithBuilding(name: String): CourseWithBuilding?
+
     @Query("SELECT * FROM CourseEntity")
     fun getAllAsFlow(): Flow<List<CourseEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM CourseEntity")
+    fun getAllWithBuildingAsFlow(): Flow<List<CourseWithBuilding>>
 
     @Delete
     suspend fun delete(dish: CourseEntity)

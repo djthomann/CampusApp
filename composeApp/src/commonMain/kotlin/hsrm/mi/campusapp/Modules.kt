@@ -1,9 +1,11 @@
 package hsrm.mi.campusapp
 
 import hsrm.mi.campusapp.data.persistence.AppDatabase
+import hsrm.mi.campusapp.domain.service.BuildingService
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.domain.service.CourseService
+import hsrm.mi.campusapp.domain.service.IBuildingService
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.ICourseService
@@ -29,6 +31,9 @@ val appStateModule = module {
 }
 
 val serviceModule = module {
+    single {get<AppDatabase>().getBuildingDao() } // BuildingDao
+    single<IBuildingService> { BuildingService(get()) } // BuildingService
+
     single { get<AppDatabase>().getCampusDao() } // CampusDao
     single<ICampusService> { CampusService(dao = get()) } // CampusService
 

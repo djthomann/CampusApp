@@ -3,7 +3,6 @@ package hsrm.mi.campusapp.domain.model
 import hsrm.mi.campusapp.data.persistence.course.CourseEntity
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
-import org.maplibre.spatialk.geojson.Position
 
 data class Course(
     val name: String,
@@ -13,7 +12,7 @@ data class Course(
     val lecturer: String? = null,
     val room: String,
     val courseType: CourseType,
-    val building: Position
+    val building: Building
 )
 
 fun Course.toEntity(): CourseEntity {
@@ -25,8 +24,7 @@ fun Course.toEntity(): CourseEntity {
         lecturer = lecturer,
         room = room,
         courseType = courseType.name,
-        longitude = building.longitude,
-        latitude = building.latitude
+        buildingId = building.id
     )
 }
 

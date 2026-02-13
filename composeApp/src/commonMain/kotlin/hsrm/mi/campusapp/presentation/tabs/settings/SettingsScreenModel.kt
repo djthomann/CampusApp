@@ -8,6 +8,7 @@ import hsrm.mi.campusapp.data.api.rmv.StopLocationDTO
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Canteen
 import hsrm.mi.campusapp.domain.model.Stop
+import hsrm.mi.campusapp.domain.service.IBuildingService
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.IMenuService
@@ -21,7 +22,8 @@ class SettingsScreenModel(
     private val appState: AppState,
     private val canteenService: ICanteenService,
     private val campusService: ICampusService,
-    private val menuService: IMenuService
+    private val menuService: IMenuService,
+    private val buildingService: IBuildingService
 ): ScreenModel {
 
     val canteens: StateFlow<List<Canteen>> = canteenService.getAllCanteens().stateIn(
@@ -63,6 +65,7 @@ class SettingsScreenModel(
             // TODO() Actually clear all Database tables
             menuService.deleteAllMenus()
             campusService.deleteAll()
+            buildingService.deleteAll()
         }
     }
 
