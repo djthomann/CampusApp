@@ -146,7 +146,7 @@ object HomeTab: CampusTab {
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             ChooseText()
-                            AnimatedBrushText("Campus")
+                            AnimatedBrushText(text = "Campus")
                             Spacer(modifier = Modifier.height(20.dp))
                         }
                     }
@@ -173,18 +173,19 @@ object HomeTab: CampusTab {
             ) {
 
                 Spacer(modifier = Modifier.height(20.dp))
+                // AnimatedBrushText(text = currentCampus!!.name, fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                 CampusName(currentCampus!!)
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 WeatherInfo(screenModel.currentWeather.value)
+                Spacer(modifier = Modifier.height(35.dp))
                 // Spacer(modifier = Modifier.height(20.dp))
                 // DepartureInfo(stops, tabNavigator)
-                Spacer(modifier = Modifier.height(20.dp))
                 ScheduleInfo(nextCourse, tabNavigator) // TODO() Probably migrate to ScreenModel
                 nextCourse?.let {
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
                     ArrivalInfo(screenModel.arrivalTrip.value, screenModel.isLoadingArrivalTrip.value)
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(30.dp))
                 MenuInfo(currentCanteen, todaysMenu)
 
             }
@@ -195,10 +196,11 @@ object HomeTab: CampusTab {
 @Composable
 fun CampusName(campus: Campus, modifier: Modifier = Modifier) {
     Text(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         style = MaterialTheme.typography.headlineLarge,
         text = campus.name,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onBackground,
+        // textAlign = TextAlign.Center
     )
 }
 

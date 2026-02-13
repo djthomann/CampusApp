@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -18,11 +19,12 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
 /* https://medium.com/androiddevelopers/animating-brush-text-coloring-in-compose-%EF%B8%8F-26ae99d9b402 */
 @Composable
-fun AnimatedBrushText(text: String) {
+fun AnimatedBrushText(modifier: Modifier = Modifier, text: String, fontSize: TextUnit = 60.sp, fontWeight: FontWeight = FontWeight.ExtraBold,) {
     val infiniteTransition = rememberInfiniteTransition()
 
     val offset by infiniteTransition.animateFloat(
@@ -55,8 +57,8 @@ fun AnimatedBrushText(text: String) {
     Text(
         text = text,
         style = TextStyle(
-            fontSize = 60.sp,
-            fontWeight = FontWeight.ExtraBold,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
             brush = brush
         )
     )

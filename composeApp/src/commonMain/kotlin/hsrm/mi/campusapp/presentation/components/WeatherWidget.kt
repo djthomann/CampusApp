@@ -2,7 +2,6 @@ package hsrm.mi.campusapp.presentation.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.outlined.Thermostat
 import androidx.compose.material.icons.outlined.WbCloudy
 import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,14 +47,12 @@ fun WeatherWidget(
     weather: Weather
 ) {
     Row(
-        modifier = modifier.padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        Text("${weather.temperature.toInt()} °C")
-        Icon(modifier = Modifier.size(24.dp),imageVector = Icons.Outlined.Thermostat, contentDescription = "Current Temperature Icon")
+        Icon(modifier = Modifier.size(16.dp),imageVector = Icons.Outlined.Thermostat, contentDescription = "Current Temperature Icon")
+        Text( style = MaterialTheme.typography.bodyMedium, text = "${weather.temperature.toInt()} °C")
         Spacer(modifier = Modifier.width(12.dp))
-        Text("${weather.windSpeed} km/h")
-        Icon(modifier = Modifier.size(24.dp), imageVector = Icons.Outlined.Air, contentDescription = "Wind Icon")
+        Text(style = MaterialTheme.typography.bodyMedium, text = "${weather.windSpeed} km/h")
+        Icon(modifier = Modifier.size(16.dp), imageVector = Icons.Outlined.Air, contentDescription = "Wind Icon")
     }
 }

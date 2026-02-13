@@ -1,12 +1,21 @@
 package hsrm.mi.campusapp.presentation.tabs.home.info
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ModeOfTravel
+import androidx.compose.material.icons.filled.ModeOfTravel
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,28 +40,57 @@ fun ArrivalInfo(trip: Trip?, isLoading: Boolean) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Icon(
-            imageVector = Icons.Outlined.ModeOfTravel,
-            contentDescription = "arrive on time"
+            imageVector = Icons.Filled.ModeOfTravel,
+            contentDescription = "arrive on time",
+            modifier = Modifier.size(30.dp)
         )
         Text(stringResource(Res.string.arrive_on_time))
         Spacer(modifier = Modifier.width(12.dp))
     }
+    HorizontalDivider(modifier = Modifier.padding(horizontal = 0.dp, vertical = 10.dp), thickness = 1.dp)
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // TODO() Make string resources
         if(homeStop != null) {
-            if(trip != null) {
+
+            AnimatedVisibility(
+                visible = (trip != null),
+                enter = slideInVertically(
+                    initialOffsetY = { -it }
+                ) + fadeIn(),
+                exit = slideOutVertically(
+                    targetOffsetY = { -it }
+                ) + fadeOut()
+            ) {
                 Column {
-                    Text(style = MaterialTheme.typography.bodyMedium, text = "Von ${trip.startTime} Bis ${trip.arrivalTime}")
-                    trip.legs.filter { leg -> leg.name != "Fußweg" }.forEach { leg ->
-                        Text(style = MaterialTheme.typography.bodyMedium, text = "• ${leg.name}: ${leg.origin} → ${leg.destination} ")
+                    Text(
+                        style = MaterialTheme.typography.bodyMedium,
+                        text = "Von ${trip?.startTime} Bis ${trip?.arrivalTime}"
+                    )
+                    trip?.legs?.filter { it.name != "Fußweg" }?.forEach { leg ->
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = "• ${leg.name}:"
+                        )
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = "\t\tVon: ${leg.origin}"
+                        )
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = "\t\tNach: ${leg.destination}"
+                        )
                     }
                 }
-            } else {
+            }
+
+            if(trip == null) {
+
                 if(isLoading) {
                     Text(text = "Lade Verbindungen...", style = MaterialTheme.typography.bodyMedium)
                 } else {

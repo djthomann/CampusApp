@@ -106,6 +106,7 @@ fun DepartureEntry(departure: Departure, currentStop: Stop, selectedDepartureEnt
 
     Column(
         modifier = Modifier
+            // .shadow(5.dp, RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
             .fillMaxWidth()
             .background(backgroundColor)

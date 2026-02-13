@@ -41,6 +41,7 @@ fun CourseEntry(course: Course) {
     ) {
         Column(
             modifier = Modifier
+                // .shadow(10.dp, RoundedCornerShape(8.dp))
                 .clip(RoundedCornerShape(8.dp))
                 .width(900.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
