@@ -10,11 +10,13 @@ import hsrm.mi.campusapp.data.api.rmv.RmvAPI
 import hsrm.mi.campusapp.data.api.rmv.toDomain
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.model.Course
+import hsrm.mi.campusapp.domain.model.Exam
 import hsrm.mi.campusapp.domain.model.Menu
 import hsrm.mi.campusapp.domain.model.Stop
 import hsrm.mi.campusapp.domain.model.Trip
 import hsrm.mi.campusapp.domain.model.Weather
 import hsrm.mi.campusapp.domain.service.ICourseService
+import hsrm.mi.campusapp.domain.service.IExamService
 import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.presentation.state.AppState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +35,8 @@ import kotlin.time.ExperimentalTime
 class HomeScreenModel(
     private val appState: AppState,
     private val menuService: IMenuService,
-    private val courseService: ICourseService
+    private val courseService: ICourseService,
+    private val examService: IExamService
 ): ScreenModel {
 
     val currentWeather = mutableStateOf<Weather?>(null)
@@ -68,6 +71,13 @@ class HomeScreenModel(
             courses.minByOrNull { it.start }
         }
         .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val unenrolledExams: StateFlow<List<Exam>> = examService.getAllExams()
+        .map { exams ->
+            exams.filter { !it.studentEnrolled }
+        }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
 
     fun updateCampus(campus: Campus?) {
         appState.updateCampus(campus, screenModelScope)

@@ -44,12 +44,14 @@ import campusapp.composeapp.generated.resources.home
 import hsrm.mi.campusapp.domain.model.Campus
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICourseService
+import hsrm.mi.campusapp.domain.service.IExamService
 import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.presentation.components.CampusButton
 import hsrm.mi.campusapp.presentation.state.AppState
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import hsrm.mi.campusapp.presentation.tabs.home.info.ArrivalInfo
+import hsrm.mi.campusapp.presentation.tabs.home.info.ExamInfo
 import hsrm.mi.campusapp.presentation.tabs.home.info.MenuInfo
 import hsrm.mi.campusapp.presentation.tabs.home.info.ScheduleInfo
 import hsrm.mi.campusapp.presentation.tabs.home.info.WeatherInfo
@@ -90,7 +92,8 @@ object HomeTab: CampusTab {
         val menuService = koinInject<IMenuService>()
         val courseService = koinInject<ICourseService>()
         val stopService = koinInject<IStopService>()
-        val screenModel = rememberScreenModel { HomeScreenModel(appState, menuService, courseService) }
+        val examService = koinInject<IExamService>()
+        val screenModel = rememberScreenModel { HomeScreenModel(appState, menuService, courseService, examService) }
 
         val tabNavigator = LocalTabNavigator.current
 
@@ -110,6 +113,7 @@ object HomeTab: CampusTab {
         val nextCourse by screenModel.earliestCourse.collectAsStateWithLifecycle()
         val todaysMenu by screenModel.todaysMeal.collectAsStateWithLifecycle()
         val homeStop by appState.homeStop.collectAsState()
+        val exams by screenModel.unenrolledExams.collectAsStateWithLifecycle()
 
         LaunchedEffect(nextCourse, homeStop) {
             nextCourse?.let { course ->
@@ -177,6 +181,10 @@ object HomeTab: CampusTab {
                 CampusName(currentCampus!!)
                 Spacer(modifier = Modifier.height(10.dp))
                 WeatherInfo(screenModel.currentWeather.value)
+                if(exams.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(35.dp))
+                    ExamInfo(exams)
+                }
                 Spacer(modifier = Modifier.height(35.dp))
                 // Spacer(modifier = Modifier.height(20.dp))
                 // DepartureInfo(stops, tabNavigator)

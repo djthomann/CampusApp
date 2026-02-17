@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.rounded.Apartment
 import androidx.compose.material.icons.rounded.Schedule
@@ -23,25 +24,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import hsrm.mi.campusapp.domain.model.Course
+import hsrm.mi.campusapp.domain.model.Exam
 import hsrm.mi.campusapp.presentation.tabs.map.MapTab
 import org.jetbrains.compose.resources.stringResource
 
-
 @Composable
-fun CourseEntry(course: Course) {
-
+fun ExamEntry(exam: Exam) {
     ScheduleEntry(
-        name = course.name,
-        subtitle = course.lecturer,
-        entryType = stringResource(course.courseType.nameResource),
-        entryTypeIcon = course.courseType.icon,
-        start = course.start.toString(),
-        duration = course.durationInMinutes,
-        highlightColor = course.courseType.color,
-        building = course.building,
-        room = course.room
+        name = exam.name,
+        subtitle = if(exam.studentEnrolled) "Angemeldet" else "Nicht Angemeldet!",
+        entryType = "Klausur",
+        entryTypeIcon = Icons.Default.Quiz,
+        start = exam.time.toString(),
+        duration = 90,
+        highlightColor = Color.Black,
+        building = exam.building,
+        room = exam.room
     )
 }

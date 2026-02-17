@@ -5,10 +5,12 @@ import hsrm.mi.campusapp.domain.service.BuildingService
 import hsrm.mi.campusapp.domain.service.CampusService
 import hsrm.mi.campusapp.domain.service.CanteenService
 import hsrm.mi.campusapp.domain.service.CourseService
+import hsrm.mi.campusapp.domain.service.ExamService
 import hsrm.mi.campusapp.domain.service.IBuildingService
 import hsrm.mi.campusapp.domain.service.ICampusService
 import hsrm.mi.campusapp.domain.service.ICanteenService
 import hsrm.mi.campusapp.domain.service.ICourseService
+import hsrm.mi.campusapp.domain.service.IExamService
 import hsrm.mi.campusapp.domain.service.IMenuService
 import hsrm.mi.campusapp.domain.service.IStopService
 import hsrm.mi.campusapp.domain.service.MenuService
@@ -42,6 +44,9 @@ val serviceModule = module {
 
     single { get<AppDatabase>().getCourseDao() } // CourseDao
     single<ICourseService> { CourseService(dao = get()) } // CourseService
+
+    single { get<AppDatabase>().getExamDao() } // ExamDao
+    single<IExamService> { ExamService(dao = get()) } // ExamService
 
     single { get<AppDatabase>().getMenuDao() } // MenuDao
     single { get<AppDatabase>().getDishDao() } // DishDao

@@ -50,7 +50,9 @@ import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.minusDays
 import com.kizitonwose.calendar.core.plusDays
 import hsrm.mi.campusapp.domain.model.Course
+import hsrm.mi.campusapp.domain.model.Exam
 import hsrm.mi.campusapp.domain.service.ICourseService
+import hsrm.mi.campusapp.domain.service.IExamService
 import hsrm.mi.campusapp.presentation.tabs.CampusTab
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
@@ -85,10 +87,12 @@ object ScheduleTab: CampusTab {
     @Composable
     override fun Content() {
         val courseService = koinInject<ICourseService>()
-        val screenModel = rememberScreenModel { ScheduleScreenModel(courseService) }
+        val examService = koinInject<IExamService>()
+        val screenModel = rememberScreenModel { ScheduleScreenModel(courseService, examService) }
 
         val courses by screenModel.todaysCourses.collectAsStateWithLifecycle()
         val selectedDay by screenModel.selectedDay.collectAsStateWithLifecycle()
+        val exams by screenModel.todaysExams.collectAsStateWithLifecycle()
 
         val state = rememberWeekCalendarState(
             startDate = screenModel.currentDate.minusDays(100),
@@ -132,7 +136,7 @@ object ScheduleTab: CampusTab {
                 }
             )
             HorizontalDivider(thickness = 1.dp)
-            Schedule(courses)
+            Schedule(courses, exams)
         }
     }
 }
@@ -156,7 +160,7 @@ fun DayOfWeek.toSingleLetter(): String = when (this) {
 }
 
 @Composable
-private fun Schedule(courses: List<Course>) {
+private fun Schedule(courses: List<Course>, exams: List<Exam>) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -164,15 +168,24 @@ private fun Schedule(courses: List<Course>) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        if (courses.isEmpty()) {
+        if (courses.isEmpty() && exams.isEmpty()) {
             EmptyIndicator()
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(10.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) { items(courses) {
-                    course -> CourseEntry(course)
-            } }
+            ) {
+
+                items(exams) { exam ->
+                    ExamEntry(exam)
+                }
+
+                items(courses) { course ->
+                    CourseEntry(course)
+                }
+            }
         }
     }
 

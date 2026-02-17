@@ -15,6 +15,8 @@ import hsrm.mi.campusapp.data.persistence.canteen.CanteenDao
 import hsrm.mi.campusapp.data.persistence.canteen.CanteenEntity
 import hsrm.mi.campusapp.data.persistence.course.CourseDao
 import hsrm.mi.campusapp.data.persistence.course.CourseEntity
+import hsrm.mi.campusapp.data.persistence.exam.ExamDao
+import hsrm.mi.campusapp.data.persistence.exam.ExamEntity
 import hsrm.mi.campusapp.data.persistence.menu.DishDao
 import hsrm.mi.campusapp.data.persistence.menu.DishEntity
 import hsrm.mi.campusapp.data.persistence.menu.MenuDao
@@ -46,9 +48,27 @@ fun getRoomDatabase(
         seedStopsFromResource(db.getStopDao())
         seedCanteensFromResource(db.getCanteenDao())
         seedCoursesFromResource(db.getCourseDao())
+        seedExamsFromResource(db.getExamDao())
     }
 
     return db
+}
+
+suspend fun seedExamsFromResource(dao: ExamDao) {
+
+    if (dao.count() == 0) {
+        println("SEEDING DB WITH EXAMS...")
+        try {
+            val jsonString = Res.readBytes("files/model/exams.json").decodeToString()
+            val items = Json.decodeFromString<List<ExamEntity>>(jsonString)
+            dao.insertAll(items)
+            println("SEEDING EXAMS FINISHED")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    println("LOADED EXAMS: ${dao.count()}")
 }
 
 suspend fun seedCoursesFromResource(dao: CourseDao) {
@@ -145,8 +165,9 @@ suspend fun seedBuildingsFromResource(dao: BuildingDao) {
     StopEntity::class,
     CanteenEntity::class,
     CourseEntity::class,
-    BuildingEntity::class
-                     ], version = 35)
+    BuildingEntity::class,
+    ExamEntity::class
+                     ], version = 37)
 @ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(
     SideDishTypeConverter::class
@@ -159,8 +180,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getCanteenDao(): CanteenDao
     abstract fun getCampusDao(): CampusDao
     abstract fun getCourseDao(): CourseDao
-
     abstract fun getBuildingDao(): BuildingDao
+
+    abstract fun getExamDao(): ExamDao
 }
 
 @Suppress("KotlinNoActualForExpect")
