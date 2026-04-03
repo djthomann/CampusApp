@@ -1,10 +1,12 @@
 # me@hsrm
 
-<div style="display: flex; align-items: center; gap: 8px;">
-  <img src="documentation/app_logo.png" width="60" height="60">
-  <span>me@hsrm is a multiplatform app based on compose multiplatform. It targets iOS, Android and desktop and offers many useful features
-to students at the campuses of HSRM.</span>
-</div>
+<table>
+  <tr>
+    <td>me@hsrm is a multiplatform app based on compose multiplatform. It targets iOS, Android and desktop and offers many useful features
+to students at the campuses of HSRM.</td>
+    <td><img src="documentation/app_logo.png" width="100" height="100"></td>
+  </tr>
+</table>
 
 ## Features
 
